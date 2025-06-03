@@ -1,0 +1,42 @@
+.draggable-card {
+  position: relative;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #ffffff;
+  color: #172b4d;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+  
+  &:hover {
+    background-color: #f4f5f7;
+  }
+  
+  &:active {
+    cursor: grabbing;
+    transform: scale(1.01);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.card-list {
+  padding: 1rem;
+  background-color: #f4f5f7;
+  border-radius: 4px;
+  min-height: 200px;
+}
+
+.drop-indicator {
+  pointer-events: none;
+  z-index: 1;
+  
+  &.drop-indicator-top {
+    transform: translateY(-1px);
+  }
+  
+  &.drop-indicator-bottom {
+    transform: translateY(1px);
+  }
+}

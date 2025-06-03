@@ -10,11 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.7.2",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
     "@reduxjs/toolkit": "^2.8.2",
+    "@types/react-beautiful-dnd": "^13.1.8",
+    "@vitejs/plugin-react": "^4.5.0",
+    "dnd-core": "^16.0.1",
     "react": "^19.1.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-redux": "^9.2.0",
-    "redux": "^5.0.1"
+    "react-router-dom": "^7.6.1",
+    "redux": "^5.0.1",
+    "sass": "^1.89.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

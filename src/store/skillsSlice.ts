@@ -1,205 +1,276 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import { xpToLevel } from '../utils/xpCalculations';
 
 // Define the Skill interface
 export interface Skill {
-  id: string;
-  name: string;
-  level: number;
-  xp: number;
-  targetLevel: number;
+	id: string;
+	name: string;
+	level: number;
+	xp: number;
+	targetLevel: number;
+}
+
+// Add this interface if it doesn't exist already
+export interface TrainingMethod {
+	id: string; // Add this line
+	name: string;
+	levelReq: number;
+	xpPerHour: number;
+	intensity: 'Low' | 'Medium' | 'High';
+	startLevel: number;
+	endLevel: number;
 }
 
 // Define the state structure
 interface SkillsState {
-  skills: Skill[];
-  loading: boolean;
-  error: string | null;
-  username: string;
+	skills: Skill[];
+	loading: boolean;
+	error: string | null;
+	username: string;
+	trainingMethods: Record<string, TrainingMethod[]>;
 }
 
 // Initial state for the skills
 const initialState: SkillsState = {
-  skills: [
-    { id: 'attack', name: 'Attack', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'defence', name: 'Defence', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'strength', name: 'Strength', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'hitpoints', name: 'Hitpoints', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'ranged', name: 'Ranged', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'prayer', name: 'Prayer', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'magic', name: 'Magic', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'cooking', name: 'Cooking', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'woodcutting', name: 'Woodcutting', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'fletching', name: 'Fletching', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'fishing', name: 'Fishing', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'firemaking', name: 'Firemaking', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'crafting', name: 'Crafting', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'smithing', name: 'Smithing', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'mining', name: 'Mining', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'herblore', name: 'Herblore', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'agility', name: 'Agility', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'thieving', name: 'Thieving', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'slayer', name: 'Slayer', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'farming', name: 'Farming', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'runecrafting', name: 'Runecrafting', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'hunter', name: 'Hunter', level: 1, xp: 0, targetLevel: 99 },
-    { id: 'construction', name: 'Construction', level: 1, xp: 0, targetLevel: 99 },
-  ],
-  loading: false,
-  error: null,
-  username: '',
+	skills: [
+		{ id: 'attack', name: 'Attack', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'defence', name: 'Defence', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'strength', name: 'Strength', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'hitpoints', name: 'Hitpoints', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'ranged', name: 'Ranged', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'prayer', name: 'Prayer', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'magic', name: 'Magic', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'cooking', name: 'Cooking', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'woodcutting', name: 'Woodcutting', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'fletching', name: 'Fletching', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'fishing', name: 'Fishing', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'firemaking', name: 'Firemaking', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'crafting', name: 'Crafting', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'smithing', name: 'Smithing', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'mining', name: 'Mining', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'herblore', name: 'Herblore', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'agility', name: 'Agility', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'thieving', name: 'Thieving', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'slayer', name: 'Slayer', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'farming', name: 'Farming', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'runecrafting', name: 'Runecrafting', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'hunter', name: 'Hunter', level: 1, xp: 0, targetLevel: 99 },
+		{ id: 'construction', name: 'Construction', level: 1, xp: 0, targetLevel: 99 },
+	],
+	loading: false,
+	error: null,
+	username: '',
+	trainingMethods: {
+		woodcutting: [
+			{id: 'method-1', name: 'Regular trees', levelReq: 1, xpPerHour: 7000, intensity: 'Low', startLevel: 1, endLevel: 15 },
+			{id: 'method-2', name: 'Oak trees', levelReq: 15, xpPerHour: 15000, intensity: 'Low', startLevel: 15, endLevel: 30 },
+			{id: 'method-3', name: 'Willow trees', levelReq: 30, xpPerHour: 35000, intensity: 'Medium', startLevel: 30, endLevel: 35 },
+			{id: 'method-4', name: 'Teak trees', levelReq: 35, xpPerHour: 65000, intensity: 'High', startLevel: 35, endLevel: 45 },
+			{id: 'method-5', name: 'Maple trees', levelReq: 45, xpPerHour: 45000, intensity: 'Medium', startLevel: 45, endLevel: 60 },
+			{id: 'method-6', name: 'Yew trees', levelReq: 60, xpPerHour: 50000, intensity: 'Low', startLevel: 60, endLevel: 90 },
+			{id: 'method-7', name: 'Redwood trees', levelReq: 90, xpPerHour: 70000, intensity: 'Low', startLevel: 90, endLevel: 99 },
+			// ... (add other woodcutting methods)
+		],
+		// ... (add other skills' training methods)
+	},
 };
 
 // Async thunks
 export const updateSkillLevel = createAsyncThunk(
-  'skills/updateSkillLevel',
-  async (payload: { id: string; level: number }, { getState, dispatch }) => {
-    const state = getState() as { skills: SkillsState };
-    const skill = state.skills.skills.find((s) => s.id === payload.id);
-    if (skill) {
-      const newXp = skill.xp;
-      dispatch(skillsSlice.actions.updateSkillLevelInternal(payload));
-      dispatch(updateSkillXp({ id: payload.id, xp: newXp }));
-    }
-    return payload;
-  }
+	'skills/updateSkillLevel',
+	async (payload: { id: string; level: number }, { getState, dispatch }) => {
+		const state = getState() as { skills: SkillsState };
+		const skill = state.skills.skills.find((s) => s.id === payload.id);
+		if (skill) {
+			const newXp = skill.xp;
+			dispatch(skillsSlice.actions.updateSkillLevelInternal(payload));
+			dispatch(updateSkillXp({ id: payload.id, xp: newXp }));
+		}
+		return payload;
+	}
 );
 
 export const updateSkillXp = createAsyncThunk(
-  'skills/updateSkillXp',
-  async (payload: { id: string; xp: number }, { dispatch }) => {
-    const newLevel = xpToLevel(payload.xp);
-    dispatch(skillsSlice.actions.updateSkillXpInternal(payload));
-    dispatch(skillsSlice.actions.updateSkillLevelInternal({ id: payload.id, level: newLevel }));
-    return payload;
-  }
+	'skills/updateSkillXp',
+	async (payload: { id: string; xp: number }, { dispatch }) => {
+		const newLevel = xpToLevel(payload.xp);
+		dispatch(skillsSlice.actions.updateSkillXpInternal(payload));
+		dispatch(skillsSlice.actions.updateSkillLevelInternal({ id: payload.id, level: newLevel }));
+		return payload;
+	}
 );
 
 export const updateTargetLevel = createAsyncThunk(
-  'skills/updateTargetLevel',
-  async (payload: { id: string; targetLevel: number }, { dispatch }) => {
-    dispatch(skillsSlice.actions.updateTargetLevelInternal(payload));
-    return payload;
-  }
+	'skills/updateTargetLevel',
+	async (payload: { id: string; targetLevel: number }, { dispatch }) => {
+		dispatch(skillsSlice.actions.updateTargetLevelInternal(payload));
+		return payload;
+	}
 );
 
 export const importCharacterStats = createAsyncThunk(
-  'skills/importCharacterStats',
-  async (skills: Skill[], { dispatch }) => {
-    dispatch(skillsSlice.actions.importCharacterStatsInternal(skills));
-    return skills;
-  }
+	'skills/importCharacterStats',
+	async (skills: Skill[], { dispatch }) => {
+		dispatch(skillsSlice.actions.importCharacterStatsInternal(skills));
+		return skills;
+	}
 );
 
 export const fetchCharacterStats = createAsyncThunk(
-  'skills/fetchCharacterStats',
-  async (username: string, { dispatch }) => {
-    if (!username.trim()) {
-      throw new Error('Please enter a username');
-    }
+	'skills/fetchCharacterStats',
+	async (username: string, { dispatch }) => {
+		if (!username.trim()) {
+			throw new Error('Please enter a username');
+		}
 
-    const corsProxy = 'https://corsproxy.io/';
-    const apiUrl = `https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=${encodeURIComponent(username)}`;
-    const response = await fetch(`${corsProxy}?url=${apiUrl}`, {
-      headers: { 
-        'Origin': 'http://localhost:5173' // Replace with your actual origin in production
-      }
-    });
+		const corsProxy = 'https://corsproxy.io/';
+		const apiUrl = `https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=${encodeURIComponent(username)}`;
+		const response = await fetch(`${corsProxy}?url=${apiUrl}`, {
+			headers: {
+				'Origin': 'http://localhost:5173' // Replace with your actual origin in production
+			}
+		});
 
-    if (!response.ok) {
-      throw new Error(response.status === 404 
-        ? 'Player not found' 
-        : 'Failed to fetch data from OSRS HiScores');
-    }
+		if (!response.ok) {
+			throw new Error(response.status === 404
+				? 'Player not found'
+				: 'Failed to fetch data from OSRS HiScores');
+		}
 
-    const data = await response.text();
-    const lines = data.split('\n');
+		const data = await response.text();
+		const lines = data.split('\n');
 
-    const skillOrder = [
-      'overall', 'attack', 'defence', 'strength', 'hitpoints', 'ranged', 
-      'prayer', 'magic', 'cooking', 'woodcutting', 'fletching', 'fishing', 
-      'firemaking', 'crafting', 'smithing', 'mining', 'herblore', 'agility', 
-      'thieving', 'slayer', 'farming', 'runecrafting', 'hunter', 'construction'
-    ];
+		const skillOrder = [
+			'overall', 'attack', 'defence', 'strength', 'hitpoints', 'ranged',
+			'prayer', 'magic', 'cooking', 'woodcutting', 'fletching', 'fishing',
+			'firemaking', 'crafting', 'smithing', 'mining', 'herblore', 'agility',
+			'thieving', 'slayer', 'farming', 'runecrafting', 'hunter', 'construction'
+		];
 
-    const updatedSkills = skillOrder.slice(1).map((skillId, index) => {
-      const [, level, xpStr] = lines[index + 1].split(',');
-      const xp = parseInt(xpStr, 10);
-      return {
-        id: skillId,
-        name: skillId.charAt(0).toUpperCase() + skillId.slice(1),
-        level: parseInt(level, 10),
-        xp: isNaN(xp) ? 0 : xp,
-        targetLevel: 99
-      };
-    });
+		const updatedSkills = skillOrder.slice(1).map((skillId, index) => {
+			const [, level, xpStr] = lines[index + 1].split(',');
+			const xp = parseInt(xpStr, 10);
+			return {
+				id: skillId,
+				name: skillId.charAt(0).toUpperCase() + skillId.slice(1),
+				level: parseInt(level, 10),
+				xp: isNaN(xp) ? 0 : xp,
+				targetLevel: 99
+			};
+		});
 
-    return updatedSkills;
-  }
+		return updatedSkills;
+	}
+);
+
+export const updateTrainingMethod = createAsyncThunk(
+	'skills/updateTrainingMethod',
+	async (payload: { skillId: string; methodIndex: number; method: TrainingMethod }, { getState, dispatch }) => {
+		// Here you would typically make an API call if you're storing this data on a server
+		// For now, we'll just return the payload to update the local state
+		return payload;
+	}
 );
 
 // Create the skills slice
 const skillsSlice = createSlice({
-  name: 'skills',
-  initialState,
-  reducers: {
-    updateSkillLevelInternal: (state, action: PayloadAction<{ id: string; level: number }>) => {
-      const { id, level } = action.payload;
-      const skill = state.skills.find((skill) => skill.id === id);
-      if (skill) {
-        skill.level = level;
-      }
-    },
-    updateSkillXpInternal: (state, action: PayloadAction<{ id: string; xp: number }>) => {
-      const { id, xp } = action.payload;
-      const skill = state.skills.find((skill) => skill.id === id);
-      if (skill) {
-        skill.xp = xp;
-      }
-    },
-    updateTargetLevelInternal: (state, action: PayloadAction<{ id: string; targetLevel: number }>) => {
-      const { id, targetLevel } = action.payload;
-      const skill = state.skills.find((skill) => skill.id === id);
-      if (skill) {
-        skill.targetLevel = targetLevel;
-      }
-    },
-    importCharacterStatsInternal: (state, action: PayloadAction<Skill[]>) => {
-      state.skills = action.payload;
-    },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-    },
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchCharacterStats.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCharacterStats.fulfilled, (state, action) => {
-        state.loading = false;
-        state.skills = action.payload;
-        state.error = null;
-      })
-      .addCase(fetchCharacterStats.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch character stats';
-      });
-  },
+	name: 'skills',
+	initialState,
+	reducers: {
+		updateSkillLevelInternal: (state, action: PayloadAction<{ id: string; level: number }>) => {
+			const { id, level } = action.payload;
+			const skill = state.skills.find((skill) => skill.id === id);
+			if (skill) {
+				skill.level = level;
+			}
+		},
+		updateSkillXpInternal: (state, action: PayloadAction<{ id: string; xp: number }>) => {
+			const { id, xp } = action.payload;
+			const skill = state.skills.find((skill) => skill.id === id);
+			if (skill) {
+				skill.xp = xp;
+			}
+		},
+		updateTargetLevelInternal: (state, action: PayloadAction<{ id: string; targetLevel: number }>) => {
+			const { id, targetLevel } = action.payload;
+			const skill = state.skills.find((skill) => skill.id === id);
+			if (skill) {
+				skill.targetLevel = targetLevel;
+			}
+		},
+		importCharacterStatsInternal: (state, action: PayloadAction<Skill[]>) => {
+			state.skills = action.payload;
+		},
+		setLoading: (state, action: PayloadAction<boolean>) => {
+			state.loading = action.payload;
+		},
+		setError: (state, action: PayloadAction<string | null>) => {
+			state.error = action.payload;
+		},
+		setUsername: (state, action: PayloadAction<string>) => {
+			state.username = action.payload;
+		},
+		updateTrainingMethodInternal: (state, action: PayloadAction<{ skillId: string; methodIndex: number; method: TrainingMethod }>) => {
+			const { skillId, methodIndex, method } = action.payload;
+			if (state.trainingMethods[skillId]) {
+				state.trainingMethods[skillId][methodIndex] = method;
+			}
+		},
+		removeTrainingMethod: (state, action: PayloadAction<{ skillId: string; methodIndex: number }>) => {
+			const { skillId, methodIndex } = action.payload;
+			if (state.trainingMethods[skillId]) {
+				state.trainingMethods[skillId].splice(methodIndex, 1);
+			}
+		},
+		addTrainingMethod: (state, action: PayloadAction<{ skillId: string; method: TrainingMethod }>) => {
+			const { skillId, method } = action.payload;
+			if (!state.trainingMethods[skillId]) {
+				state.trainingMethods[skillId] = [];
+			}
+			state.trainingMethods[skillId].push(method);
+		},
+		reorderTrainingMethods: (state, action: PayloadAction<{ skillId: string; startIndex: number; endIndex: number }>) => {
+			const { skillId, startIndex, endIndex } = action.payload;
+			if (state.trainingMethods[skillId]) {
+				const [reorderedItem] = state.trainingMethods[skillId].splice(startIndex, 1);
+				state.trainingMethods[skillId].splice(endIndex, 0, reorderedItem);
+			}
+		},
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchCharacterStats.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchCharacterStats.fulfilled, (state, action) => {
+				state.loading = false;
+				state.skills = action.payload;
+				state.error = null;
+			})
+			.addCase(fetchCharacterStats.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.error.message || 'Failed to fetch character stats';
+			})
+			.addCase(updateTrainingMethod.fulfilled, (state, action) => {
+				const { skillId, methodIndex, method } = action.payload;
+				if (state.trainingMethods[skillId]) {
+					state.trainingMethods[skillId][methodIndex] = method;
+				}
+			});
+	},
 });
 
 // Export the actions
 export const {
-  setLoading,
-  setError,
-  setUsername,
+	setLoading,
+	setError,
+	setUsername,
+	updateTrainingMethodInternal,
+	removeTrainingMethod,
+	addTrainingMethod,
+	reorderTrainingMethods,
+
 } = skillsSlice.actions;
 
 // Export the reducer

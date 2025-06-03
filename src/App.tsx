@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import MaxingGuide from './components/MaxingGuide';
-import './App.css'
+import SkillPlanPage from './components/SkillPlanPage';
+import './App.css';
 import { store } from '.';
 import { fetchCharacterStats, setUsername } from './store/skillsSlice';
 
@@ -21,12 +23,17 @@ function AppContent() {
   );
 }
 
-function App() {
+const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <AppContent />
+      <Router>
+        <Routes>
+          <Route path="/" element={<AppContent />} />
+          <Route path="/skill-plan/:skillId" element={<SkillPlanPage />} />
+        </Routes>
+      </Router>
     </Provider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -35,6 +35,7 @@
 
 .card {
   padding: 2em;
+  transition: height 0.3s ease, padding 0.3s ease;
 }
 
 .read-the-docs {
@@ -44,4 +45,146 @@
 .app {
   width: 100%;
   min-height: 100vh;
+}
+
+.skill-card.maxed {
+  background-color: #2b4218;
+  border-color: #0c1f0c;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skill-card.maxed:not(.expanded) {
+  height: 60px;
+  overflow: hidden;
+}
+
+.skill-card.maxed.expanded {
+  height: auto;
+}
+
+.maxed-indicator {
+  background-color: #4caf50;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.skill-card.maxed .progress-bar .progress {
+  background-color: #4caf50;
+}
+
+.skill-card.maxed input {
+  background-color: #f0f0f0;
+  color: #888;
+}
+
+.skill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.skill-card.maxed .skill-header {
+  cursor: pointer;
+}
+
+.skill-plan {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.skill-plan h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.skill-plan ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.skill-plan li {
+  margin-bottom: 0.25rem;
+}
+
+button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.skill-plan-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.plan-step {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.plan-step h4 {
+  margin-top: 0;
+}
+
+.plan-step ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.plan-step li {
+  margin-bottom: 5px;
+}
+
+.unavailable {
+  color: #888;
+}
+
+
+.training-methods, .level-breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.training-methods th, .training-methods td,
+.level-breakdown th, .level-breakdown td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.training-methods th, .level-breakdown th {
+  background-color: #f2f2f2;
+}
+
+.training-methods input[type="number"] {
+  width: 60px;
+}
+
+.unavailable {
+  color: #888;
 }

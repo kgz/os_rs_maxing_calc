@@ -110,7 +110,7 @@ button:focus-visible {
   background-color: var(--osrs-brown);
   border: 2px solid var(--osrs-light-brown);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s;
 }
@@ -141,12 +141,14 @@ button:focus-visible {
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  padding: 1rem;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  
 }
 
 .input-group label {
@@ -164,6 +166,8 @@ button:focus-visible {
 
 .progress-container {
   margin: 1rem 0;
+  padding: 1rem;
+
 }
 
 .progress-bar {
@@ -192,6 +196,33 @@ button:focus-visible {
 
 .xp-info p {
   margin: 0.25rem 0;
+}
+
+.overall-progress {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--osrs-brown);
+  border-radius: 8px;
+}
+
+.overall-progress h2 {
+  margin-bottom: 0.5rem;
+  color: var(--osrs-gold);
+}
+
+.overall-progress .progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.overall-progress .progress-bar {
+  flex-grow: 1;
+}
+
+.overall-progress .progress-text {
+  font-weight: bold;
+  color: var(--osrs-gold);
 }
 
 @media (prefers-color-scheme: light) {
