@@ -47,7 +47,7 @@ function getItemPosition({ index, items }: { index: number; items: TrainingMetho
 
 
 const containerStyles = xcss({
-	maxWidth: '400px',
+	// maxWidth: '400px',
 	borderWidth: 'border.width',
 	borderStyle: 'solid',
 	borderColor: 'color.border',
