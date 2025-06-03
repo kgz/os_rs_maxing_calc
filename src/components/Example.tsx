@@ -1,106 +1,31 @@
-import React, {
-	createContext,
-	Fragment,
+import {
 	useCallback,
-	useContext,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from 'react';
 
-import ReactDOM from 'react-dom';
-import invariant from 'tiny-invariant';
-
-import Avatar from '@atlaskit/avatar';
-import Badge from '@atlaskit/badge';
-import DropdownMenu, { DropdownItem, DropdownItemGroup } from '@atlaskit/dropdown-menu';
-// eslint-disable-next-line @atlaskit/design-system/no-banned-imports
-import mergeRefs from '@atlaskit/ds-lib/merge-refs';
-import Lozenge from '@atlaskit/lozenge';
 import { triggerPostMoveFlash } from '@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash';
 import {
-	attachClosestEdge,
 	type Edge,
 	extractClosestEdge,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
 import * as liveRegion from '@atlaskit/pragmatic-drag-and-drop-live-region';
-import { DragHandleButton } from '@atlaskit/pragmatic-drag-and-drop-react-accessibility/drag-handle-button';
-import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box';
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
-	draggable,
-	dropTargetForElements,
-	type ElementDropTargetEventBasePayload,
 	monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
-import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
-import { Box, Grid, Inline, Stack, xcss } from '@atlaskit/primitives';
-import { token } from '@atlaskit/tokens';
+import { Stack, xcss } from '@atlaskit/primitives';
+import { trainingMethods } from './TrainingMethods';
+import type { TrainingMethod } from '../store/skillsSlice';
+import { isItemData, ListContext, type ItemEntry, type ItemPosition, type ListContextValue } from './CardTypes';
+import { ListItem } from './CardList';
 
-type ItemPosition = 'first' | 'last' | 'middle' | 'only';
 
-type CleanupFn = () => void;
 
-type ItemEntry = { itemId: string; element: HTMLElement };
 
-type ListContextValue = {
-	getListLength: () => number;
-	registerItem: (entry: ItemEntry) => CleanupFn;
-	reorderItem: (args: {
-		startIndex: number;
-		indexOfTarget: number;
-		closestEdgeOfTarget: Edge | null;
-	}) => void;
-	instanceId: symbol;
-};
-
-const ListContext = createContext<ListContextValue | null>(null);
-
-function useListContext() {
-	const listContext = useContext(ListContext);
-	invariant(listContext !== null);
-	return listContext;
-}
-
-type Item = {
-	id: string;
-	label: string;
-};
-
-const itemKey = Symbol('item');
-type ItemData = {
-	[itemKey]: true;
-	item: Item;
-	index: number;
-	instanceId: symbol;
-};
-
-function getItemData({
-	item,
-	index,
-	instanceId,
-}: {
-	item: Item;
-	index: number;
-	instanceId: symbol;
-}): ItemData {
-	return {
-		[itemKey]: true,
-		item,
-		index,
-		instanceId,
-	};
-}
-
-function isItemData(data: Record<string | symbol, unknown>): data is ItemData {
-	return data[itemKey] === true;
-}
-
-function getItemPosition({ index, items }: { index: number; items: Item[] }): ItemPosition {
+function getItemPosition({ index, items }: { index: number; items: TrainingMethod[] }): ItemPosition {
 	if (items.length === 1) {
 		return 'only';
 	}
@@ -116,291 +41,10 @@ function getItemPosition({ index, items }: { index: number; items: Item[] }): It
 	return 'middle';
 }
 
-const listItemContainerStyles = xcss({
-	position: 'relative',
-	backgroundColor: 'elevation.surface',
-	borderWidth: 'border.width.0',
-	borderBottomWidth: token('border.width', '1px'),
-	borderStyle: 'solid',
-	borderColor: 'color.border',
-	// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-selectors -- Ignored via go/DSP-18766
-	':last-of-type': {
-		borderWidth: 'border.width.0',
-	},
-});
 
-const listItemStyles = xcss({
-	position: 'relative',
-	padding: 'space.100',
-});
 
-const listItemDisabledStyles = xcss({ opacity: 0.4 });
 
-type DraggableState =
-	| { type: 'idle' }
-	| { type: 'preview'; container: HTMLElement }
-	| { type: 'dragging' };
 
-const idleState: DraggableState = { type: 'idle' };
-const draggingState: DraggableState = { type: 'dragging' };
-
-const listItemPreviewStyles = xcss({
-	paddingBlock: 'space.050',
-	paddingInline: 'space.100',
-	borderRadius: 'border.radius.100',
-	backgroundColor: 'elevation.surface.overlay',
-	maxWidth: '360px',
-	whiteSpace: 'nowrap',
-	overflow: 'hidden',
-	textOverflow: 'ellipsis',
-});
-
-const itemLabelStyles = xcss({
-	flexGrow: 1,
-	whiteSpace: 'nowrap',
-	textOverflow: 'ellipsis',
-	overflow: 'hidden',
-});
-
-function DropDownContent({ position, index }: { position: ItemPosition; index: number }) {
-	const { reorderItem, getListLength } = useListContext();
-
-	const isMoveUpDisabled = position === 'first' || position === 'only';
-	const isMoveDownDisabled = position === 'last' || position === 'only';
-
-	const moveToTop = useCallback(() => {
-		reorderItem({
-			startIndex: index,
-			indexOfTarget: 0,
-			closestEdgeOfTarget: null,
-		});
-	}, [index, reorderItem]);
-
-	const moveUp = useCallback(() => {
-		reorderItem({
-			startIndex: index,
-			indexOfTarget: index - 1,
-			closestEdgeOfTarget: null,
-		});
-	}, [index, reorderItem]);
-
-	const moveDown = useCallback(() => {
-		reorderItem({
-			startIndex: index,
-			indexOfTarget: index + 1,
-			closestEdgeOfTarget: null,
-		});
-	}, [index, reorderItem]);
-
-	const moveToBottom = useCallback(() => {
-		reorderItem({
-			startIndex: index,
-			indexOfTarget: getListLength() - 1,
-			closestEdgeOfTarget: null,
-		});
-	}, [index, getListLength, reorderItem]);
-
-	return (
-		<DropdownItemGroup>
-			<DropdownItem onClick={moveToTop} isDisabled={isMoveUpDisabled}>
-				Move to top
-			</DropdownItem>
-			<DropdownItem onClick={moveUp} isDisabled={isMoveUpDisabled}>
-				Move up
-			</DropdownItem>
-			<DropdownItem onClick={moveDown} isDisabled={isMoveDownDisabled}>
-				Move down
-			</DropdownItem>
-			<DropdownItem onClick={moveToBottom} isDisabled={isMoveDownDisabled}>
-				Move to bottom
-			</DropdownItem>
-		</DropdownItemGroup>
-	);
-}
-
-function ListItem({
-	item,
-	index,
-	position,
-}: {
-	item: Item;
-	index: number;
-	position: ItemPosition;
-}) {
-	const { registerItem, instanceId } = useListContext();
-
-	const ref = useRef<HTMLDivElement>(null);
-	const dragHandleRef = useRef<HTMLButtonElement>(null);
-
-	const [draggableState, setDraggableState] = useState<DraggableState>(idleState);
-	const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
-
-	useEffect(() => {
-		const element = ref.current;
-		const dragHandle = dragHandleRef.current;
-		invariant(element);
-		invariant(dragHandle);
-
-		const data = getItemData({ item, index, instanceId });
-
-		function onChange({ source, self }: ElementDropTargetEventBasePayload) {
-			const isSource = source.element === dragHandle;
-			if (isSource) {
-				setClosestEdge(null);
-				return;
-			}
-
-			const closestEdge = extractClosestEdge(self.data);
-
-			const sourceIndex = source.data.index;
-			invariant(typeof sourceIndex === 'number');
-
-			const isItemBeforeSource = index === sourceIndex - 1;
-			const isItemAfterSource = index === sourceIndex + 1;
-
-			const isDropIndicatorHidden =
-				(isItemBeforeSource && closestEdge === 'bottom') ||
-				(isItemAfterSource && closestEdge === 'top');
-
-			if (isDropIndicatorHidden) {
-				setClosestEdge(null);
-				return;
-			}
-
-			setClosestEdge(closestEdge);
-		}
-
-		return combine(
-			registerItem({ itemId: item.id, element }),
-			draggable({
-				element: dragHandle,
-				getInitialData: () => data,
-				onGenerateDragPreview({ nativeSetDragImage }) {
-					setCustomNativeDragPreview({
-						nativeSetDragImage,
-						getOffset: pointerOutsideOfPreview({
-							x: token('space.200', '16px'),
-							y: token('space.100', '8px'),
-						}),
-						render({ container }) {
-							setDraggableState({ type: 'preview', container });
-
-							return () => setDraggableState(draggingState);
-						},
-					});
-				},
-				onDragStart() {
-					setDraggableState(draggingState);
-				},
-				onDrop() {
-					setDraggableState(idleState);
-				},
-			}),
-			dropTargetForElements({
-				element,
-				canDrop({ source }) {
-					return isItemData(source.data) && source.data.instanceId === instanceId;
-				},
-				getData({ input }) {
-					return attachClosestEdge(data, {
-						element,
-						input,
-						allowedEdges: ['top', 'bottom'],
-					});
-				},
-				onDragEnter: onChange,
-				onDrag: onChange,
-				onDragLeave() {
-					setClosestEdge(null);
-				},
-				onDrop() {
-					setClosestEdge(null);
-				},
-			}),
-		);
-	}, [instanceId, item, index, registerItem]);
-
-	return (
-		<Fragment>
-			<Box ref={ref} xcss={listItemContainerStyles}>
-				<Grid
-					alignItems="center"
-					columnGap="space.050"
-					templateColumns="auto 1fr auto"
-					xcss={[
-						listItemStyles,
-						/**
-						 * We are applying the disabled effect to the inner element so that
-						 * the border and drop indicator are not affected.
-						 */
-						draggableState.type === 'dragging' && listItemDisabledStyles,
-					]}
-				>
-					<DropdownMenu
-						trigger={({ triggerRef, ...triggerProps }) => (
-							<DragHandleButton
-								ref={mergeRefs([dragHandleRef, triggerRef])}
-								{...triggerProps}
-								label={`Reorder ${item.label}`}
-							/>
-						)}
-					>
-						<DropdownItemGroup>
-							<DropDownContent position={position} index={index} />
-						</DropdownItemGroup>
-					</DropdownMenu>
-					<Box xcss={itemLabelStyles}>{item.label}</Box>
-					<Inline alignBlock="center" space="space.100">
-						<Badge>{1}</Badge>
-						<Avatar size="small" />
-						<Lozenge>Todo</Lozenge>
-					</Inline>
-				</Grid>
-				{closestEdge && <DropIndicator edge={closestEdge} gap="1px" />}
-			</Box>
-			{draggableState.type === 'preview' &&
-				ReactDOM.createPortal(
-					<Box xcss={listItemPreviewStyles}>{item.label}</Box>,
-					draggableState.container,
-				)}
-		</Fragment>
-	);
-}
-
-const defaultItems: Item[] = [
-	{
-		id: 'task-1',
-		label: 'Organize a team-building event',
-	},
-	{
-		id: 'task-2',
-		label: 'Create and maintain office inventory',
-	},
-	{
-		id: 'task-3',
-		label: 'Update company website content',
-	},
-	{
-		id: 'task-4',
-		label: 'Plan and execute marketing campaigns',
-	},
-	{
-		id: 'task-5',
-		label: 'Coordinate employee training sessions',
-	},
-	{
-		id: 'task-6',
-		label: 'Manage facility maintenance',
-	},
-	{
-		id: 'task-7',
-		label: 'Organize customer feedback surveys',
-	},
-	{
-		id: 'task-8',
-		label: 'Coordinate travel arrangements',
-	},
-];
 
 const containerStyles = xcss({
 	maxWidth: '400px',
@@ -428,18 +72,18 @@ function getItemRegistry() {
 }
 
 type ListState = {
-	items: Item[];
+	items: TrainingMethod[];
 	lastCardMoved: {
-		item: Item;
+		item: TrainingMethod;
 		previousIndex: number;
 		currentIndex: number;
 		numberOfItems: number;
 	} | null;
 };
 
-export default function ListExample() {
+export function ListExample() {
 	const [{ items, lastCardMoved }, setListState] = useState<ListState>({
-		items: defaultItems,
+		items: trainingMethods['woodcutting'],
 		lastCardMoved: null,
 	});
 	const [registry] = useState(getItemRegistry);
@@ -536,7 +180,7 @@ export default function ListExample() {
 		}
 
 		liveRegion.announce(
-			`You've moved ${item.label} from position ${
+			`You've moved ${item.id} from position ${
 				previousIndex + 1
 			} to position ${currentIndex + 1} of ${numberOfItems}.`,
 		);

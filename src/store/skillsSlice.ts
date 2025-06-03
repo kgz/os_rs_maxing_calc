@@ -12,6 +12,7 @@ export interface Skill {
 
 // Add this interface if it doesn't exist already
 export interface TrainingMethod {
+	id: string;
 	name: string;
 	levelReq: number;
 	xpPerHour: number;

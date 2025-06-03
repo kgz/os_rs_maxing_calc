@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
+import React, {  } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
 import { remainingXPToTarget } from '../utils/xpCalculations';
-import { updateTrainingMethod, removeTrainingMethod, addTrainingMethod, reorderTrainingMethods, type TrainingMethod } from '../store/skillsSlice';
-import CardList from './CardList';
+import { updateTrainingMethod, removeTrainingMethod, addTrainingMethod, type TrainingMethod } from '../store/skillsSlice';
 import './SkillPlanPage.scss';
 import { DraggableContainer } from './DraggableContainer';
 
