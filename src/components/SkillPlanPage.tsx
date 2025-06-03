@@ -5,6 +5,7 @@ import { remainingXPToTarget } from '../utils/xpCalculations';
 import { updateTrainingMethod, removeTrainingMethod, addTrainingMethod, reorderTrainingMethods, type TrainingMethod } from '../store/skillsSlice';
 import CardList from './CardList';
 import './SkillPlanPage.scss';
+import { DraggableContainer } from './DraggableContainer';
 
 const SkillPlanPage: React.FC = () => {
     const { skillId } = useParams<{ skillId: string }>();
@@ -54,7 +55,7 @@ const SkillPlanPage: React.FC = () => {
             <h3>Training Methods</h3>
             
             {/* Add the CardList component here */}
-            <CardList />
+            <DraggableContainer/>
 
             <button className="add-method-btn" onClick={addNewMethod}>Add New Method</button>
         </div>
