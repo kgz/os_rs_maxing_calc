@@ -3,10 +3,20 @@
 # Script to replace HTML entities with their proper characters in TypeScript/React files
 # Specifically targets &lt; -> < and &gt; -> >
 
-# Set the directory to search in (current directory by default)
-DIR=${1:-.}
+# Set the base directory to src (or use provided argument + /src)
+if [ -z "$1" ]; then
+  DIR="src"
+else
+  DIR="$1/src"
+fi
 
-# Find all TypeScript and React files
+# Check if the src directory exists
+if [ ! -d "$DIR" ]; then
+  echo "Error: Directory '$DIR' not found!"
+  exit 1
+fi
+
+# Find all TypeScript and React files in the src directory
 echo "Finding TypeScript and React files in $DIR..."
 FILES=$(find "$DIR" -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \))
 
