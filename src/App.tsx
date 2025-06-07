@@ -4,15 +4,14 @@ import { Provider } from 'react-redux';
 import MaxingGuide from './components/MaxingGuide';
 import SkillPlanPage from './components/SkillPlanPage';
 import './App.css';
-import { store } from '.';
-import { fetchCharacterStats, setUsername } from './store/skillsSlice';
+// import { fetchCharacterStats, setUsername } from './store/slices/skillsSlice';
 
 function AppContent() {
   useEffect(() => {
     const lastUsername = localStorage.getItem('lastUsername');
     if (lastUsername) {
-      store.dispatch(setUsername(lastUsername));
-      store.dispatch(fetchCharacterStats(lastUsername));
+    //   store.dispatch(setUsername(lastUsername));
+    //   store.dispatch(fetchCharacterStats(lastUsername));
     }
   }, []);
 
@@ -25,14 +24,12 @@ function AppContent() {
 
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
       <Router>
         <Routes>
           <Route path="/" element={<AppContent />} />
           <Route path="/skill-plan/:skillId" element={<SkillPlanPage />} />
         </Routes>
       </Router>
-    </Provider>
   );
 };
 

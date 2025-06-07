@@ -26,7 +26,7 @@ import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/eleme
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import { Box, Grid, Inline, xcss } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
-import type { TrainingMethod } from '../store/skillsSlice';
+import type { TrainingMethod } from '../store/slices/skillsSlice';
 import { isItemData, itemKey, useListContext, type ItemData, type ItemPosition } from './CardTypes';
 
 const listItemContainerStyles = xcss({

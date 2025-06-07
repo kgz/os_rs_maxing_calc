@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import { xpToLevel } from '../utils/xpCalculations';
+import { xpToLevel } from '../../utils/xpCalculations';
 
 // Define the Skill interface
 export interface Skill {
@@ -71,42 +71,17 @@ const initialState: SkillsState = {
 			{id: 'method-7', name: 'Redwood trees', levelReq: 90, xpPerHour: 70000, intensity: 'Low', startLevel: 90, endLevel: 99 },
 			// ... (add other woodcutting methods)
 		],
+		smithing: [
+			//... (add smithing methods)
+			{id: 'method-1', name: 'Iron ore', levelReq: 1, xpPerHour: 7000, intensity: 'Low', startLevel: 1, endLevel: 15 },
+
+        ],
 		// ... (add other skills' training methods)
 	},
 };
 
-// Async thunks
-export const updateSkillLevel = createAsyncThunk(
-	'skills/updateSkillLevel',
-	async (payload: { id: string; level: number }, { getState, dispatch }) => {
-		const state = getState() as { skills: SkillsState };
-		const skill = state.skills.skills.find((s) => s.id === payload.id);
-		if (skill) {
-			const newXp = skill.xp;
-			dispatch(skillsSlice.actions.updateSkillLevelInternal(payload));
-			dispatch(updateSkillXp({ id: payload.id, xp: newXp }));
-		}
-		return payload;
-	}
-);
 
-export const updateSkillXp = createAsyncThunk(
-	'skills/updateSkillXp',
-	async (payload: { id: string; xp: number }, { dispatch }) => {
-		const newLevel = xpToLevel(payload.xp);
-		dispatch(skillsSlice.actions.updateSkillXpInternal(payload));
-		dispatch(skillsSlice.actions.updateSkillLevelInternal({ id: payload.id, level: newLevel }));
-		return payload;
-	}
-);
 
-export const updateTargetLevel = createAsyncThunk(
-	'skills/updateTargetLevel',
-	async (payload: { id: string; targetLevel: number }, { dispatch }) => {
-		dispatch(skillsSlice.actions.updateTargetLevelInternal(payload));
-		return payload;
-	}
-);
 
 export const importCharacterStats = createAsyncThunk(
 	'skills/importCharacterStats',
@@ -116,52 +91,7 @@ export const importCharacterStats = createAsyncThunk(
 	}
 );
 
-export const fetchCharacterStats = createAsyncThunk(
-	'skills/fetchCharacterStats',
-	async (username: string, { dispatch }) => {
-		if (!username.trim()) {
-			throw new Error('Please enter a username');
-		}
 
-		const corsProxy = 'https://corsproxy.io/';
-		const apiUrl = `https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=${encodeURIComponent(username)}`;
-		const response = await fetch(`${corsProxy}?url=${apiUrl}`, {
-			headers: {
-				'Origin': 'http://localhost:5173' // Replace with your actual origin in production
-			}
-		});
-
-		if (!response.ok) {
-			throw new Error(response.status === 404
-				? 'Player not found'
-				: 'Failed to fetch data from OSRS HiScores');
-		}
-
-		const data = await response.text();
-		const lines = data.split('\n');
-
-		const skillOrder = [
-			'overall', 'attack', 'defence', 'strength', 'hitpoints', 'ranged',
-			'prayer', 'magic', 'cooking', 'woodcutting', 'fletching', 'fishing',
-			'firemaking', 'crafting', 'smithing', 'mining', 'herblore', 'agility',
-			'thieving', 'slayer', 'farming', 'runecrafting', 'hunter', 'construction'
-		];
-
-		const updatedSkills = skillOrder.slice(1).map((skillId, index) => {
-			const [, level, xpStr] = lines[index + 1].split(',');
-			const xp = parseInt(xpStr, 10);
-			return {
-				id: skillId,
-				name: skillId.charAt(0).toUpperCase() + skillId.slice(1),
-				level: parseInt(level, 10),
-				xp: isNaN(xp) ? 0 : xp,
-				targetLevel: 99
-			};
-		});
-
-		return updatedSkills;
-	}
-);
 
 export const updateTrainingMethod = createAsyncThunk(
 	'skills/updateTrainingMethod',
@@ -171,6 +101,7 @@ export const updateTrainingMethod = createAsyncThunk(
 		return payload;
 	}
 );
+
 
 // Create the skills slice
 const skillsSlice = createSlice({
@@ -239,19 +170,6 @@ const skillsSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchCharacterStats.pending, (state) => {
-				state.loading = true;
-				state.error = null;
-			})
-			.addCase(fetchCharacterStats.fulfilled, (state, action) => {
-				state.loading = false;
-				state.skills = action.payload;
-				state.error = null;
-			})
-			.addCase(fetchCharacterStats.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.error.message || 'Failed to fetch character stats';
-			})
 			.addCase(updateTrainingMethod.fulfilled, (state, action) => {
 				const { skillId, methodIndex, method } = action.payload;
 				if (state.trainingMethods[skillId]) {
@@ -274,4 +192,4 @@ export const {
 } = skillsSlice.actions;
 
 // Export the reducer
-export default skillsSlice.reducer;
+export const skillsRecider = skillsSlice.reducer;

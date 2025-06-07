@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { TrainingMethod } from "../store/skillsSlice";
+import type { TrainingMethod } from "../store/slices/skillsSlice";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types";
 import invariant from 'tiny-invariant';
 

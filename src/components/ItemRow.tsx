@@ -17,10 +17,11 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 import { Stack, xcss } from '@atlaskit/primitives';
-import { trainingMethods } from './TrainingMethods';
-import type { TrainingMethod } from '../store/skillsSlice';
+import type { TrainingMethod } from '../store/slices/skillsSlice';
 import { isItemData, ListContext, type ItemEntry, type ItemPosition, type ListContextValue } from './CardTypes';
 import { ListItem } from './CardList';
+import { useAppDispatch, useAppSelector } from '../hooks/reduxHooks';
+import { useParams } from 'react-router-dom';
 
 
 
@@ -81,15 +82,38 @@ type ListState = {
 	} | null;
 };
 
-export function ListExample() {
+export function ItemRow() {
 	const [{ items, lastCardMoved }, setListState] = useState<ListState>({
-		items: trainingMethods['woodcutting'],
+		items: [],
 		lastCardMoved: null,
 	});
 	const [registry] = useState(getItemRegistry);
+	const { skillId } = useParams<{ skillId: string }>();
 
 	// Isolated instances of this component from one another
 	const [instanceId] = useState(() => Symbol('instance-id'));
+
+	const { trainingMethods } = useAppSelector((state) => state.skills);
+
+	const {level: currentLevel} = useAppSelector((state) => state.skills.skills.find((s) => s.id === skillId));
+
+	useEffect(() => {
+		if (!skillId) return 
+		setListState((listState) => ({
+			items: trainingMethods[skillId].filter((method) => {
+				if (method.endLevel < currentLevel) {
+					return false;
+                }
+				return true;
+			}).map((method) => {
+				return {
+					...method,
+					startLevel: Math.max(method.startLevel, currentLevel),
+				}
+			}),
+            lastCardMoved: null,
+        }));
+	}, [trainingMethods, skillId, currentLevel])
 
 	const reorderItem = useCallback(
 		({
@@ -204,6 +228,22 @@ export function ListExample() {
 		};
 	}, [registry.register, reorderItem, instanceId, getListLength]);
 
+	const dispatch = useAppDispatch();
+
+	
+
+	const handleStartLevelChange = useCallback(
+        (methodId: string, newStartLevel: number) => {
+			const methodIndex = trainingMethods[skillId].findIndex((m) => m.id === methodId);
+			if (methodIndex >= 0) {
+                const newMethods = trainingMethods[skillId].slice();
+                newMethods[methodIndex] = {...newMethods[methodIndex], startLevel: newStartLevel };
+                dispatch(updateTrainingMethods({ skillId, trainingMethods: newMethods }));
+            }
+			},
+        [dispatch, skillId, trainingMethods]
+	);
+
 	return (
 		<ListContext.Provider value={contextValue}>
 			<Stack xcss={containerStyles}>
@@ -220,6 +260,7 @@ export function ListExample() {
 						item={item}
 						index={index}
 						position={getItemPosition({ index, items })}
+						onStartLevelChange={handleStartLevelChange}
 					/>
 				))}
 			</Stack>
