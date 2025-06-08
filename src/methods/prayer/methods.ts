@@ -3,6 +3,7 @@ import type { Methods } from "../../types/method";
 
 export default {
 	bdbga: {
+		id: "bdbga",
 		label: "baby dragon bones (gilded altar)",
 		xp: 105,
 		items: [
@@ -18,6 +19,7 @@ export default {
 		},
 	},
 	dbga: {
+		id: "dbga",
 		label: "dragon bones (gilded altar)",
 		xp: 252,
 		items: [

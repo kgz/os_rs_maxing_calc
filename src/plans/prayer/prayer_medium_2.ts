@@ -3,6 +3,8 @@ import type { Plan } from "../../types/plan";
 
 export default {
 	label: "Med High",
+	id: "high-cost",
+	type: "Prayer",
 	methods: [
 	{
         from: 30,

@@ -2,6 +2,7 @@
 export type Item = {
 	id: number;
 	label: string;
+	imageSrc?: string; // Optional: Add an image source for the item, if available.
 	// other properties
 }
 
@@ -11,6 +12,8 @@ export const Items: {
 	BabyDragonBones: {
 		id: 534,
 		label: 'Baby Dragon Bones',
+		
+
 	},
 	DragonBones: {
         id: 536,
@@ -18,7 +21,8 @@ export const Items: {
     },
     // Add more items as needed...
 	Coins: {
-		id: 617,
+		id: 995,
 		label: 'gp',
+		imageSrc: "https://oldschool.runescape.wiki/images/Coins_250.png?c2755"
 	}
 } as const;

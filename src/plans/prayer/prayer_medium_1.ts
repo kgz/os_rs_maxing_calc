@@ -2,6 +2,8 @@ import { SkillMethods } from "../../methods/methods";
 import type { Plan } from "../../types/plan";
 
 export default {
+	id: "med-cost",
+	type: "Prayer",
 	label: "Med Cost",
 	methods: [
 	{

@@ -9,7 +9,12 @@ import { levelToXp, remainingXPToTarget, xpToLevel } from '../utils/xpCalculatio
 import { setSelectedPlan } from '../store/thunks/skills/setSelectedPlan';
 import { setPlanFromLevel } from '../store/thunks/skills/setPlanFromLevel';
 import { addNewMethodToPlan } from '../store/thunks/skills/addNewMethodToPlan';
-
+import CustomSelect from './CustomSelect';
+import { updatePlanMethod } from '../store/thunks/skills/updatePlanMethod';
+import type { Method } from '../types/method';
+import { Items } from '../types/items';
+import { CirclePlus, Trash2 } from 'lucide-react'
+import { removeMethodFromPlan } from '../store/thunks/skills/removeMethodFromPlan';
 const SkillPlanPage = () => {
 	const { skillId } = useParams();
 	const characters = useAppSelector(state => state.characterReducer)
@@ -142,13 +147,15 @@ const SkillPlanPage = () => {
 			</select>
 			<div>{currentSelectedPlan?.label}</div>
 
-			<table style={{ background: '#222' }}>
+			<table style={{ background: '#222', padding: 10 }}>
 				<thead>
 					<tr>
 						<th></th>
-						<th style={{paddingBottom: 5}}>Level</th>
-						<th style={{paddingBottom: 5}}>Method</th>
-						<th style={{paddingBottom: 5}}>Amount</th>
+						<th style={{ paddingBottom: 5 }}>Level</th>
+						<th style={{ paddingBottom: 5 }}>Xp Remaining</th>
+						<th style={{ paddingBottom: 5 }}>Method</th>
+						<th style={{ paddingBottom: 5 }}>XP/Action</th>
+						<th style={{ paddingBottom: 5 }}>Amount</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -167,6 +174,7 @@ const SkillPlanPage = () => {
 									const xpToNext = remainingXPToTarget(fromXp, nextLevel);
 									const itemsToNext = Math.ceil(xpToNext / plan.method.xp)
 
+
 									const prevLevel = (Object.values(currentSelectedPlan.methods).find((p) => p?.from < from) || { from: 0 }).from;
 									return (
 										<>
@@ -176,7 +184,6 @@ const SkillPlanPage = () => {
 														position: 'absolute',
 														width: '100%',
 														height: '1px',
-														// backgroundColor: 'var(--osrs-gold)',
 														opacity: 0.5,
 														top: '50%',
 														left: 0
@@ -186,17 +193,20 @@ const SkillPlanPage = () => {
 															position: 'relative',
 															zIndex: 2,
 															height: 1,
-															color: 'white',
 															border: 'none',
 															display: 'flex',
 															alignItems: 'center',
 															justifyContent: 'center',
+															background: 'none',
 															cursor: 'pointer',
 															margin: '0 auto',
 															padding: 0,
+															marginRight: 2,
 															fontSize: '16px',
 															fontWeight: 'bold',
-															marginTop: -4
+															marginTop: 0,
+															outline: 'none',
+															color: '#4CAF50'
 														}}
 														onClick={() => {
 															const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
@@ -207,19 +217,40 @@ const SkillPlanPage = () => {
 
 															void dispatch(addNewMethodToPlan({
 																planId: currentSelectedPlan.id,
-																index: Number(key),
+																index: Object.keys(currentSelectedPlan.methods).indexOf(key),
 																skill: skillId,
 															}))
 														}}
 													>
-														<span style={{ marginTop: -4 }}>+</span>
+														<span style={{ marginTop: -4 }}><CirclePlus size={15} /></span>
 													</button>
 												</td>
-												<td colSpan={4} style={{ borderTop: 'solid 1px white' }}></td>
+												<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 											</tr>
 											<tr key={key}>
-												<td />
-												<td style={{paddingBottom: 5}}>
+
+												<td >
+													{/* // add remove button */}
+													<button
+														style={{
+															background: 'none',
+															width:10,
+															aspectRatio: '1',
+															marginRight: 16,
+															marginLeft: 0,
+															padding:0,
+															color: '#ff4747',
+															outline: 'none',
+														}}
+														onClick={()=> {
+															void dispatch(removeMethodFromPlan({
+                                                                planId: currentSelectedPlan.id,
+                                                                methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
+                                                            }))
+														}}
+													><Trash2 size={15} /></button>
+												</td>
+												<td style={{ paddingBottom: 5 }}>
 													<input
 
 														data-min={prevLevel + 1}
@@ -241,19 +272,60 @@ const SkillPlanPage = () => {
 													></input>
 
 												</td>
-												<td style={{paddingBottom: 5}}>
-													<div style={{ display: 'flex', alignItems: 'center', textAlign:'left' }}>
-														<img src={"https://secure.runescape.com/m=itemdb_oldschool/1749130378040_obj_sprite.gif?id=" + plan.method.items.at(0)?.item.id} width="32" height="32" alt={plan.method.label} />
-
-
-														{plan.method.label}
+												<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
+												<td style={{ paddingBottom: 5 }}>
+													<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+														<CustomSelect
+															showSearch
+															searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+															options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+															value={plan.method} // This is correct - accessing the nested method object
+															onChange={(newMethod) => {
+																console.log('newMethod', newMethod);
+																void dispatch(updatePlanMethod({
+																	methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
+																	planId: currentSelectedPlan.id,
+																	method: newMethod,
+																}));
+															}}
+															getOptionLabel={(option) => option.label}
+															getOptionValue={(option) => option.id}
+															renderSelectedValue={(option) => (
+																<span>{option.label}</span> // Only show the label, no image
+															)}
+															renderOption={(option) => (
+																<span>{option.label}</span> // Only show the label, no image
+															)}
+														/>
 													</div>
 												</td>
-												<td style={{paddingBottom: 5}} title={itemsToNext.toString()}>{itemsToNext.toLocaleString("en-AU", {
-													// notation: 'compact',
-													maximumFractionDigits: 2,
-													style: 'decimal',
-												}).toLocaleString()}</td>
+												<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
+												<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
+													<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+														{plan.method.items.map((itemData, idx) => {
+
+															const item = Object.values(Items).find((i) => i.id === itemData.item.id);
+															console.log('item', item, itemData);
+															return (
+																<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
+																	<img
+																		src={item?.imageSrc ? item.imageSrc : `https://secure.runescape.com/m=itemdb_oldschool/1749130378040_obj_sprite.gif?id=${item?.id}`}
+																		width="24"
+																		height="24"
+																		alt={item?.label}
+																		style={{ marginRight: '4px' }}
+																	/>
+																	<span>
+																		{(itemData.amount * itemsToNext).toLocaleString("en-AU", {
+																			maximumFractionDigits: 0,
+																			style: 'decimal',
+																		})} {itemData.item.label}
+																	</span>
+																</div>
+															)
+														})}
+													</div>
+												</td>
 												{/* <td>{currentStartXp.toLocaleString()} {"->"} {xpToNext.toLocaleString()} </td> */}
 											</tr>
 										</>
@@ -261,9 +333,57 @@ const SkillPlanPage = () => {
 								})
 
 							}
-						</>
+                            
+                            {/* Add new method at the end of the list */}
+                            <tr>
+                                <td style={{ position: 'relative', paddingTop: 4, paddingBottom: 4, paddingRight: 10 }}>
+                                    <div style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '1px',
+                                        opacity: 0.5,
+                                        top: '50%',
+                                        left: 0
+                                    }}></div>
+                                    <button
+                                        style={{
+                                            position: 'relative',
+                                            zIndex: 2,
+                                            height: 1,
+                                            color: 'white',
+                                            border: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            margin: '0 auto',
+                                            padding: 0,
+                                            fontSize: '16px',
+                                            fontWeight: 'bold',
+                                            marginTop: -4
+                                        }}
+                                        onClick={() => {
+                                            const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+                                            if (!skillId || !valInSkills(skillId)) {
+                                                console.warn('Invalid skill', skillId);
+                                                return;
+                                            }
 
-					}
+                                            void dispatch(addNewMethodToPlan({
+                                                planId: currentSelectedPlan.id,
+                                                index: Object.keys(currentSelectedPlan.methods).length,
+                                                skill: skillId,
+                                            }))
+                                        }}
+                                    >
+                                        <span style={{ marginTop: -4 }}>+</span>
+                                    </button>
+                                </td>
+                                <td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
+                            </tr>
+                        </>
+                    }
+
 				</tbody>
 			</table>
 

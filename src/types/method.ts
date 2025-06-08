@@ -7,6 +7,7 @@ type SkillLevels = {
 };
 
 export type Method = {
+	id: string;
 	label: string;
 	xp: number;
 	items: { amount: number, item: Item }[];
