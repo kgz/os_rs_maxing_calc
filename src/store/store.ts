@@ -22,10 +22,12 @@ import storage from "redux-persist-indexeddb-storage";
 import { v4 } from "uuid";
 import getStoredState from "redux-persist/es/getStoredState";
 import { characterReducer } from "./slices/characterSlice";
+import { skillsReducer } from "./slices/skillsSlice";
 // import testMiddleware from "./middleware/testMiddleware";
 
 const reducer = combineReducers({
-	characterReducer
+	characterReducer,
+	skillsReducer
 });
 
 const persistConfig: PersistConfig<DefaultRootState> = {

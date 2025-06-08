@@ -137,3 +137,12 @@ export function xpToNextLevel(currentXP: number): number {
   const nextLevelXP = levelData[currentLevel];
   return nextLevelXP - currentXP;
 }
+
+
+export function levelToXp(level: number): number {
+	if (level < 1 || level > 99) {
+        return 0; // Invalid level
+    }
+    return levelData[level - 1];
+}
+	

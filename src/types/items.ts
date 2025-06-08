@@ -12,6 +12,11 @@ export const Items: {
 		id: 534,
 		label: 'Baby Dragon Bones',
 	},
+	DragonBones: {
+        id: 536,
+        label: 'Dragon Bones',
+    },
+    // Add more items as needed...
 	Coins: {
 		id: 617,
 		label: 'gp',

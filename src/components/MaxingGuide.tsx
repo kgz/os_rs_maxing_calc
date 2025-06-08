@@ -1,7 +1,4 @@
-import { type ChangeEvent, useMemo, useRef } from 'react';
-import {
-	setUsername,
-} from '../store/slices/skillsSlice';
+import {useMemo, useRef } from 'react';
 import { fetchCharacterStats } from '../store/thunks/character/fetchCharacterStats';
 import { skillsEnum } from '../types/skillsResponse';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -32,9 +29,6 @@ const MaxingGuide = () => {
 		return null
 	}, [characters])
 
-	const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
-		dispatch(setUsername(e.target.value));
-	};
 
 	const handleFetchStats = () => {
 		const username = usernameRef.current?.value?.trim();
@@ -59,8 +53,8 @@ const MaxingGuide = () => {
 					<input
 						ref={usernameRef}
 						type="text"
-						value={lastCharacter?.username ?? ''}
-						onChange={handleUsernameChange}
+						defaultValue={lastCharacter?.username ?? ''}
+						// onChange={handleUsernameChange}
 						onKeyPress={handleKeyPress}
 						placeholder="Enter RuneScape username"
 					// disabled={loading}
