@@ -1,7 +1,7 @@
 export type Item = {
-	id: number;
-	label: string;
-	// other properties
+    id: number;
+    label: string;
+    // other properties
 }
 
 export const Items = {
@@ -159,5 +159,83 @@ export const Items = {
     BlackDhideBody: {
         id: 2503,
         label: "Black d'hide body",
+    },
+    
+    // Prayer training items
+    SuperiorDragonBones: {
+        id: 22124,
+        label: 'Superior dragon bones',
+    },
+    BlessedBoneShards: {
+        id: 29096,
+        label: 'Blessed bone shards',
+    },
+    JugOfWine: {
+        id: 1993,
+        label: 'Jug of wine',
+    },
+    JugOfBlessedWine: {
+        id: 29098,
+        label: 'Jug of blessed wine',
+    },
+    SunfireSplinters: {
+        id: 29100,
+        label: 'Sunfire splinters',
+    },
+    JugOfBlessedSunfireWine: {
+        id: 29102,
+        label: 'Jug of blessed sunfire wine',
+    },
+    PotOfSlime: {
+        id: 4286,
+        label: 'Pot of slime',
+    },
+    EnsouledDragonHead: {
+        id: 13511,
+        label: 'Ensouled dragon head',
+    },
+    DemonAshes: {
+        id: 592,
+        label: 'Demon ashes',
+    },
+    BloodRune: {
+        id: 565,
+        label: 'Blood rune',
+    },
+    SoulRune: {
+        id: 566,
+        label: 'Soul rune',
+    },
+    
+    // Urium remains for zealot robes
+    UriumRemains: {
+        id: 24792,
+        label: 'Urium remains',
+    },
+    FiyrRemains: {
+        id: 24790,
+        label: 'Fiyr remains',
+    },
+    GoldKey: {
+        id: 24795,
+        label: 'Gold key',
+    },
+    
+    // Zealot's robes
+    ZealotsRobeTop: {
+        id: 24943,
+        label: "Zealot's robe top",
+    },
+    ZealotsRobeBottom: {
+        id: 24946,
+        label: "Zealot's robe bottom",
+    },
+    ZealotsHood: {
+        id: 24949,
+        label: "Zealot's hood",
+    },
+    ZealotsBoots: {
+        id: 24952,
+        label: "Zealot's boots",
     },
 } as const;
