@@ -1,15 +1,17 @@
-// Component for the table header
-export const TableHeader = () => (
-	<thead>
-		<tr>
-			<th></th>
-			<th style={{ paddingBottom: 5 }}>Level</th>
-			<th style={{ paddingBottom: 5 }}>Xp Remaining</th>
-			<th style={{ paddingBottom: 5 }}>Method</th>
-			<th style={{ paddingBottom: 5 }}>XP/Action</th>
-			<th style={{ paddingBottom: 5 }}>Input</th>
-			<th style={{ paddingBottom: 5 }}>Output</th>
-			<th style={{ paddingBottom: 5 }}>Profit/Loss</th>
-		</tr>
-	</thead>
-);
+export const TableHeader = () => {
+    return (
+        <thead>
+            <tr>
+                <th></th> {/* For the remove button */}
+                <th>From</th>
+                <th>XP</th>
+                <th>Method</th>
+                <th>XP/Action</th>
+                <th>Items</th>
+                <th>Output</th>
+                <th>Profit/Loss</th>
+                <th>Time to Complete</th> {/* New column */}
+            </tr>
+        </thead>
+    );
+};
