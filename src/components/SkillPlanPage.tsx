@@ -16,332 +16,364 @@ import { Items } from '../types/items';
 import { CirclePlus, Trash2 } from 'lucide-react'
 import { removeMethodFromPlan } from '../store/thunks/skills/removeMethodFromPlan';
 import { useItems } from '../hooks/useItems';
+
 const SkillPlanPage = () => {
-	const { skillId } = useParams();
-	const characters = useAppSelector(state => state.characterReducer)
-	const {getItemIconUrl} = useItems();
+    const { skillId } = useParams();
+    const characters = useAppSelector(state => state.characterReducer)
+    const { getItemIconUrl } = useItems();
 
-	const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
-	const dispatch = useAppDispatch();
-	const lastCharacter: SkillsRecord & { 'username': string } | null = useMemo(() => {
-		const last = Object.entries(characters).sort(([, a], [, b]) => b.lastUpdated - a.lastUpdated).at(0);
-		if (last !== undefined) {
-			return {
-				...last[1],
-				username: last[0]
-			}
-		}
+    const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
+    const dispatch = useAppDispatch();
+    
+    // Function to get skill icon URL
+    const getSkillIconUrl = (skillName: string) => {
+        return `/images/skills/${skillName.toLowerCase()}.png`;
+    };
+    
+    const lastCharacter: SkillsRecord & { 'username': string } | null = useMemo(() => {
+        const last = Object.entries(characters).sort(([, a], [, b]) => b.lastUpdated - a.lastUpdated).at(0);
+        if (last !== undefined) {
+            return {
+                ...last[1],
+                username: last[0]
+            }
+        }
 
-		return null
-	}, [characters])
+        return null
+    }, [characters])
 
-	const userPlans = useMemo(() => {
-		const isInSkillMethods = (skill: string): skill is keyof typeof SkillMethods => skill in SkillMethods;
-		if (!skillId || !isInSkillMethods(skillId)) {
-			console.error(`No skill data found for ${skillId}`);
-			return [];
-		}
-		console.log(_UserPlans)
-		return _UserPlans.filter(plan => plan.type === skillId);
-	}, [_UserPlans, skillId])
+    const userPlans = useMemo(() => {
+        const isInSkillMethods = (skill: string): skill is keyof typeof SkillMethods => skill in SkillMethods;
+        if (!skillId || !isInSkillMethods(skillId)) {
+            console.error(`No skill data found for ${skillId}`);
+            return [];
+        }
+        console.log(_UserPlans)
+        return _UserPlans.filter(plan => plan.type === skillId);
+    }, [_UserPlans, skillId])
 
-	// useEffect(() => {
-	//     if (userPlans && userPlans.length > 0) {
-	//         dispatch(setSelectedPlan({ skill: skillId as keyof typeof skillsEnum, plan: userPlans[0] }));
-	//     }
-	// }, [dispatch, skillId, userPlans])
+    // useEffect(() => {
+    //     if (userPlans && userPlans.length > 0) {
+    //         dispatch(setSelectedPlan({ skill: skillId as keyof typeof skillsEnum, plan: userPlans[0] }));
+    //     }
+    // }, [dispatch, skillId, userPlans])
 
-	const skillMethods = useMemo(() => {
-		const isInSkillMethods = (skill: string): skill is keyof typeof SkillMethods => skill in SkillMethods;
-		if (!skillId || !isInSkillMethods(skillId)) {
-			return null;
-		}
+    const skillMethods = useMemo(() => {
+        const isInSkillMethods = (skill: string): skill is keyof typeof SkillMethods => skill in SkillMethods;
+        if (!skillId || !isInSkillMethods(skillId)) {
+            return null;
+        }
 
-		return SkillMethods[skillId] ?? {};
+        return SkillMethods[skillId] ?? {};
 
-	}, [skillId])
+    }, [skillId])
 
-	const _currentSkill = useMemo(() => {
+    const _currentSkill = useMemo(() => {
 
-		if (!lastCharacter || !skillId) {
-			return null;
-		}
-		return lastCharacter?.[skillId as keyof SkillsRecord] ?? null;
-	}, [lastCharacter, skillId]);
+        if (!lastCharacter || !skillId) {
+            return null;
+        }
+        return lastCharacter?.[skillId as keyof SkillsRecord] ?? null;
+    }, [lastCharacter, skillId]);
 
-	const currentSkillXp = useMemo(() => {
+    const currentSkillXp = useMemo(() => {
 
-		const lastEpoch = Math.max(...Object.keys(_currentSkill ?? {}).map(Number));
+        const lastEpoch = Math.max(...Object.keys(_currentSkill ?? {}).map(Number));
 
-		if (typeof _currentSkill !== 'object') {
-			return 1;
-		}
+        if (typeof _currentSkill !== 'object') {
+            return 1;
+        }
 
-		if (lastEpoch && lastEpoch !== Infinity && lastEpoch !== -Infinity) {
-			return (_currentSkill ?? {})[Number(lastEpoch)] ?? 1;
-		}
+        if (lastEpoch && lastEpoch !== Infinity && lastEpoch !== -Infinity) {
+            return (_currentSkill ?? {})[Number(lastEpoch)] ?? 1;
+        }
 
-		return 1;
-	}, [_currentSkill]);
+        return 1;
+    }, [_currentSkill]);
 
-	const currentSkillLevel = useMemo(() => {
+    const currentSkillLevel = useMemo(() => {
 
-		return xpToLevel(currentSkillXp);
+        return xpToLevel(currentSkillXp);
+
+    }, [currentSkillXp])
+
+    const TemplatePlans = useMemo(() => {
+        return Plans[skillId as keyof typeof Plans] ?? [null];
+    }, [skillId])
+
+    const currentSelectedPlan = useMemo(() => {
+        const keyExists = (key: string): key is keyof typeof selectedPlans => key in selectedPlans;
+        console.log({ selectedPlans })
+        if (!skillId || !keyExists(skillId)) {
+            console.warn('No skill data found for', skillId);
+            return null;
+        }
+
+        const plan = selectedPlans[skillId] ?? null;
+        if (!plan) {
+            console.warn('No plan found for', skillId);
+            return null;
+        }
+
+        // merge user plans and template plans
+        const userPlan = userPlans.filter(plan => plan.id === selectedPlans[skillId]).at(0);
+        if (!userPlan) {
+            return TemplatePlans[plan as keyof typeof TemplatePlans];
+        }
+        return userPlan
+    }, [TemplatePlans, selectedPlans, skillId, userPlans])
+
+    useEffect(() => {
+        console.log({ skillMethods, plans: TemplatePlans, currentSelectedPlan, currentSkillLevel, lastCharacter })
+    }, [TemplatePlans, skillMethods, currentSelectedPlan, currentSkillLevel, lastCharacter])
+
+    return (
+        <div className={style.container}>
+            {/* New Skill Header */}
+            <div className="skill-header">
+                {skillId && (
+                    <>
+                        <img 
+                            src={getSkillIconUrl(skillId)} 
+                            alt={`${skillId} icon`} 
+                            width="50" 
+                            height="50" 
+                        />
+                        <h3>{skillId} Training Plan</h3>
+                    </>
+                )}
+                
+                {lastCharacter && (
+                    <div className={style.character}>
+                        Player: {lastCharacter.username} - Level: {currentSkillLevel}
+                    </div>
+                )}
+            </div>
+
+            {/* Plan Selection */}
+            <div className={style.planSelection}>
+                <label htmlFor="plan-select">Select Plan: </label>
+                <select 
+                    id="plan-select"
+                    value={selectedPlans[skillId as keyof typeof selectedPlans]} 
+                    onChange={(e) => {
+                        const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+                        const val = e.target.value;
+
+                        if (!skillId || !valInSkills(skillId)) {
+                            console.warn('Invalid plan or skill', skillId, val);
+                            return;
+                        }
+                        const valInSelectedPlans = (key: string): key is keyof typeof Plans[typeof skillId] => key in Plans[skillId];
+                        if (!valInSelectedPlans(val)) {
+                            console.warn('Invalid plan in selected plans', skillId, val);
+                            return;
+                        }
+                        void dispatch(setSelectedPlan({ plan: val, skill: skillId }));
+                    }}
+                >
+                    {
+                        Object.entries(TemplatePlans ?? {}).map(([key, method]) => {
+                            return <option key={key} value={key}>{method?.label ?? 'unknown'}</option>
+                        })
+                    }
+                </select>
+                
+                {currentSelectedPlan && (
+                    <div className={style.currentPlan}>
+                        Current Plan: {currentSelectedPlan.label}
+                    </div>
+                )}
+            </div>
+
+            <table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th style={{ paddingBottom: 5 }}>Level</th>
+                        <th style={{ paddingBottom: 5 }}>Xp Remaining</th>
+                        <th style={{ paddingBottom: 5 }}>Method</th>
+                        <th style={{ paddingBottom: 5 }}>XP/Action</th>
+                        <th style={{ paddingBottom: 5 }}>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {
+                        currentSelectedPlan && <>
+                            {
+                                Object.entries(currentSelectedPlan?.methods ?? {}).map(([key, plan]) => {
+                                    const from = Math.max(plan.from, currentSkillLevel);
+                                    // calc to from next OR 99
+                                    const nextLevel = (Object.values(currentSelectedPlan.methods).find((p) => p?.from > from) || { from: 99 }).from;
+
+                                    const currentStartXp = levelToXp(from);
+                                    const fromXp = Math.max(currentStartXp, currentSkillXp);
+
+                                    const xpToNext = remainingXPToTarget(fromXp, nextLevel);
+                                    const itemsToNext = Math.ceil(xpToNext / plan.method.xp)
 
 
-	}, [currentSkillXp])
+                                    const prevLevel = (Object.values(currentSelectedPlan.methods).find((p) => p?.from < from) || { from: 0 }).from;
+                                    return (
+                                        <>
+                                            <tr>
+                                                <td style={{ position: 'relative', paddingTop: 4, paddingBottom: 4, paddingRight: 10, }}>
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        width: '100%',
+                                                        height: '1px',
+                                                        opacity: 0.5,
+                                                        top: '50%',
+                                                        left: 0
+                                                    }}></div>
+                                                    <button
+                                                        disabled={nextLevel - Math.max(from, currentSkillLevel) <= 1}
+                                                        style={{
+                                                            position: 'relative',
+                                                            zIndex: 2,
+                                                            height: 1,
+                                                            border: 'none',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            background: 'none',
+                                                            cursor: nextLevel - Math.max(from, currentSkillLevel) <= 1 ? 'default' : 'pointer',
+                                                            opacity: nextLevel - Math.max(from, currentSkillLevel) <= 1 ? 0.5 : 1,
+                                                            margin: '0 auto',
+                                                            padding: 0,
+                                                            marginRight: 2,
+                                                            fontSize: '16px',
+                                                            fontWeight: 'bold',
+                                                            marginTop: 0,
+                                                            outline: 'none',
+                                                            color: '#4CAF50'
+                                                        }}
+                                                        onClick={() => {
+                                                            const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+                                                            if (!skillId || !valInSkills(skillId)) {
+                                                                console.warn('Invalid skill', skillId);
+                                                                return;
+                                                            }
 
+                                                            void dispatch(addNewMethodToPlan({
+                                                                planId: currentSelectedPlan.id,
+                                                                index: Object.keys(currentSelectedPlan.methods).indexOf(key),
+                                                                skill: skillId,
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <span style={{ marginTop: -4 }}><CirclePlus size={15} /></span>
+                                                    </button>
+                                                </td>
+                                                <td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
+                                            </tr>
+                                            <tr key={key}>
 
-
-	const TemplatePlans = useMemo(() => {
-		return Plans[skillId as keyof typeof Plans] ?? [null];
-	}, [skillId])
-
-
-	const currentSelectedPlan = useMemo(() => {
-		const keyExists = (key: string): key is keyof typeof selectedPlans => key in selectedPlans;
-		console.log({selectedPlans})
-		if (!skillId || !keyExists(skillId)) {
-			console.warn('No skill data found for', skillId);
-			return null;
-		}
-
-		const plan = selectedPlans[skillId] ?? null;
-		if (!plan) {
-			console.warn('No plan found for', skillId);
-			return null;
-		}
-
-		// merge user plans and template plans
-		const userPlan = userPlans.filter(plan => plan.id === selectedPlans[skillId]).at(0);
-		if (!userPlan) {
-			return TemplatePlans[plan as keyof typeof TemplatePlans];
-		}
-		return userPlan
-	}, [TemplatePlans, selectedPlans, skillId, userPlans])
-
-
-	useEffect(() => {
-		console.log({ skillMethods, plans: TemplatePlans, currentSelectedPlan, currentSkillLevel, lastCharacter })
-	}, [TemplatePlans, skillMethods, currentSelectedPlan, currentSkillLevel, lastCharacter])
-
-	return (
-		<div className={style.container}>
-
-
-			{lastCharacter && <div className={style.character}> {lastCharacter.username} </div>}
-			<select value={selectedPlans[skillId as keyof typeof selectedPlans]} onChange={(e) => {
-				const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-				const val = e.target.value;
-
-				if (!skillId || !valInSkills(skillId)) {
-					console.warn('Invalid plan or skill', skillId, val);
-					return;
-				}
-				const valInSelectedPlans = (key: string): key is keyof typeof Plans[typeof skillId] => key in Plans[skillId];
-				if (!valInSelectedPlans(val)) {
-					console.warn('Invalid plan in selected plans', skillId, val);
-					return;
-				}
-				void dispatch(setSelectedPlan({ plan: val, skill: skillId }));
-			}}>
-				{
-					Object.entries(TemplatePlans ?? {}).map(([key, method]) => {
-						return <option key={key} value={key}>{method?.label ?? 'unknown'}</option>
-					})
-				}
-
-			</select>
-			<div>{currentSelectedPlan?.label}</div>
-
-			<table style={{ background: '#222', padding: 10 }}>
-				<thead>
-					<tr>
-						<th></th>
-						<th style={{ paddingBottom: 5 }}>Level</th>
-						<th style={{ paddingBottom: 5 }}>Xp Remaining</th>
-						<th style={{ paddingBottom: 5 }}>Method</th>
-						<th style={{ paddingBottom: 5 }}>XP/Action</th>
-						<th style={{ paddingBottom: 5 }}>Amount</th>
-					</tr>
-				</thead>
-				<tbody>
-
-					{
-						currentSelectedPlan && <>
-							{
-								Object.entries(currentSelectedPlan?.methods ?? {}).map(([key, plan]) => {
-									const from = Math.max(plan.from, currentSkillLevel);
-									// calc to from next OR 99
-									const nextLevel = (Object.values(currentSelectedPlan.methods).find((p) => p?.from > from) || { from: 99 }).from;
-
-									const currentStartXp = levelToXp(from);
-									const fromXp = Math.max(currentStartXp, currentSkillXp);
-
-									const xpToNext = remainingXPToTarget(fromXp, nextLevel);
-									const itemsToNext = Math.ceil(xpToNext / plan.method.xp)
-
-
-									const prevLevel = (Object.values(currentSelectedPlan.methods).find((p) => p?.from < from) || { from: 0 }).from;
-									return (
-										<>
-											<tr>
-												<td style={{ position: 'relative', paddingTop: 4, paddingBottom: 4, paddingRight: 10, }}>
-													<div style={{
-														position: 'absolute',
-														width: '100%',
-														height: '1px',
-														opacity: 0.5,
-														top: '50%',
-														left: 0
-													}}></div>
-													<button
-														disabled={nextLevel - Math.max(from, currentSkillLevel) <= 1}
-														style={{
-															position: 'relative',
-															zIndex: 2,
-															height: 1,
-															border: 'none',
-															display: 'flex',
-															alignItems: 'center',
-															justifyContent: 'center',
-															background: 'none',
-															cursor: nextLevel - Math.max(from, currentSkillLevel) <= 1 ? 'default' : 'pointer',
-															opacity: nextLevel - Math.max(from, currentSkillLevel) <= 1? 0.5 : 1,
-															margin: '0 auto',
-															padding: 0,
-															marginRight: 2,
-															fontSize: '16px',
-															fontWeight: 'bold',
-															marginTop: 0,
-															outline: 'none',
-															color: '#4CAF50'
-														}}
-														onClick={() => {
-															const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-															if (!skillId || !valInSkills(skillId)) {
-																console.warn('Invalid skill', skillId);
-																return;
-															}
-
-															void dispatch(addNewMethodToPlan({
-																planId: currentSelectedPlan.id,
-																index: Object.keys(currentSelectedPlan.methods).indexOf(key),
-																skill: skillId,
-															}))
-														}}
-													>
-														<span style={{ marginTop: -4 }}><CirclePlus size={15} /></span>
-													</button>
-												</td>
-												<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
-											</tr>
-											<tr key={key}>
-
-												<td >
-													{/* // add remove button */}
-													<button
-														style={{
-															background: 'none',
-															width:10,
-															aspectRatio: '1',
-															marginRight: 16,
-															marginLeft: 0,
-															padding:0,
-															color: '#ff4747',
-															outline: 'none',
-														}}
-														onClick={()=> {
-															void dispatch(removeMethodFromPlan({
+                                                <td >
+                                                    {/* // add remove button */}
+                                                    <button
+                                                        style={{
+                                                            background: 'none',
+                                                            width: 10,
+                                                            aspectRatio: '1',
+                                                            marginRight: 16,
+                                                            marginLeft: 0,
+                                                            padding: 0,
+                                                            color: '#ff4747',
+                                                            outline: 'none',
+                                                        }}
+                                                        onClick={() => {
+                                                            void dispatch(removeMethodFromPlan({
                                                                 planId: currentSelectedPlan.id,
                                                                 methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
                                                             }))
-														}}
-													><Trash2 size={15} /></button>
-												</td>
-												<td style={{ paddingBottom: 5 }}>
-													<input
+                                                        }}
+                                                    ><Trash2 size={15} /></button>
+                                                </td>
+                                                <td style={{ paddingBottom: 5 }}>
+                                                    <input
 
-														data-min={prevLevel + 1}
-														value={from}
-														type="number"
-														min={Math.max(prevLevel  + 1, currentSkillLevel)}
-														max={nextLevel - 1}
-														step={1}
-														onChange={(e) => {
-															const val = Number(e.target.value);
-															void dispatch(setPlanFromLevel({
-																level: val,
-																methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
-																plan: currentSelectedPlan.id,
+                                                        data-min={prevLevel + 1}
+                                                        value={from}
+                                                        type="number"
+                                                        min={Math.max(prevLevel + 1, currentSkillLevel)}
+                                                        max={nextLevel - 1}
+                                                        step={1}
+                                                        onChange={(e) => {
+                                                            const val = Number(e.target.value);
+                                                            void dispatch(setPlanFromLevel({
+                                                                level: val,
+                                                                methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
+                                                                plan: currentSelectedPlan.id,
 
-															}))
-														}
-														}
-													></input>
+                                                            }))
+                                                        }
+                                                        }
+                                                    ></input>
 
-												</td>
-												<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
-												<td style={{ paddingBottom: 5 }}>
-													<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-														<CustomSelect
-															showSearch
-															searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
-															options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-															value={plan.method} // This is correct - accessing the nested method object
-															onChange={(newMethod) => {
-																console.log('newMethod', newMethod);
-																void dispatch(updatePlanMethod({
-																	methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
-																	planId: currentSelectedPlan.id,
-																	method: newMethod,
-																}));
-															}}
-															getOptionLabel={(option) => option.label}
-															getOptionValue={(option) => option.id}
-															renderSelectedValue={(option) => (
-																<span>{option.label}</span> // Only show the label, no image
-															)}
-															renderOption={(option) => (
-																<span>{option.label}</span> // Only show the label, no image
-															)}
-														/>
-													</div>
-												</td>
-												<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
-												<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
-													<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-														{plan.method.items.map((itemData, idx) => {
-															console.log('itemData', itemData, idx, key, plan);
-															const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-															console.log('item', item, itemData);
-															return (
-																<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-																	<img
-																		src={getItemIconUrl(item?.id ?? 0)}
-																		width="24"
-																		height="24"
-																		alt={item?.label}
-																		style={{ marginRight: '4px' }}
-																	/>
-																	<span>
-																		{(itemData.amount * itemsToNext).toLocaleString("en-AU", {
-																			maximumFractionDigits: 0,
-																			style: 'decimal',
-																		})} {itemData.item.label}
-																	</span>
-																</div>
-															)
-														})}
-													</div>
-												</td>
-												{/* <td>{currentStartXp.toLocaleString()} {"->"} {xpToNext.toLocaleString()} </td> */}
-											</tr>
-										</>
-									)
-								})
+                                                </td>
+                                                <td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
+                                                <td style={{ paddingBottom: 5 }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
+                                                        <CustomSelect
+                                                            showSearch
+                                                            searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+                                                            options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+                                                            value={plan.method} // This is correct - accessing the nested method object
+                                                            onChange={(newMethod) => {
+                                                                console.log('newMethod', newMethod);
+                                                                void dispatch(updatePlanMethod({
+                                                                    methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
+                                                                    planId: currentSelectedPlan.id,
+                                                                    method: newMethod,
+                                                                }));
+                                                            }}
+                                                            getOptionLabel={(option) => option.label}
+                                                            getOptionValue={(option) => option.id}
+                                                            renderSelectedValue={(option) => (
+                                                                <span>{option.label}</span> // Only show the label, no image
+                                                            )}
+                                                            renderOption={(option) => (
+                                                                <span>{option.label}</span> // Only show the label, no image
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </td>
+                                                <td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
+                                                <td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                        {plan.method.items.map((itemData, idx) => {
+                                                            console.log('itemData', itemData, idx, key, plan);
+                                                            const item = Object.values(Items).find((i) => i.id === itemData.item.id);
+                                                            console.log('item', item, itemData);
+                                                            return (
+                                                                <div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
+                                                                    <img
+                                                                        src={getItemIconUrl(item?.id ?? 0)}
+                                                                        width="24"
+                                                                        height="24"
+                                                                        alt={item?.label}
+                                                                        style={{ marginRight: '4px' }}
+                                                                    />
+                                                                    <span>
+                                                                        {(itemData.amount * itemsToNext).toLocaleString("en-AU", {
+                                                                            maximumFractionDigits: 0,
+                                                                            style: 'decimal',
+                                                                        })} {itemData.item.label}
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </td>
+                                                {/* <td>{currentStartXp.toLocaleString()} {"->"} {xpToNext.toLocaleString()} </td> */}
+                                            </tr>
+                                        </>
+                                    )
+                                })
 
-							}
+                            }
                             
                             {/* Add new method at the end of the list */}
                             <tr>
@@ -398,11 +430,11 @@ const SkillPlanPage = () => {
                         </>
                     }
 
-				</tbody>
-			</table>
+                </tbody>
+            </table>
 
-		</div>
-	)
+        </div>
+    )
 };
 
 export default SkillPlanPage;
