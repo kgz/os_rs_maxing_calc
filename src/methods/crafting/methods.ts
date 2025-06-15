@@ -157,7 +157,7 @@ export default {
     xp: 107.5,
     items: [
       { amount: 1, item: Items.UncutDiamond },
-      { amount: 1, item: Items.Chisel },
+    //   { amount: 1, item: Items.Chisel },
     ],
     returns: [
       { amount: 1, item: Items.Diamond }

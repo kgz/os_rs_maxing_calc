@@ -4,7 +4,9 @@ import MaxingGuide from './components/MaxingGuide';
 import SkillPlanPage from './components/SkillPlanPage';
 import './App.css';
 import Sidebar from './components/Sidebar/Sidebar';
-
+import { useAppDispatch } from './store/store';
+import { fetchItemMapping } from './store/thunks/items/fetchItemMapping';
+import { fetchLatestPrices } from './store/thunks/items/fetchLatestPrices';
 
 function AppContent() {
   useEffect(() => {
@@ -23,6 +25,21 @@ function AppContent() {
 }
 
 const App: React.FC = () => {
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    // Fetch item mapping and latest prices when the app loads
+    void dispatch(fetchItemMapping());
+    void dispatch(fetchLatestPrices());
+    
+    // Set up an interval to refresh prices every 5 minutes
+    const intervalId = setInterval(() => {
+      void dispatch(fetchLatestPrices());
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
   return (
     <Router>
       <div className="app-container">
