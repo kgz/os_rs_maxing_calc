@@ -1,12 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const setPlanFromLevel = createAsyncThunk(
-	'skills/setPlanFromLevel',
-	async (args: {
-		methodIndex: number,
+    'skills/setPlanFromLevel',
+    async (args: {
         level: number,
-        plan: string
-	}) => {
+        plan: string,
+        methodIndex: number,
+        skill: string // Changed from optional to required
+    }) => {
         return args;
     }
 );

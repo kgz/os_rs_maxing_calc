@@ -1,9 +1,11 @@
 @use "../styles/variables.scss";
 
 .container{
-	
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
-
+	
 .addMethodRow {
   position: relative;
   height: 20px;
@@ -45,4 +47,43 @@
 .addMethodButton:hover {
   background-color: #45a049;
   transform: scale(1.05);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.character {
+  font-size: 16px;
+  color: var(--osrs-gold, #ffcb6b);
+  margin-bottom: 4px;
+}
+
+.planSelectorContainer {
+  width: 300px;
+}
+
+.planSelectorLabel {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #ccc;
+  text-align: left;
+}
+
+.planSelectorWrapper {
+  width: 100%;
+}
+
+.selectedPlanLabel {
+  font-size: 16px;
+  font-weight: 500;
 }
