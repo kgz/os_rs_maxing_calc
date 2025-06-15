@@ -100,20 +100,25 @@ const SkillPlanPage = () => {
 
 	const currentSelectedPlan = useMemo(() => {
 		const keyExists = (key: string): key is keyof typeof selectedPlans => key in selectedPlans;
-
+		console.log({selectedPlans})
 		if (!skillId || !keyExists(skillId)) {
+			console.warn('No skill data found for', skillId);
 			return null;
 		}
 
 		const plan = selectedPlans[skillId] ?? null;
 		if (!plan) {
+			console.warn('No plan found for', skillId);
 			return null;
 		}
 
-
-
-		return userPlans.filter(plan => plan.id === selectedPlans[skillId]).at(0);
-	}, [selectedPlans, skillId, userPlans])
+		// merge user plans and template plans
+		const userPlan = userPlans.filter(plan => plan.id === selectedPlans[skillId]).at(0);
+		if (!userPlan) {
+			return TemplatePlans[plan as keyof typeof TemplatePlans];
+		}
+		return userPlan
+	}, [TemplatePlans, selectedPlans, skillId, userPlans])
 
 
 	useEffect(() => {
@@ -307,7 +312,7 @@ const SkillPlanPage = () => {
 												<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
 													<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 														{plan.method.items.map((itemData, idx) => {
-
+															console.log('itemData', itemData, idx, key, plan);
 															const item = Object.values(Items).find((i) => i.id === itemData.item.id);
 															console.log('item', item, itemData);
 															return (

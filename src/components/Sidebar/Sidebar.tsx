@@ -69,7 +69,7 @@ const Sidebar: React.FC = () => {
   const renderSkillLink = (skill: string) => (
     <Link 
       key={skill} 
-      to={`/skill/${skill.toLowerCase()}`} 
+      to={`/skill/${skill.toLowerCase().charAt(0).toUpperCase() + skill.slice(1)}/`} 
       className={styles.skillItem}
     >
       <img 
