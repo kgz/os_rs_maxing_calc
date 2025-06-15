@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import style from './SkillPlanPage.module.css';
 import type { SkillsRecord } from '../store/slices/characterSlice';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { SkillMethods } from '../methods/methods';
 import { Plans } from '../plans/plans';
@@ -13,7 +13,7 @@ import CustomSelect from './CustomSelect';
 import { updatePlanMethod } from '../store/thunks/skills/updatePlanMethod';
 import type { Method } from '../types/method';
 import { Items } from '../types/items';
-import { CirclePlus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronRight, CirclePlus, Trash2 } from 'lucide-react'
 import { removeMethodFromPlan } from '../store/thunks/skills/removeMethodFromPlan';
 import { useItems } from '../hooks/useItems';
 
@@ -21,6 +21,7 @@ const SkillPlanPage = () => {
     const { skillId } = useParams();
     const characters = useAppSelector(state => state.characterReducer)
     const { getItemIconUrl } = useItems();
+    const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
     const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
     const dispatch = useAppDispatch();
@@ -51,12 +52,6 @@ const SkillPlanPage = () => {
         console.log(_UserPlans)
         return _UserPlans.filter(plan => plan.type === skillId);
     }, [_UserPlans, skillId])
-
-    // useEffect(() => {
-    //     if (userPlans && userPlans.length > 0) {
-    //         dispatch(setSelectedPlan({ skill: skillId as keyof typeof skillsEnum, plan: userPlans[0] }));
-    //     }
-    // }, [dispatch, skillId, userPlans])
 
     const skillMethods = useMemo(() => {
         const isInSkillMethods = (skill: string): skill is keyof typeof SkillMethods => skill in SkillMethods;
@@ -127,63 +122,75 @@ const SkillPlanPage = () => {
         console.log({ skillMethods, plans: TemplatePlans, currentSelectedPlan, currentSkillLevel, lastCharacter })
     }, [TemplatePlans, skillMethods, currentSelectedPlan, currentSkillLevel, lastCharacter])
 
+    // Create an array of plan options for the CustomSelect component
+    const planOptions = useMemo(() => {
+        if (!TemplatePlans) return [];
+        return Object.entries(TemplatePlans).map(([key, plan]) => ({
+            id: key,
+            label: plan?.label || "Unknown",
+            plan
+        }));
+    }, [TemplatePlans]);
+
+    // Find the currently selected plan option
+    const selectedPlanOption = useMemo(() => {
+        if (!skillId || !selectedPlans[skillId as keyof typeof selectedPlans] || !planOptions.length) return null;
+        return planOptions.find(option => option.id === selectedPlans[skillId as keyof typeof selectedPlans]) || null;
+    }, [planOptions, selectedPlans, skillId]);
+
     return (
         <div className={style.container}>
-            {/* New Skill Header */}
+            {/* Redesigned Skill Header with Plan Selector */}
             <div className="skill-header">
-                {skillId && (
-                    <>
-                        <img 
-                            src={getSkillIconUrl(skillId)} 
-                            alt={`${skillId} icon`} 
-                            width="50" 
-                            height="50" 
-                        />
-                        <h3>{skillId} Training Plan</h3>
-                    </>
-                )}
+                <div className={style.headerLeft}>
+                    {skillId && (
+                        <>
+                            <img 
+                                src={getSkillIconUrl(skillId)} 
+                                alt={`${skillId} icon`} 
+                                width="50" 
+                                height="50" 
+                            />
+                            <h3>{skillId} Training Plan</h3>
+                        </>
+                    )}
+                </div>
                 
-                {lastCharacter && (
-                    <div className={style.character}>
-                        Player: {lastCharacter.username} - Level: {currentSkillLevel}
+                <div className={style.headerRight}>
+                    {lastCharacter && (
+                        <div className={style.character}>
+                            Player: {lastCharacter.username} - Level: {currentSkillLevel}
+                        </div>
+                    )}
+                    
+                    {/* Larger Plan Selector using CustomSelect */}
+                    <div className={style.planSelectorContainer}>
+                        <div className={style.planSelectorLabel}>Current Plan:</div>
+                        <div className={style.planSelectorWrapper}>
+                            <CustomSelect
+                                options={planOptions}
+                                value={selectedPlanOption}
+                                onChange={(option) => {
+                                    const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+                                    if (!skillId || !valInSkills(skillId)) {
+                                        console.warn('Invalid plan or skill', skillId, option.id);
+                                        return;
+                                    }
+                                    void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
+                                }}
+                                getOptionLabel={(option) => option.label}
+                                getOptionValue={(option) => option.id}
+                                placeholder="Select a plan..."
+                                renderSelectedValue={(option) => (
+                                    <span className={style.selectedPlanLabel}>{option.label}</span>
+                                )}
+                                renderOption={(option) => (
+                                    <span>{option.label}</span>
+                                )}
+                            />
+                        </div>
                     </div>
-                )}
-            </div>
-
-            {/* Plan Selection */}
-            <div className={style.planSelection}>
-                <label htmlFor="plan-select">Select Plan: </label>
-                <select 
-                    id="plan-select"
-                    value={selectedPlans[skillId as keyof typeof selectedPlans]} 
-                    onChange={(e) => {
-                        const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-                        const val = e.target.value;
-
-                        if (!skillId || !valInSkills(skillId)) {
-                            console.warn('Invalid plan or skill', skillId, val);
-                            return;
-                        }
-                        const valInSelectedPlans = (key: string): key is keyof typeof Plans[typeof skillId] => key in Plans[skillId];
-                        if (!valInSelectedPlans(val)) {
-                            console.warn('Invalid plan in selected plans', skillId, val);
-                            return;
-                        }
-                        void dispatch(setSelectedPlan({ plan: val, skill: skillId }));
-                    }}
-                >
-                    {
-                        Object.entries(TemplatePlans ?? {}).map(([key, method]) => {
-                            return <option key={key} value={key}>{method?.label ?? 'unknown'}</option>
-                        })
-                    }
-                </select>
-                
-                {currentSelectedPlan && (
-                    <div className={style.currentPlan}>
-                        Current Plan: {currentSelectedPlan.label}
-                    </div>
-                )}
+                </div>
             </div>
 
             <table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
