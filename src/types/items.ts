@@ -20,5 +20,31 @@ export const Items: {
 	Coins: {
 		id: 995,
 		label: 'gp',
-	}
+	},
+    
+    // New items for crafting
+    Leather: {
+        id: 1741,
+        label: 'Leather',
+    },
+    Needle: {
+        id: 1733,
+        label: 'Needle',
+    },
+    Thread: {
+        id: 1734,
+        label: 'Thread',
+    },
+    LeatherGloves: {
+        id: 1059,
+        label: 'Leather gloves',
+    },
+    LeatherBoots: {
+        id: 1061,
+        label: 'Leather boots',
+    },
+    LeatherCowl: {
+        id: 1063,
+        label: 'Leather cowl',
+    },
 } as const;

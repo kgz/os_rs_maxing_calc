@@ -11,7 +11,7 @@ export type Method = {
 	label: string;
 	xp: number;
 	items: { amount: number, item: Item }[];
-	returns: Item[];
+	returns: { amount: number, item: Item }[];
 	// pehaps we add a lower and upper bound on the number of actions
 	actionsPerHour: number;
 	requirments: {
