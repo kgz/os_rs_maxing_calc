@@ -1,10 +1,12 @@
+import type { RootState } from '../store/store';
+
 export const loadState = () => {
   try {
     const serializedState = localStorage.getItem('reduxState');
     if (serializedState === null) {
       return undefined;
     }
-    return JSON.parse(serializedState);
+    return JSON.parse(serializedState) as Partial<RootState>;
   } catch (err) {
     console.error('Error loading state from localStorage:', err);
     return undefined;

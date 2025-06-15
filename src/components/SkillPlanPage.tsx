@@ -205,11 +205,11 @@ const SkillPlanPage = () => {
 
 		if (!option) return;
         
-        if (option.isTemplate) {
-            createCustomPlanFromTemplate(option.id);
-        } else {
-            void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
-        }
+        // if (option.isTemplate) {
+        //     createCustomPlanFromTemplate(option.id);
+        // } else {
+		// }
+		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
     };
 
     return (

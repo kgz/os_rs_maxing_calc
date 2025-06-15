@@ -64,8 +64,20 @@ const skillsSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setSelectedPlan.fulfilled, (state, action) => {
-			const { skill, plan } = action.payload;
-			state.selectedPlans[skill] = plan;
+		  const { skill, plan } = action.payload;
+		  
+		  // Check if the plan is a template plan or a custom plan
+		  const isCustomPlan = state.plans.some(p => p.id === plan);
+		  const isTemplatePlan = isValidPlan(skill, plan);
+		  
+		  // If it's a template plan and not already in user plans, just set it as selected
+		  // without creating a custom copy
+		  if (isTemplatePlan && !isCustomPlan) {
+		    state.selectedPlans[skill] = plan;
+		  } else {
+		    // For custom plans, just set it as selected
+		    state.selectedPlans[skill] = plan;
+		  }
 		});
 
 		builder.addCase(setPlanFromLevel.fulfilled, (state, action) => {
