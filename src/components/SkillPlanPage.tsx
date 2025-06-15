@@ -151,50 +151,6 @@ const SkillPlanPage = () => {
         return planOptions.find(option => option.id === selectedPlans[skillId as keyof typeof selectedPlans]) || null;
     }, [planOptions, selectedPlans, skillId]);
 
-    // Function to create a copy of a template plan as a user plan
-    const createCustomPlanFromTemplate = (templatePlanId: string) => {
-        if (!skillId) return null;
-
-		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-
-		if (!valInSkills(skillId)) {
-			console.warn('Invalid plan or skill', skillId, templatePlanId);
-			return;
-		}
-
-		const templatePlanIdInTemplatePlans = (key: string): key is keyof typeof Plans[keyof typeof Plans] => key in TemplatePlans;
-        if (!templatePlanIdInTemplatePlans(templatePlanId)) {
-			console.warn('Invalid template plan', skillId, templatePlanId);
-			return;
-		}
-
-        const templatePlan = TemplatePlans[templatePlanId] as Plan | undefined;
-        if (!templatePlan) return null;
-        
-        // Create a new custom plan with a unique ID
-        const newPlanId = uuidv4();
-        const newPlan = {
-            id: newPlanId,
-            label: `${templatePlan.label} (Custom)`,
-            methods: [...templatePlan.methods],
-            type: skillId
-        };
-        
-        // Add the new plan to the store
-        dispatch({ 
-            type: 'skills/addCustomPlan', 
-            payload: newPlan 
-        });
-        
-        // Set the new plan as selected
-        dispatch(setSelectedPlan({ 
-            skill: skillId, 
-            plan: newPlanId 
-        }));
-        
-        return newPlanId;
-    };
-
     // Handle plan selection change
     const handlePlanChange = (option: typeof planOptions[0] | null) => {
         const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
@@ -268,7 +224,8 @@ const SkillPlanPage = () => {
                         <th style={{ paddingBottom: 5 }}>Xp Remaining</th>
                         <th style={{ paddingBottom: 5 }}>Method</th>
                         <th style={{ paddingBottom: 5 }}>XP/Action</th>
-                        <th style={{ paddingBottom: 5 }}>Amount</th>
+                        <th style={{ paddingBottom: 5 }}>Input</th>
+                        <th style={{ paddingBottom: 5 }}>Output</th> {/* New column */}
                     </tr>
                 </thead>
                 <tbody>
@@ -441,6 +398,31 @@ const SkillPlanPage = () => {
                                                                 </div>
                                                             )
                                                         })}
+                                                    </div>
+                                                </td>
+                                                {/* New output column */}
+                                                <td style={{ paddingBottom: 5 }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                        {plan.method.returns?.map((outputData, idx) => {
+                                                            const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
+                                                            return (
+                                                                <div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
+                                                                    <img
+                                                                        src={getItemIconUrl(outputItem?.id ?? 0)}
+                                                                        width="24"
+                                                                        height="24"
+                                                                        alt={outputItem?.label}
+                                                                        style={{ marginRight: '4px' }}
+                                                                    />
+                                                                    <span>
+                                                                        {(outputData.amount * itemsToNext).toLocaleString("en-AU", {
+                                                                            maximumFractionDigits: 0,
+                                                                            style: 'decimal',
+                                                                        })} {outputData.item.label}
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        }) || <span>-</span>}
                                                     </div>
                                                 </td>
                                                 {/* <td>{currentStartXp.toLocaleString()} {"->"} {xpToNext.toLocaleString()} </td> */}
