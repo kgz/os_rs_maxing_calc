@@ -1,3 +1,31 @@
+:root {
+  --osrs-yellow: #ffcb05;
+  --osrs-light-brown: #8a6134;
+  --osrs-dark-brown: #5a3921;
+  --sidebar-width: 250px;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  margin-left: var(--sidebar-width);
+}
+
+.home-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.home-page h1 {
+  color: var(--osrs-yellow);
+  margin-bottom: 1.5rem;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -162,7 +190,6 @@ button:hover {
 .unavailable {
   color: #888;
 }
-
 
 .training-methods, .level-breakdown {
   width: 100%;

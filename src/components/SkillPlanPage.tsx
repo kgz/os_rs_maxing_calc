@@ -142,7 +142,7 @@ const SkillPlanPage = () => {
 			}}>
 				{
 					Object.entries(TemplatePlans ?? {}).map(([key, method]) => {
-						return <option key={key} value={key}>{method.label}</option>
+						return <option key={key} value={key}>{method?.label ?? 'unknown'}</option>
 					})
 				}
 
