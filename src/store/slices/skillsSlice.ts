@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, current, type PayloadAction } from '@reduxjs/toolkit';
 import { Plans } from '../../plans/plans';
 import { setSelectedPlan } from '../thunks/skills/setSelectedPlan';
 import type { Plan } from '../../types/plan';
@@ -41,14 +41,7 @@ const initialState: InitialState = {
 	selectedPlans: {
 		Prayer: '234234-234234-234'
 	},
-	plans: [{
-		id: '234234-234234-234',
-		label: 'Default Plan',
-		methods: [
-			...Plans['Prayer'].prayer_medium_1.methods,
-		],
-		type: "Prayer"
-	}]
+	plans: []
 
 }
 
@@ -249,6 +242,7 @@ const skillsSlice = createSlice({
 		builder.addCase(updatePlanMethod.fulfilled, (state, action) => {
 			const { planId, methodIndex, method, skill } = action.payload;
 			let planIndex = state.plans.findIndex(p => p.id === planId);
+			console.log({planIndex}, current(state).plans);
 			
 			// If plan doesn't exist in user plans but exists in template plans, create a copy
 			if (planIndex === -1) {

@@ -37,7 +37,9 @@ const SkillPlanPage = () => {
 			isTemplate: true
 		}));
 
-		const userPlanOptions = _UserPlans.map(plan => ({
+		const userPlanOptions = _UserPlans.filter(plan=>{
+			return plan.type === skillId
+		}).map(plan => ({
 			id: plan.id,
 			label: plan.label,
 			plan,
