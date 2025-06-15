@@ -4,7 +4,7 @@ import styles from './CustomSelect.module.css';
 export interface CustomSelectProps<T> {
 	options: T[];
 	value: T;
-	onChange: (value: T) => void;
+	onChange: (value: T, index: number) => void;
 	getOptionLabel: (option: T) => string;
 	getOptionValue?: (option: T) => string | number;
 	renderOption?: (option: T, isSelected: boolean) => React.ReactNode;
@@ -66,8 +66,8 @@ function CustomSelect<T>({
 		}
 	}, [isOpen]);
 
-	const handleSelect = (option: T) => {
-		onChange(option);
+	const handleSelect = (option: T, index:number) => {
+		onChange(option, index);
 		setIsOpen(false);
 	};
 
@@ -137,7 +137,7 @@ function CustomSelect<T>({
 							<div
 								key={`${getOptionValue(option)}-${index}`}
 								className={`${styles.option} ${isOptionSelected(option) ? styles.selected : ''}`}
-								onClick={() => handleSelect(option)}
+								onClick={() => handleSelect(option, index)}
 							>
 								{renderOption ? (
 									renderOption(option, isOptionSelected(option))

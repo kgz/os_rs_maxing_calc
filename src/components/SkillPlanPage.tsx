@@ -89,15 +89,17 @@ const SkillPlanPage = () => {
 							<>
 								{
 									Object.entries(currentSelectedPlan?.methods ?? {})
-										.sort((a, b) => a[1].from - b[1].from) // Sort by level requirement
-										.filter(([, plan]) => {
+										.map((plan, key) => ({
+											key, plan: plan[1],
+										}))
+										.sort((a, b) => a.plan?.from - b.plan?.from) // Sort by level requirement
+										.filter((ob) => {
 											// Show methods that are applicable to the player's current level
 											// This means either:
 											// 1. The method's level requirement is exactly at the player's level
 											// 2. The method's level requirement is below the player's level, but it's the highest such method
 											// 3. The method's level requirement is above the player's level, but it's the lowest such method
-
-											if (plan.from === currentSkillLevel) {
+											if (ob.plan.from === currentSkillLevel) {
 												// Exact match for player's level
 												return true;
 											}
@@ -118,10 +120,10 @@ const SkillPlanPage = () => {
 											);
 
 											// Show this method if it's either the highest below or the lowest above
-											return plan.from === highestBelowOrEqual || plan.from === lowestAbove;
+											return ob.plan.from === highestBelowOrEqual || ob.plan.from === lowestAbove;
 										})
-										.map(([key, plan]) => {
-											const from = Math.max(plan.from, currentSkillLevel);
+										.map((ob) => {
+											const from = Math.max(ob.plan.from, currentSkillLevel);
 
 											// Find the next method's level or default to 99
 											const nextLevel = (
@@ -134,7 +136,7 @@ const SkillPlanPage = () => {
 											const fromXp = Math.max(currentStartXp, currentSkillXp);
 
 											const xpToNext = remainingXPToTarget(fromXp, nextLevel);
-											const itemsToNext = Math.ceil(xpToNext / plan.method.xp);
+											const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
 
 											// Find the previous method's level
 											const prevLevel = (
@@ -142,11 +144,10 @@ const SkillPlanPage = () => {
 													.filter(p => p?.from < from)
 													.sort((a, b) => b.from - a.from)[0] || { from: 0 }
 											).from;
-
 											return (
 												<MethodRow
-													key={key}
-													plan={plan}
+													index={ob.key.toString()}
+													plan={ob.plan}
 													from={from}
 													nextLevel={nextLevel}
 													prevLevel={prevLevel}

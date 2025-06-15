@@ -1,4 +1,5 @@
 import { SkillMethods } from "../../methods/methods";
+import type { Plan } from "../../types/plan";
 export default {
     id: "cheap-cost",
     type: "Prayer",

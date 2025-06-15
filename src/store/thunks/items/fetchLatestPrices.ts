@@ -22,7 +22,6 @@ export const fetchLatestPrices = createAsyncThunk(
     if (response.status < 200 || response.status >= 300) {
       throw new Error('Failed to fetch latest price data');
     }
-    
     return response.data.data;
   }
 );

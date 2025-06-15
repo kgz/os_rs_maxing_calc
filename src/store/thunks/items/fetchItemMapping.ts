@@ -15,17 +15,30 @@ export const fetchItemMapping = createAsyncThunk(
     
     // Add Coins item manually since it's not in the API response
     const coinsItem: ItemMapping = {
-      examine: "Lovely money!",
-      id: 995,
-      members: false,
-      lowalch: 1,
-      limit: 0, // No GE limit for coins
-      value: 1,
-      highalch: 1,
-      icon: "Coins_250.png",
-      name: "Coins",
-      imageSrc: "https://oldschool.runescape.wiki/images/Coins_250.png?c2755"
+		examine: "Lovely money!",
+		id: 995,
+		members: false,
+		lowalch: 1,
+		limit: 0, // No GE limit for coins
+		value: 1,
+		highalch: 1,
+		icon: "Coins_250.png",
+		name: "Coins",
+		imageSrc: "https://oldschool.runescape.wiki/images/Coins_250.png?c2755"
     };
+
+	const BoneShardData: ItemMapping = {
+		examine: "A shard of bone.",
+        id: 29381,
+        members: false,
+        lowalch: 50,
+        limit: 0,
+		value: 0,
+        highalch: 0,
+        icon: "Blessed_bone_shards_detail.png",
+        name: "Bone shard",
+        imageSrc: "https://oldschool.runescape.wiki/images/thumb/Blessed_bone_shards_detail.png/150px-Blessed_bone_shards_detail.png?1e664"
+	}
     
     // Check if coins already exist in the response
     const coinsExists = mappingData.some(item => item.id === 995);
@@ -34,6 +47,10 @@ export const fetchItemMapping = createAsyncThunk(
     if (!coinsExists) {
       mappingData.push(coinsItem);
     }
+
+	// Add Bone Shard manually since it's not in the API response
+	mappingData.push(BoneShardData);
+    
     
     return mappingData;
   }
