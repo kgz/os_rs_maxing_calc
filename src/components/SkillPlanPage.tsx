@@ -380,7 +380,7 @@ const SkillPlanPage = () => {
 
 											void dispatch(addNewMethodToPlan({
 												planId: currentSelectedPlan.id,
-												index: Object.keys(currentSelectedPlan.methods).indexOf(key),
+												index: Object.keys(currentSelectedPlan.methods).indexOf(skillId),
 												skill: skillId,
 											}))
 										}}

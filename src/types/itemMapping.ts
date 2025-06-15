@@ -8,6 +8,7 @@ export interface ItemMapping {
   highalch: number;
   icon: string;
   name: string;
+  imageSrc?: string; // Optional property for custom image sources
 }
 
 export type ItemMappingRecord = Record<number, ItemMapping>;

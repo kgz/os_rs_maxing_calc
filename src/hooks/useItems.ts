@@ -11,6 +11,7 @@ export const useItems = () => {
   
   const getItemIconUrl = (id: number): string | undefined => {
     const item = allItems[id];
+	console.log('getItemIconUrl', item, id, allItems);
     if (!item) return undefined;
     
     // Construct the URL for the item icon
