@@ -39,11 +39,11 @@ export const Items = {
         label: 'Leather boots',
     },
     LeatherCowl: {
-        id: 1063,
+        id: 1167,
         label: 'Leather cowl',
     },
     LeatherVambraces: {
-        id: 1065,
+        id: 1063,
         label: 'Leather vambraces',
     },
     LeatherBody: {
