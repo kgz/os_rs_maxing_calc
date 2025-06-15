@@ -8,8 +8,6 @@ export default {
     xp: 13.8,
     items: [
       { amount: 1, item: Items.Leather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.LeatherGloves }
@@ -27,8 +25,6 @@ export default {
     xp: 16.2,
     items: [
       { amount: 1, item: Items.Leather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.LeatherBoots }
@@ -46,8 +42,6 @@ export default {
     xp: 18.5,
     items: [
       { amount: 1, item: Items.Leather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.LeatherCowl }
@@ -65,8 +59,6 @@ export default {
     xp: 22,
     items: [
       { amount: 1, item: Items.Leather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.LeatherVambraces }
@@ -84,8 +76,6 @@ export default {
     xp: 25,
     items: [
       { amount: 1, item: Items.Leather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.LeatherBody }
@@ -229,8 +219,6 @@ export default {
     xp: 186,
     items: [
       { amount: 3, item: Items.GreenDragonLeather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.GreenDhideBody }
@@ -248,8 +236,6 @@ export default {
     xp: 210,
     items: [
       { amount: 3, item: Items.BlueDragonLeather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.BlueDhideBody }
@@ -267,8 +253,6 @@ export default {
     xp: 234,
     items: [
       { amount: 3, item: Items.RedDragonLeather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.RedDhideBody }
@@ -286,8 +270,6 @@ export default {
     xp: 258,
     items: [
       { amount: 3, item: Items.BlackDragonLeather },
-      { amount: 1, item: Items.Needle },
-      { amount: 1, item: Items.Thread },
     ],
     returns: [
       { amount: 1, item: Items.BlackDhideBody }

@@ -38,9 +38,9 @@ export const useItems = () => {
     }
     
     const priceData = allPrices[itemId];
-		// Use the average of high and low prices
-	const validHigh = priceData.high > 0 ? priceData.high : 0;
-	const validLow = priceData.low > 0 ? priceData.low : 0;
+    // Use the average of high and low prices
+    const validHigh = priceData.high > 0 ? priceData.high : 0;
+    const validLow = priceData.low > 0 ? priceData.low : 0;
 
     // Handle different price types
     switch (type) {
@@ -52,8 +52,6 @@ export const useItems = () => {
         return priceData.high > 0 ? priceData.high : priceData.low;
       case 'average':
       default:
-  
-        
         // If only one price is available, use that
         if (validHigh === 0) return validLow;
         if (validLow === 0) return validHigh;
