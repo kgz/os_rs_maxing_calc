@@ -1,7 +1,10 @@
 import type { Plan } from '../types/plan';
 import type { skillsEnum } from '../types/skillsResponse';
-import prayer_medium_1 from './prayer/prayer_medium_1';
-import prayer_medium_2 from './prayer/prayer_medium_2';
+import prayer_cheap from './prayer/prayer_cheap';
+import prayer_medium from './prayer/prayer_medium';
+import prayer_expensive from './prayer/prayer_expensive';
+import prayer_wilderness from './prayer/prayer_wilderness';
+import prayer_alternative from './prayer/prayer_alternative';
 import { crafting_low_cost, crafting_medium_cost, crafting_high_cost } from './crafting';
 
 type SkillPlans = {
@@ -12,8 +15,11 @@ type SkillPlans = {
 
 export const Plans = {
 	"Prayer": {
-		prayer_medium_1,
-		prayer_medium_2
+		prayer_cheap,
+		prayer_medium,
+		prayer_expensive,
+		prayer_wilderness,
+		prayer_alternative
 	},
 	"Crafting": {
 		crafting_low_cost,

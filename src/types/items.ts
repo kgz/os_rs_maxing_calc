@@ -167,7 +167,7 @@ export const Items = {
         label: 'Superior dragon bones',
     },
     BlessedBoneShards: {
-        id: 29096,
+        id: 29381,
         label: 'Blessed bone shards',
     },
     JugOfWine: {
