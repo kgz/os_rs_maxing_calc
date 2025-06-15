@@ -5,7 +5,6 @@ import {
 } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 
-
 import type { PersistConfig } from "redux-persist";
 import {
     persistStore,
@@ -23,37 +22,34 @@ import { v4 } from "uuid";
 import getStoredState from "redux-persist/es/getStoredState";
 import { characterReducer } from "./slices/characterSlice";
 import { skillsReducer } from "./slices/skillsSlice";
-// import testMiddleware from "./middleware/testMiddleware";
-
-const reducer = combineReducers({
-	characterReducer,
-	skillsReducer
-});
+import itemsReducer from './slices/itemsSlice';
+import { fetchItemMapping } from './thunks/items/fetchItemMapping';
 
 const persistConfig: PersistConfig<DefaultRootState> = {
     key: "root",
     storage: storage("BAWP"),
 };
-const persistedReducer = persistReducer(persistConfig, reducer);
 
-const store = configureStore({
+const rootReducer = combineReducers({
+    characterReducer,
+    skillsReducer,
+    items: itemsReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
-                ignoredActions: [
-                    FLUSH,
-                    REHYDRATE,
-                    PAUSE,
-                    PERSIST,
-                    PURGE,
-                    REGISTER,
-                ],
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
-        })
-            // .concat(thunk)
-            // .concat(testMiddleware),
+        }),
 });
+
+// Fetch item mapping data on application startup
+store.dispatch(fetchItemMapping());
 
 export const persistor = persistStore(store);
 
@@ -92,17 +88,16 @@ store.subscribe(() => {
     }, 200);
 });
 
-export type StoreType = typeof store;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
-export type IAppDispatch = StoreType["dispatch"];
-
-export type TRootState = ReturnType<typeof reducer>;
+export type TRootState = ReturnType<typeof rootReducer>;
 
 declare module "react-redux" {
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     export interface DefaultRootState extends TRootState {}
 }
-export const useAppDispatch = () => useDispatch<IAppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<DefaultRootState> =
-    useSelector;
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export default store;

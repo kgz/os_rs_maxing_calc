@@ -15,9 +15,11 @@ import type { Method } from '../types/method';
 import { Items } from '../types/items';
 import { CirclePlus, Trash2 } from 'lucide-react'
 import { removeMethodFromPlan } from '../store/thunks/skills/removeMethodFromPlan';
+import { useItems } from '../hooks/useItems';
 const SkillPlanPage = () => {
 	const { skillId } = useParams();
 	const characters = useAppSelector(state => state.characterReducer)
+	const {getItemIconUrl} = useItems();
 
 	const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
 	const dispatch = useAppDispatch();
@@ -189,6 +191,7 @@ const SkillPlanPage = () => {
 														left: 0
 													}}></div>
 													<button
+														disabled={nextLevel - Math.max(from, currentSkillLevel) <= 1}
 														style={{
 															position: 'relative',
 															zIndex: 2,
@@ -198,7 +201,8 @@ const SkillPlanPage = () => {
 															alignItems: 'center',
 															justifyContent: 'center',
 															background: 'none',
-															cursor: 'pointer',
+															cursor: nextLevel - Math.max(from, currentSkillLevel) <= 1 ? 'default' : 'pointer',
+															opacity: nextLevel - Math.max(from, currentSkillLevel) <= 1? 0.5 : 1,
 															margin: '0 auto',
 															padding: 0,
 															marginRight: 2,
@@ -256,7 +260,7 @@ const SkillPlanPage = () => {
 														data-min={prevLevel + 1}
 														value={from}
 														type="number"
-														min={prevLevel + 1}
+														min={Math.max(prevLevel  + 1, currentSkillLevel)}
 														max={nextLevel - 1}
 														step={1}
 														onChange={(e) => {
@@ -309,7 +313,7 @@ const SkillPlanPage = () => {
 															return (
 																<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 																	<img
-																		src={item?.imageSrc ? item.imageSrc : `https://secure.runescape.com/m=itemdb_oldschool/1749130378040_obj_sprite.gif?id=${item?.id}`}
+																		src={getItemIconUrl(item?.id ?? 0)}
 																		width="24"
 																		height="24"
 																		alt={item?.label}
@@ -346,38 +350,43 @@ const SkillPlanPage = () => {
                                         left: 0
                                     }}></div>
                                     <button
-                                        style={{
-                                            position: 'relative',
-                                            zIndex: 2,
-                                            height: 1,
-                                            color: 'white',
-                                            border: 'none',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            cursor: 'pointer',
-                                            margin: '0 auto',
-                                            padding: 0,
-                                            fontSize: '16px',
-                                            fontWeight: 'bold',
-                                            marginTop: -4
-                                        }}
-                                        onClick={() => {
-                                            const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-                                            if (!skillId || !valInSkills(skillId)) {
-                                                console.warn('Invalid skill', skillId);
-                                                return;
-                                            }
+										// disabled={nextLevel - Math.max(from, currentSkillLevel) <= 1}
+										style={{
+											position: 'relative',
+											zIndex: 2,
+											height: 1,
+											border: 'none',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											background: 'none',
+											// cursor: nextLevel - Math.max(from, currentSkillLevel) <= 1 ? 'default' : 'pointer',
+											// opacity: nextLevel - Math.max(from, currentSkillLevel) <= 1? 0.5 : 1,
+											margin: '0 auto',
+											padding: 0,
+											marginRight: 2,
+											fontSize: '16px',
+											fontWeight: 'bold',
+											marginTop: 0,
+											outline: 'none',
+											color: '#4CAF50'
+										}}
+										onClick={() => {
+											const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+											if (!skillId || !valInSkills(skillId)) {
+												console.warn('Invalid skill', skillId);
+												return;
+											}
 
-                                            void dispatch(addNewMethodToPlan({
-                                                planId: currentSelectedPlan.id,
-                                                index: Object.keys(currentSelectedPlan.methods).length,
-                                                skill: skillId,
-                                            }))
-                                        }}
-                                    >
-                                        <span style={{ marginTop: -4 }}>+</span>
-                                    </button>
+											void dispatch(addNewMethodToPlan({
+												planId: currentSelectedPlan.id,
+												index: Object.keys(currentSelectedPlan.methods).indexOf(key),
+												skill: skillId,
+											}))
+										}}
+									>
+										<span style={{ marginTop: -4 }}><CirclePlus size={15} /></span>
+									</button>
                                 </td>
                                 <td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
                             </tr>
