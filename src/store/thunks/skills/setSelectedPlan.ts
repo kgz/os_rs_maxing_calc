@@ -3,11 +3,11 @@ import type { Plans } from "../../../plans/plans";
 
 type TPlans = keyof typeof Plans;
 
-type T = keyof typeof Plans[TPlans];
+// type T = keyof typeof Plans[TPlans];
 
 export const setSelectedPlan = createAsyncThunk(
 	'skills/setSelectedPlan',
-	async (args: {skill: TPlans, plan: T}) => {
+	async (args: {skill: TPlans, plan: string}) => {
 		return args;
 	}
 );

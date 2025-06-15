@@ -8,6 +8,18 @@ import { addNewMethodToPlan } from '../thunks/skills/addNewMethodToPlan';
 import { updatePlanMethod } from '../thunks/skills/updatePlanMethod';
 import { removeMethodFromPlan } from '../thunks/skills/removeMethodFromPlan';
 
+function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
+  return key in obj;
+}
+
+function isValidSkill(skill: string): skill is keyof typeof Plans {
+  return skill in Plans;
+}
+
+// Alternative approach without type predicate
+function isValidPlan(skill: keyof typeof Plans, plan: string): boolean {
+  return plan in Plans[skill];
+}
 
 type TPlanKeys =
 	{
@@ -62,25 +74,34 @@ const skillsSlice = createSlice({
 			
 			// If plan doesn't exist in user plans but exists in template plans, create a copy
 			if (planIndex === -1) {
-				// Find the plan in template plans
-				const skillPlans = Plans[skill as keyof typeof Plans];
-				if (!skillPlans) {
+				// Check if skill is a valid key in Plans
+				if (!isValidSkill(skill)) {
 					console.error(`No plans found for skill: ${skill}`);
 					return;
 				}
 				
-				const templatePlan = skillPlans[plan as keyof typeof skillPlans];
-				if (!templatePlan) {
-					console.error(`Template plan not found: ${plan} for skill: ${skill}`);
-					return;
+				const skillPlans = Plans[skill];
+
+				if (!isValidPlan(skill, plan)) {
+				  console.error(`Template plan not found: ${plan} for skill: ${skill}`);
+				  return;
 				}
-				
+
+				// Check if plan is a valid key in skillPlans
+				if (!isKeyOfObject(plan, skillPlans)) {
+				  console.error(`Invalid plan key: ${plan} for skill: ${skill}`);
+				  return;
+				}
+
+				// Now TypeScript knows plan is a valid key
+				const templatePlan = skillPlans[plan] as Plan;
+
 				// Create a new custom plan based on the template
 				const newPlan = {
-					...templatePlan,
-					id: `${plan}-custom`,
-					label: `${templatePlan.label} (Custom)`,
-					type: skill
+				  ...templatePlan,
+				  id: `${plan}-custom`,
+				  label: `${templatePlan.label} (Custom)`,
+				  type: skill
 				};
 				
 				// Add the new plan to user plans
@@ -131,70 +152,87 @@ const skillsSlice = createSlice({
 			}
 		});
 
-		builder.addCase(addNewMethodToPlan.fulfilled, (state, action) => {
-			const { skill, planId, index } = action.payload;
-			let planIndex = state.plans.findIndex(p => p.id === planId);
+  builder.addCase(addNewMethodToPlan.fulfilled, (state, action) => {
+    const { skill, planId, index } = action.payload;
+    let planIndex = state.plans.findIndex(p => p.id === planId);
+  
+    // If plan doesn't exist in user plans but exists in template plans, create a copy
+    if (planIndex === -1) {
+      // Check if skill is a valid key in Plans
+      if (!isValidSkill(skill)) {
+        console.error(`No plans found for skill: ${skill}`);
+        return;
+      }
+      
+      const skillPlans = Plans[skill];
+  
+      if (!isValidPlan(skill, planId)) {
+        console.error(`Template plan not found: ${planId} for skill: ${skill}`);
+        return;
+      }
+  
+      // Check if planId is a valid key in skillPlans
+      if (!isKeyOfObject(planId, skillPlans)) {
+        console.error(`Invalid plan key: ${planId} for skill: ${skill}`);
+        return;
+      }
+  
+      // Now TypeScript knows planId is a valid key
+      const templatePlan = skillPlans[planId] as Plan;
+  
+      // Create a new custom plan based on the template
+      const newPlan = {
+        ...templatePlan,
+        id: `${planId}-custom`,
+        label: `${templatePlan.label} (Custom)`,
+        type: skill
+      };
+      
+      // Add the new plan to user plans
+      state.plans.push(newPlan);
+      
+      // Update the selected plan to point to the new custom plan
+      state.selectedPlans[skill] = newPlan.id;
+      
+      // Update planIndex to point to the newly created plan
+      planIndex = state.plans.length - 1;
+    }
+  
+    const userPlans = state.plans[planIndex];
+  
+    const availableSkillMethods = Plans[skill];
 
-			// If plan doesn't exist in user plans but exists in template plans, create a copy
-			if (planIndex === -1) {
-				// Find the plan in template plans
-				const skillPlans = Plans[skill as keyof typeof Plans];
-				if (!skillPlans) {
-					console.error(`No plans found for skill: ${skill}`);
-					return;
-				}
-				
-				const templatePlan = skillPlans[planId as keyof typeof skillPlans];
-				if (!templatePlan) {
-					console.error(`Template plan not found: ${planId} for skill: ${skill}`);
-					return;
-				}
-				
-				// Create a new custom plan based on the template
-				const newPlan = {
-					...templatePlan,
-					id: `${planId}-custom`,
-					label: `${templatePlan.label} (Custom)`,
-					type: skill
-				};
-				
-				// Add the new plan to user plans
-				state.plans.push(newPlan);
-				
-				// Update the selected plan to point to the new custom plan
-				state.selectedPlans[skill] = newPlan.id;
-				
-				// Update planIndex to point to the newly created plan
-				planIndex = state.plans.length - 1;
-			}
+    // Get the first key and ensure it exists
+    const _firstKey = Object.keys(availableSkillMethods)[0];
+    if (!_firstKey || !(_firstKey in availableSkillMethods)) {
+      console.error('No default method found for', skill);
+      return;
+    }
 
-			const userPlans = state.plans[planIndex];
+    // Get the plan using the key
+    const firstPlan = availableSkillMethods[_firstKey as keyof typeof availableSkillMethods];
 
-			const availableSkillMethods = Plans[skill as keyof typeof Plans];
-			if (!availableSkillMethods) {
-				console.error(`No methods found for skill: ${skill}`);
-				return;
-			}
-			
-			const _firstKey = Object.keys(availableSkillMethods)[0];
-			const defaultMethod = availableSkillMethods[_firstKey as keyof typeof availableSkillMethods]?.methods?.at(0);
-			if (!defaultMethod) {
-				console.error('No default method found for', skill);
-				return;
-			}
+    // Use type assertion to help TypeScript understand the structure
+    if (!firstPlan || !('methods' in firstPlan) || !Array.isArray((firstPlan as Plan).methods) || (firstPlan as Plan).methods.length === 0) {
+      console.error('No default method found for', skill);
+      return;
+    }
 
-			// Add the new method to the user's plan at the specified index
-			const newMethods = [...Object.values(userPlans.methods)];
-			newMethods.splice(index, 0, {
-				from: defaultMethod.from,
-				method: defaultMethod.method
-			});
-
-			state.plans[planIndex] = {
-				...userPlans,
-				methods: newMethods
-			};
-		});
+    // Now we can safely access the first method with proper type assertion
+    const defaultMethod = (firstPlan as Plan).methods[0];
+  
+    // Add the new method to the user's plan at the specified index
+    const newMethods = [...Object.values(userPlans.methods)];
+    newMethods.splice(index, 0, {
+      from: defaultMethod.from,
+      method: defaultMethod.method
+    });
+  
+    state.plans[planIndex] = {
+      ...userPlans,
+      methods: newMethods
+    };
+  });
 
 		builder.addCase(updatePlanMethod.fulfilled, (state, action) => {
 			const { planId, methodIndex, method, skill } = action.payload;
@@ -202,25 +240,27 @@ const skillsSlice = createSlice({
 			
 			// If plan doesn't exist in user plans but exists in template plans, create a copy
 			if (planIndex === -1) {
-				// Find the plan in template plans
-				const skillPlans = Plans[skill as keyof typeof Plans];
-				if (!skillPlans) {
+				// Check if skill is a valid key in Plans
+				if (!skill || !isValidSkill(skill)) {
 					console.error(`No plans found for skill: ${skill}`);
 					return;
 				}
+				
+				const skillPlans = Plans[skill];
 
-				const templatePlan = Object.values(skillPlans).find(p => p.id === planId)
+				// For this case, we need to find the plan by ID since we're using Object.values
+				const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan | undefined;
 				if (!templatePlan) {
-					console.error(`Template plan not found: ${planId} for skill: ${skill}`, {skillPlans, planId, skill  });
+					console.error(`Template plan not found: ${planId} for skill: ${skill}`);
 					return;
 				}
 				
 				// Create a new custom plan based on the template
 				const newPlan = {
-					...templatePlan,
-					id: `${planId}-custom`,
-					label: `${templatePlan.label} (Custom)`,
-					type: skill
+				  ...templatePlan,
+				  id: `${planId}-custom`,
+				  label: `${templatePlan.label} (Custom)`,
+				  type: skill
 				};
 				
 				// Add the new plan to user plans
@@ -254,25 +294,34 @@ const skillsSlice = createSlice({
 			
 			// If plan doesn't exist in user plans but exists in template plans, create a copy
 			if (planIndex === -1) {
-				// Find the plan in template plans
-				const skillPlans = Plans[skill as keyof typeof Plans];
-				if (!skillPlans) {
+				// Check if skill is a valid key in Plans
+				if (!skill || !isValidSkill(skill)) {
 					console.error(`No plans found for skill: ${skill}`);
 					return;
 				}
 				
-				const templatePlan = skillPlans[planId as keyof typeof skillPlans];
-				if (!templatePlan) {
-					console.error(`Template plan not found: ${planId} for skill: ${skill}`);
-					return;
+				const skillPlans = Plans[skill];
+
+				if (!isValidPlan(skill, planId)) {
+				  console.error(`Template plan not found: ${planId} for skill: ${skill}`);
+				  return;
 				}
-				
+
+				// Check if planId is a valid key in skillPlans
+				if (!isKeyOfObject(planId, skillPlans)) {
+				  console.error(`Invalid plan key: ${planId} for skill: ${skill}`);
+				  return;
+				}
+
+				// Now TypeScript knows planId is a valid key
+				const templatePlan = skillPlans[planId] as Plan;
+
 				// Create a new custom plan based on the template
 				const newPlan = {
-					...templatePlan,
-					id: `${planId}-custom`,
-					label: `${templatePlan.label} (Custom)`,
-					type: skill
+				  ...templatePlan,
+				  id: `${planId}-custom`,
+				  label: `${templatePlan.label} (Custom)`,
+				  type: skill
 				};
 				
 				// Add the new plan to user plans

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import style from './SkillPlanPage.module.css';
 import type { SkillsRecord } from '../store/slices/characterSlice';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { SkillMethods } from '../methods/methods';
 import { Plans } from '../plans/plans';
@@ -13,16 +13,16 @@ import CustomSelect from './CustomSelect';
 import { updatePlanMethod } from '../store/thunks/skills/updatePlanMethod';
 import type { Method } from '../types/method';
 import { Items } from '../types/items';
-import { ChevronDown, ChevronRight, CirclePlus, Trash2 } from 'lucide-react'
+import { CirclePlus, Trash2 } from 'lucide-react'
 import { removeMethodFromPlan } from '../store/thunks/skills/removeMethodFromPlan';
 import { useItems } from '../hooks/useItems';
 import { v4 as uuidv4 } from 'uuid';
+import type { Plan } from '../types/plan';
 
 const SkillPlanPage = () => {
     const { skillId } = useParams();
     const characters = useAppSelector(state => state.characterReducer)
     const { getItemIconUrl } = useItems();
-    const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
     const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
     const dispatch = useAppDispatch();
@@ -154,8 +154,21 @@ const SkillPlanPage = () => {
     // Function to create a copy of a template plan as a user plan
     const createCustomPlanFromTemplate = (templatePlanId: string) => {
         if (!skillId) return null;
-        
-        const templatePlan = TemplatePlans[templatePlanId as keyof typeof TemplatePlans];
+
+		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+
+		if (!valInSkills(skillId)) {
+			console.warn('Invalid plan or skill', skillId, templatePlanId);
+			return;
+		}
+
+		const templatePlanIdInTemplatePlans = (key: string): key is keyof typeof Plans[keyof typeof Plans] => key in TemplatePlans;
+        if (!templatePlanIdInTemplatePlans(templatePlanId)) {
+			console.warn('Invalid template plan', skillId, templatePlanId);
+			return;
+		}
+
+        const templatePlan = TemplatePlans[templatePlanId] as Plan | undefined;
         if (!templatePlan) return null;
         
         // Create a new custom plan with a unique ID
@@ -183,12 +196,14 @@ const SkillPlanPage = () => {
     };
 
     // Handle plan selection change
-    const handlePlanChange = (option: any) => {
+    const handlePlanChange = (option: typeof planOptions[0] | null) => {
         const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
         if (!skillId || !valInSkills(skillId)) {
-            console.warn('Invalid plan or skill', skillId, option.id);
+            console.warn('Invalid plan or skill', skillId, option?.id);
             return;
         }
+
+		if (!option) return;
         
         if (option.isTemplate) {
             createCustomPlanFromTemplate(option.id);
@@ -230,14 +245,14 @@ const SkillPlanPage = () => {
                                 options={planOptions}
                                 value={selectedPlanOption}
                                 onChange={handlePlanChange}
-                                getOptionLabel={(option) => option.label}
-                                getOptionValue={(option) => option.id}
+                                getOptionLabel={(option) => option?.label}
+                                getOptionValue={(option) => option?.id ?? ''}
                                 placeholder="Select a plan..."
                                 renderSelectedValue={(option) => (
-                                    <span className={style.selectedPlanLabel}>{option.label}</span>
+                                    <span className={style.selectedPlanLabel}>{option?.label}</span>
                                 )}
                                 renderOption={(option) => (
-                                    <span>{option.label}</span>
+                                    <span>{option?.label}</span>
                                 )}
                             />
                         </div>
@@ -346,7 +361,7 @@ const SkillPlanPage = () => {
                                                             void dispatch(removeMethodFromPlan({
                                                                 planId: currentSelectedPlan.id,
                                                                 methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
-                                                                skill: skillId
+                                                                skill: skillId ?? ''
                                                             }))
                                                         }}
                                                     ><Trash2 size={15} /></button>
@@ -366,7 +381,7 @@ const SkillPlanPage = () => {
                                                                 level: val,
                                                                 methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
                                                                 plan: currentSelectedPlan.id,
-                                                                skill: skillId
+                                                                skill: skillId ?? ''
                                                             }))
                                                         }
                                                         }
@@ -387,7 +402,7 @@ const SkillPlanPage = () => {
                                                                     methodIndex: Object.keys(currentSelectedPlan.methods).indexOf(key),
                                                                     planId: currentSelectedPlan.id,
                                                                     method: newMethod,
-                                                                    skill: skillId
+                                                                	skill: skillId ?? ''
                                                                 }));
                                                             }}
                                                             getOptionLabel={(option) => option.label}
