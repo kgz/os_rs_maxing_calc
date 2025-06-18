@@ -135,6 +135,8 @@ const SkillPlanPage = () => {
 											const currentStartXp = levelToXp(from);
 											const fromXp = Math.max(currentStartXp, currentSkillXp);
 
+											
+
 											const xpToNext = remainingXPToTarget(fromXp, nextLevel);
 											const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
 

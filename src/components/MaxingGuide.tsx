@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { fetchCharacterStats } from '../store/thunks/character/fetchCharacterStats';
 import { skillsEnum } from '../types/skillsResponse';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -109,9 +109,11 @@ const MaxingGuide = () => {
     };
 
     // Function to estimate the cost of a plan based on the selected plan and remaining XP
-    const estimatePlanCost = (skillId: string, remainingXP: number, currentLevel: number) => {
-		if (skillId !== "Crafting") return null;
+    const estimatePlanCost = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
+		// if (skillId !== "Crafting") return null;
         const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
+
+
 		console.log({selectedPlanId})
         if (!selectedPlanId) {
 			console.warn('No plan selected for crafting');	
@@ -124,6 +126,11 @@ const MaxingGuide = () => {
 			return null
 		};
         
+		const skillEpochs = lastCharacter?.[skillId]?? { "0": 0 };
+		// get the last skill level, key is an epoch
+		const lastEpoch = Math.max(...Object.keys(skillEpochs).map(Number));
+        const currentSkillXp = skillEpochs[lastEpoch]?? 0;
+
         // Get the plan details
         const templatePlans = Plans[skillId];
 
@@ -197,6 +204,7 @@ const MaxingGuide = () => {
 				console.log(`ret of ${item.item.label}: ${cost}`);
 			});
 
+			console.log(`Cost per action: ${costPerAction} for method ${method.from}`);
             
             if (xpPerAction <= 0) continue;
             
@@ -209,18 +217,19 @@ const MaxingGuide = () => {
                 remainingXpToCalculate,
                 remainingXPToTarget(Math.max(currentLevel, method.from), nextLevel)
             );
+			const userLevel = xpToLevel(userXp.[skillId]?? { "0": 0 });
             
             const actionsNeeded = Math.ceil(xpForThisMethod / xpPerAction);
             totalCost += actionsNeeded * costPerAction;
             
             remainingXpToCalculate -= xpForThisMethod;
             
-            console.log(`Method ${method.from}-${nextLevel}: ${actionsNeeded} actions at ${costPerAction} each = ${actionsNeeded * costPerAction}`);
+            console.log(`Method ${method.from}(${userLevel})-${nextLevel}: ${actionsNeeded} actions at ${costPerAction} each = ${actionsNeeded * costPerAction}`);
         }
         
         console.log(`Total estimated cost for ${skillId}: ${totalCost}`);
         return totalCost;
-    };
+    }, [getItemPrice, selectedPlans, userPlans]);
 
     return (
         <div className={styles.maxingGuide}>

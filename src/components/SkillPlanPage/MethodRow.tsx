@@ -45,6 +45,7 @@ export const MethodRow = ({
 		if (!plan.method.actionsPerHour || plan.method.actionsPerHour <= 0) {
 			return "Unknown";
 		}
+		console.log(xpToNext)
 		
 		// Calculate how many hours it will take
 		const hours = itemsToNext / plan.method.actionsPerHour;
@@ -250,43 +251,37 @@ export const MethodRow = ({
 				{/* New Profit/Loss column */}
 				<td style={{ paddingBottom: 5 }}>
 					{(() => {
-						// Calculate total input cost
-						const inputCost = plan.method.items.reduce((total, itemData) => {
-							const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-							if (!item) return total;
+						const inputItems = plan.method.items
+						const outputItems = plan.method.returns
 
-							// Use the latest price data if available, otherwise fall back to the mapping value
-							const itemPrice = getItemPrice(item.id) ?? 0
+						let costPerAction = 0;
 
-							return total + (itemPrice * itemData.amount * itemsToNext);
-						}, 0);
+						inputItems.forEach(item => {
+							const cost = getItemPrice(item.item.id) ?? 0;
+							costPerAction += cost * item.amount;
+							console.log(`Cost of ${item.item.label}: ${cost}`);	
+						});
 
-						// Calculate total output value
-						const outputValue = (plan.method.returns || []).reduce((total, outputData) => {
-							const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
-							if (!outputItem) return total;
+						outputItems.forEach(item => {
+							const cost = getItemPrice(item.item.id) ?? 0;
+                            costPerAction -= cost * item.amount;
+                            console.log(`Cost of ${item.item.label}: ${cost}`);    
+                        });
+						
+						console.log(`Cost per action: ${costPerAction}`);	
 
-							// Use the latest price data if available, otherwise fall back to the mapping value
-							const itemPrice = getItemPrice(outputItem.id) ?? 0
-
-
-							return total + (itemPrice * outputData.amount * itemsToNext);
-						}, 0);
-
-						// Calculate profit/loss
-						const profitLoss = outputValue - inputCost;
-						const isProfit = profitLoss >= 0;
+						const totalCost = -(costPerAction * itemsToNext);
+						
+						const isProfit = totalCost < 0;
 
 						return (
 							<span style={{
-								color: isProfit ? '#4CAF50' : '#ff4747',
+								color: !isProfit ? '#4CAF50' : '#ff4747',
 								fontWeight: 'bold',
 							}}>
-								{isProfit ? '+' : ''}
-								{profitLoss.toLocaleString("en-AU", {
+								{/* {isProfit ? '+' : ''} */}
+								{totalCost.toLocaleString("en-AU", {
 									notation: 'compact',
-									maximumFractionDigits: 0,
-									style: 'decimal',
 								})} gp
 							</span>
 						);
