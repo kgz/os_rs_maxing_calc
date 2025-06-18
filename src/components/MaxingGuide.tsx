@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { fetchCharacterStats } from '../store/thunks/character/fetchCharacterStats';
 import { skillsEnum } from '../types/skillsResponse';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -13,6 +13,7 @@ import type { PlanMethod } from '../types/plan';
 import { useItems } from '../hooks/useItems';
 
 const MaxingGuide = () => {
+	const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     const usernameRef = useRef<HTMLInputElement>(null);
 	const {getItemPrice} = useItems();
@@ -58,7 +59,8 @@ const MaxingGuide = () => {
         const username = usernameRef.current?.value?.trim();
         console.log('Fetching stats for:', username);
         if (username) {
-            dispatch(fetchCharacterStats(username));
+			setLoading(true);
+            dispatch(fetchCharacterStats(username)).finally(() => setLoading(false));
         }
     };
 
@@ -238,9 +240,14 @@ const MaxingGuide = () => {
                         defaultValue={lastCharacter?.username ?? ''}
                         onKeyPress={handleKeyPress}
                         placeholder="Enter RuneScape username"
+                        className={styles.usernameInput}
                     />
-                    <button onClick={handleFetchStats}>
-                        {'Take Xp Snapshot'}
+                    <button 
+						disabled={loading}
+                        onClick={handleFetchStats}
+                        className={styles.snapshotButton}
+                    >
+                       {loading && <>Loading</> || 'Take XP Snapshot'}
                     </button>
                 </div>
             </header>

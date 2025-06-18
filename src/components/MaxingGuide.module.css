@@ -115,33 +115,30 @@
 
 /* Overall Progress styling */
 .overallProgress {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #111;
+  background-color: #222;
   border-radius: 8px;
-  border: 1px solid #333;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .overallProgress h2 {
+  color: var(--osrs-gold);
   margin-bottom: 1rem;
-  color: #e6cc80; /* Gold color for the heading */
   text-align: center;
-  font-size: 1.5rem;
 }
 
 .progressContainer {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  gap: 12px;
 }
 
 .progressBar {
+  flex: 1;
   height: 12px;
   background-color: #333;
   border-radius: 6px;
   overflow: hidden;
-  flex-grow: 1;
 }
 
 .progress {
@@ -152,8 +149,8 @@
 
 .progressText {
   font-weight: bold;
-  color: #e6cc80; /* Gold color for the text */
-  min-width: 50px;
+  color: var(--osrs-gold);
+  min-width: 40px;
   text-align: right;
 }
 
@@ -244,4 +241,61 @@
 
 .costNegative {
   color: #F44336; /* Red for expense */
+}
+
+.guideHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.importContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.usernameInput {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background-color: #222;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.usernameInput:focus {
+  border-color: var(--osrs-gold);
+}
+
+.usernameInput::placeholder {
+  color: #777;
+}
+
+.snapshotButton {
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.snapshotButton:hover {
+  background-color: #45a049;
+}
+
+.snapshotButton:active {
+  transform: scale(0.98);
 }
