@@ -168,11 +168,16 @@
 
 .skillIcon {
 	width: 23px;
-	aspect-ratio: 1;
+	/* aspect-ratio: 1; */
 }
 
 .skillNameCell {
 	display: flex;
 	align-items: center;
     gap: 10px;
+}
+
+.skillsTable {
+	border-spacing: 16px;
+background: rgb(34, 34, 34);
 }

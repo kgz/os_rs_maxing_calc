@@ -108,8 +108,8 @@ const MaxingGuide = () => {
                                 <th>Skill</th>
                                 <th>Level</th>
                                 <th>XP</th>
-                                <th>Remaining XP to 99</th>
-                                <th>Progress</th>
+                                <th>Remaining XP</th>
+                                {/* <th>Progress</th> */}
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -143,11 +143,11 @@ const MaxingGuide = () => {
                                         <td className={styles.levelCell}>
                                             {currentLevel}
                                         </td>
-                                        <td className={styles.xpCell}>{currentSkill.toLocaleString()}</td>
+                                        <td className={styles.xpCell}>{currentSkill.toLocaleString('en-au', { notation: 'compact' })}</td>
                                         <td className={styles.remainingXpCell}>
-                                            {isMaxed ? '-' : remainingXP.toLocaleString()}
+                                            {isMaxed ? '-' : remainingXP.toLocaleString('en-au', { notation: 'compact' })}
                                         </td>
-                                        <td className={styles.progressCell}>
+                                        {/* <td className={styles.progressCell}>
                                             <div className={styles.progressBar}>
                                                 <div 
                                                     className={styles.progress} 
@@ -155,7 +155,7 @@ const MaxingGuide = () => {
                                                 ></div>
                                             </div>
                                             <span className={styles.progressText}>{Math.floor(progressPercent)}%</span>
-                                        </td>
+                                        </td> */}
                                         <td className={styles.actionsCell}>
                                             {!isMaxed && (
                                                 <Link to={`/skill/${skillName}`}>
