@@ -11,6 +11,7 @@ import { setSelectedPlan } from '../store/thunks/skills/setSelectedPlan';
 import { Plans } from '../plans/plans';
 import type { PlanMethod } from '../types/plan';
 import { useItems } from '../hooks/useItems';
+import { formatTime } from '../utils/timeFormatting';
 
 const MaxingGuide = () => {
 	const [loading, setLoading] = useState(false);
@@ -116,7 +117,6 @@ const MaxingGuide = () => {
 
     // Function to estimate the cost of a plan based on the selected plan and remaining XP
     const estimatePlanCost = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
-        // if (skillId !== "Crafting") return null;
         const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
 
         if (!selectedPlanId) {
@@ -131,15 +131,10 @@ const MaxingGuide = () => {
         }
         
         const skillEpochs = lastCharacter?.[skillId] ?? { "0": 0 };
-        // get the last skill level, key is an epoch
         const lastEpoch = Math.max(...Object.keys(skillEpochs).map(Number));
 
         // Get the plan details
         const templatePlans = Plans[skillId];
-
-        if (!(selectedPlanId in templatePlans) && !userPlans.some(plan => plan.id === selectedPlanId)) {
-            console.warn(`Invalid plan ID or type for ${skillId}:`, selectedPlanId);
-        }
 
         let selectedPlan = null;
 
@@ -172,7 +167,6 @@ const MaxingGuide = () => {
         // Sort methods by level requirement
         let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
         sortedMethods = sortedMethods.filter((method, i) => {
-            // if next element .from is less than or equal to current level ignore
             if (sortedMethods[i+1] && sortedMethods[i+1].from <= currentLevel) return false;
             return true;
         });
@@ -191,20 +185,13 @@ const MaxingGuide = () => {
             const input = methodObj.items;
             const output = methodObj.returns;
             
-			 // Find the next method's level or default to 99
+            // Find the next method's level or default to 99
             const nextMethod = sortedMethods.find(m => m.from > method.from);
             const nextLevel = nextMethod ? nextMethod.from : 99;
         	const currentSkillXp = skillEpochs[lastEpoch] ?? 0;
 			const fromXp = Math.max(levelToXp(method.from), currentSkillXp);
 
 			const xpForThisMethod = remainingXPToTarget(fromXp, nextLevel);
-
-            
-            // // Calculate XP for this level range
-            // const xpForThisMethod = Math.min(
-            //     remainingXpToCalculate,
-            //     remainingXPToTarget(Math.max(currentSkillXp, levelToXp(method.from)), levelToXp(nextLevel))
-            // );
             
             const actionsNeeded = Math.ceil(xpForThisMethod / xpPerAction);
 
@@ -232,6 +219,89 @@ const MaxingGuide = () => {
         
         return totalCost;
     }, [getItemPrice, selectedPlans, userPlans, lastCharacter]);
+
+    // Function to estimate the time based on the plan and remaining XP
+    const estimatePlanTime = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
+        const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
+
+        if (!selectedPlanId) {
+            return null;
+        }
+        
+        const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+        if (!valInSkills(skillId)) {
+            return null;
+        }
+        
+        const skillEpochs = lastCharacter?.[skillId] ?? { "0": 0 };
+        const lastEpoch = Math.max(...Object.keys(skillEpochs).map(Number));
+
+        // Get the plan details
+        const templatePlans = Plans[skillId];
+
+        let selectedPlan = null;
+
+        const selectedTemplatePlan = Object.entries(templatePlans).find(([key]) => key === selectedPlanId);
+        if (selectedTemplatePlan) {
+            selectedPlan = selectedTemplatePlan[1];
+        } else {
+            selectedPlan = userPlans.find((plan) => plan.id === selectedPlanId);
+        }
+        
+        if (!selectedPlan) return null;
+        
+        // Check if methods exist
+        if (!selectedPlan.methods || typeof selectedPlan.methods !== 'object') {
+            return null;
+        }
+        
+        // Calculate time based on methods in the plan
+        let totalHours = 0;
+        let remainingXpToCalculate = remainingXP;
+        
+        // Handle both array and object formats for methods
+        const _methodsArray: PlanMethod[] = Array.isArray(selectedPlan.methods) 
+            ? selectedPlan.methods 
+            : Object.values(selectedPlan.methods);
+
+        const methodsArray = [..._methodsArray];
+        
+        // Sort methods by level requirement
+        let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
+        sortedMethods = sortedMethods.filter((method, i) => {
+            if (sortedMethods[i+1] && sortedMethods[i+1].from <= currentLevel) return false;
+            return true;
+        });
+        
+        if (sortedMethods.length === 0) {
+            return null;
+        }
+        
+        for (const method of sortedMethods) {
+            if (remainingXpToCalculate <= 0) break;
+            
+            const methodObj = method.method;
+            const xpPerHour = methodObj.xpPerHour || methodObj.xp * (methodObj.actionsPerHour || 0);
+            
+            if (!xpPerHour || xpPerHour <= 0) continue;
+            
+            // Find the next method's level or default to 99
+            const nextMethod = sortedMethods.find(m => m.from > method.from);
+            const nextLevel = nextMethod ? nextMethod.from : 99;
+            const currentSkillXp = skillEpochs[lastEpoch] ?? 0;
+            const fromXp = Math.max(levelToXp(method.from), currentSkillXp);
+
+            const xpForThisMethod = remainingXPToTarget(fromXp, nextLevel);
+            
+            // Calculate hours needed for this method
+            const hoursNeeded = xpForThisMethod / xpPerHour;
+            
+            totalHours += hoursNeeded;
+            remainingXpToCalculate -= xpForThisMethod;
+        }
+        
+        return totalHours;
+    }, [selectedPlans, userPlans, lastCharacter]);
 
     return (
         <div className={styles.maxingGuide}>
@@ -297,13 +367,13 @@ const MaxingGuide = () => {
                                 <th>Remaining XP</th>
                                 <th>Current Plan</th>
                                 <th>Est. Cost</th>
+                                <th>Est. Time</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {Object.keys(skillsEnum)
                                 .sort((a, b) => {
-                                    // First sort by maxed status (non-maxed first)
                                     const skillsA = lastCharacter?.[a as keyof typeof skillsEnum] ?? { "0": 0 };
                                     const skillsB = lastCharacter?.[b as keyof typeof skillsEnum] ?? { "0": 0 };
                                     
@@ -317,10 +387,9 @@ const MaxingGuide = () => {
                                     const isMaxedB = xpToLevel(currentSkillB) >= 99;
                                     
                                     if (isMaxedA !== isMaxedB) {
-                                        return isMaxedA ? 1 : -1; // Non-maxed first
+                                        return isMaxedA ? 1 : -1;
                                     }
                                     
-                                    // Then sort alphabetically
                                     return a.localeCompare(b);
                                 })
                                 .map((skillId) => {
@@ -345,6 +414,7 @@ const MaxingGuide = () => {
                                     
                                     // Estimate cost based on selected plan
                                     const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
+                                    const estimatedTime = !isMaxed ? estimatePlanTime(skillName, remainingXP, currentLevel) : null;
                                     return (
                                         <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
                                             <td>
@@ -394,6 +464,9 @@ const MaxingGuide = () => {
                                                         {Math.abs(estimatedCost).toLocaleString('en-au', { notation: 'compact' })}
                                                     </span>
                                                 ) : '-'}
+                                            </td>
+                                            <td className={styles.estTimeCell}>
+                                                {estimatedTime !== null ? formatTime(estimatedTime) : '-'}
                                             </td>
                                             <td className={styles.actionsCell}>
                                                 {!isMaxed && (

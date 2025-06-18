@@ -350,3 +350,15 @@
 .maxedSkill:first-of-type {
   border-top: 1px solid var(--osrs-gold);
 }
+
+.estTimeCell {
+  text-align: right;
+  font-family: monospace;
+  white-space: nowrap;
+  color: #e0d0a0; /* Light gold color for time */
+}
+
+/* Update the border for the CustomSelect component */
+.selectControl {
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
