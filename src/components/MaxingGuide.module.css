@@ -353,6 +353,7 @@
 }
 
 .estTimeCell {
+	font-size: large;
   text-align: right;
   font-family: monospace;
   white-space: nowrap;
