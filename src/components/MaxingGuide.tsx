@@ -243,11 +243,18 @@ const MaxingGuide = () => {
                         className={styles.usernameInput}
                     />
                     <button 
-						disabled={loading}
+                        disabled={loading || !usernameRef.current?.value?.trim()}
                         onClick={handleFetchStats}
-                        className={styles.snapshotButton}
+                        className={`${styles.snapshotButton} ${loading ? styles.loading : ''}`}
                     >
-                       {loading && <>Loading</> || 'Take XP Snapshot'}
+                        {loading  ? (
+                            <span className={styles.loadingContainer}>
+                                <span className={styles.loadingSpinner}></span>
+                                <span>Loading...</span>
+                            </span>
+                        ) : (
+                            <>Fetch</>
+                        )}
                     </button>
                 </div>
             </header>

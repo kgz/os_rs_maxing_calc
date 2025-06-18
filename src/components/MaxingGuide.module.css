@@ -282,20 +282,53 @@
 .snapshotButton {
   padding: 10px 20px;
   border-radius: 4px;
-  border: none;
-  background-color: #4CAF50;
-  color: white;
+  border: 1px solid var(--osrs-gold);
+  background-color: var(--osrs-brown);
+  color: var(--osrs-gold);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s;
   white-space: nowrap;
+  min-width: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.snapshotButton:hover {
-  background-color: #45a049;
+.snapshotButton:hover:not(:disabled) {
+  background-color: #3a2e1f;
+  transform: translateY(-1px);
 }
 
-.snapshotButton:active {
-  transform: scale(0.98);
+.snapshotButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.snapshotButton:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 203, 107, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--osrs-gold);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
