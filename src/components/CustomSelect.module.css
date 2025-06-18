@@ -15,6 +15,7 @@
   cursor: pointer;
   color: white;
   transition: background-color 0.2s;
+  column-gap: 2px;
 }
 
 .selectControl:hover {
@@ -28,7 +29,7 @@
 .arrow {
   font-size: 10px;
   transition: transform 0.2s;
-  padding-left: 15px;
+  /* padding-left: 15px; */
 }
 
 .open .arrow {
