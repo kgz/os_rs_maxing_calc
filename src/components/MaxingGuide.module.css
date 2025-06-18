@@ -1,0 +1,104 @@
+.skills-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.skills-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #222;
+  color: #eee;
+}
+
+.skills-table th,
+.skills-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.skills-table th {
+  background-color: #333;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.skill-name-cell {
+  min-width: 150px;
+}
+
+.skill-name-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skill-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.level-cell {
+  position: relative;
+  font-weight: bold;
+}
+
+.maxed-badge {
+  font-size: 0.7rem;
+  background-color: #4CAF50;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+.progress-cell {
+  min-width: 150px;
+}
+
+.progress-bar {
+  height: 10px;
+  background-color: #444;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 5px;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.plan-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.plan-button:hover {
+  background-color: #2980b9;
+}
+
+.maxed-skill {
+  opacity: 0.7;
+}
+
+.maxed-skill .level-cell {
+  color: #4CAF50;
+}
