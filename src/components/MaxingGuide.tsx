@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { fetchCharacterStats } from '../store/thunks/character/fetchCharacterStats';
 import { skillsEnum } from '../types/skillsResponse';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -14,11 +14,14 @@ import { useItems } from '../hooks/useItems';
 import { formatTime } from '../utils/timeFormatting';
 
 const MaxingGuide = () => {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const suggestionsRef = useRef<HTMLDivElement>(null);
     const dispatch = useAppDispatch();
     const usernameRef = useRef<HTMLInputElement>(null);
-	const {getItemPrice} = useItems();
+    const {getItemPrice} = useItems();
 
     const characters = useAppSelector(state => state.characterReducer);
     const { selectedPlans, plans: userPlans } = useAppSelector((state) => state.skillsReducer);
@@ -33,9 +36,8 @@ const MaxingGuide = () => {
         }
 
         return null
-    }, [characters])
+    }, [characters]);
 
-    // Calculate overall progress
     const overallProgress = useMemo(() => {
         if (!lastCharacter) return 0;
         
@@ -53,37 +55,107 @@ const MaxingGuide = () => {
             totalSkills++;
         });
         
-        // Calculate percentage (max level is 99 * number of skills)
         return Math.floor((totalLevels / (99 * totalSkills)) * 100);
     }, [lastCharacter]);
 
-    const handleFetchStats = () => {
-        const username = usernameRef.current?.value?.trim();
+    const characterUsernames = useMemo(() => {
+        return Object.keys(characters).sort();
+    }, [characters]);
+
+    // Add this state to track if user has manually typed
+    const [hasTyped, setHasTyped] = useState(false);
+
+    // Update the filteredSuggestions logic
+    const filteredSuggestions = useMemo(() => {
+        // If user hasn't typed anything manually, show all suggestions
+        if (!hasTyped) return characterUsernames;
+        
+        // If they've typed, filter based on input
+        if (!inputValue) return characterUsernames;
+        return characterUsernames.filter(username => 
+            username.toLowerCase().includes(inputValue.toLowerCase())
+        );
+    }, [characterUsernames, inputValue, hasTyped]);
+
+    useEffect(() => {
+        if (lastCharacter?.username) {
+            setInputValue(lastCharacter.username);
+            setHasTyped(false); // Reset typing state when character changes
+        }
+    }, [lastCharacter]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) && 
+                usernameRef.current && !usernameRef.current.contains(event.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // Update the handleInputChange function
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+        setShowSuggestions(true);
+        setHasTyped(true); // Mark that user has typed
+    };
+
+    // Update the handleSuggestionClick function
+    const handleSuggestionClick = (username: string) => {
+        setInputValue(username);
+        setShowSuggestions(false);
+        setHasTyped(false); // Reset typing state when selecting from dropdown
+        if (usernameRef.current) {
+            usernameRef.current.value = username;
+        }
+		handleFetchStats(username)
+		
+    };
+
+    // Update the handleFetchStats function
+    const handleFetchStats = (val:string) => {
+        const username = val.trim();
         console.log('Fetching stats for:', username);
         if (username) {
-			setLoading(true);
-            dispatch(fetchCharacterStats(username)).then(() => setError(null)).finally(() => setLoading(false)).catch((error) => {
-				console.error('Failed to fetch character stats:', error);
-				setError('Failed to fetch character stats');
-			});
+            setLoading(true);
+            setHasTyped(false); // Reset typing state after fetch
+            dispatch(fetchCharacterStats(username))
+                .then(() => setError(null))
+                .finally(() => setLoading(false))
+                .catch((error) => {
+                    console.error('Failed to fetch character stats:', error);
+                    setError('Failed to fetch character stats');
+                });
         }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             handleFetchStats();
+            setShowSuggestions(false);
         }
     };
 
-    // Function to get plan options for a specific skill
+    const handleInputFocus = () => {
+        // Only show suggestions when focusing if we have character usernames
+        if (characterUsernames.length > 0) {
+            setShowSuggestions(true);
+            // Don't filter on focus, show all available usernames
+            setHasTyped(false);
+        }
+    };
+
     const getPlanOptionsForSkill = (skillId: string) => {
         const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
         if (!valInSkills(skillId)) return [];
 
-        // Get template plans for this skill
         const templatePlans = Plans[skillId] || {};
         
-        // Create options from template plans
         const templatePlanOptions = Object.entries(templatePlans).map(([key, plan]) => ({
             id: key,
             label: plan?.label || "Unknown",
@@ -91,7 +163,6 @@ const MaxingGuide = () => {
             isTemplate: true
         }));
 
-        // Get user plans for this skill
         const filteredUserPlans = userPlans.filter(plan => plan.type === skillId).map(plan => ({
             id: plan.id,
             label: plan.label,
@@ -102,7 +173,6 @@ const MaxingGuide = () => {
         return [...templatePlanOptions, ...filteredUserPlans];
     };
 
-    // Function to handle plan selection change
     const handlePlanChange = (skillId: string, option: any) => {
         const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
         if (!valInSkills(skillId)) {
@@ -115,7 +185,6 @@ const MaxingGuide = () => {
         void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
     };
 
-    // Function to estimate the cost of a plan based on the selected plan and remaining XP
     const estimatePlanCost = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
         const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
 
@@ -133,7 +202,6 @@ const MaxingGuide = () => {
         const skillEpochs = lastCharacter?.[skillId] ?? { "0": 0 };
         const lastEpoch = Math.max(...Object.keys(skillEpochs).map(Number));
 
-        // Get the plan details
         const templatePlans = Plans[skillId];
 
         let selectedPlan = null;
@@ -147,24 +215,20 @@ const MaxingGuide = () => {
         
         if (!selectedPlan) return null;
         
-        // Check if methods exist and are in the expected format
         if (!selectedPlan.methods || typeof selectedPlan.methods !== 'object') {
             console.warn(`Invalid plan structure for ${skillId}:`, selectedPlan);
             return null;
         }
         
-        // Calculate cost based on methods in the plan
         let totalCost = 0;
         let remainingXpToCalculate = remainingXP;
         
-        // Handle both array and object formats for methods
         const _methodsArray: PlanMethod[] = Array.isArray(selectedPlan.methods) 
             ? selectedPlan.methods 
             : Object.values(selectedPlan.methods);
 
         const methodsArray = [..._methodsArray];
         
-        // Sort methods by level requirement
         let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
         sortedMethods = sortedMethods.filter((method, i) => {
             if (sortedMethods[i+1] && sortedMethods[i+1].from <= currentLevel) return false;
@@ -179,13 +243,11 @@ const MaxingGuide = () => {
         for (const method of sortedMethods) {
             if (remainingXpToCalculate <= 0) break;
             
-            // Safely access method properties
             const methodObj = method.method;
             const xpPerAction = methodObj.xp;
             const input = methodObj.items;
             const output = methodObj.returns;
             
-            // Find the next method's level or default to 99
             const nextMethod = sortedMethods.find(m => m.from > method.from);
             const nextLevel = nextMethod ? nextMethod.from : 99;
         	const currentSkillXp = skillEpochs[lastEpoch] ?? 0;
@@ -195,7 +257,6 @@ const MaxingGuide = () => {
             
             const actionsNeeded = Math.ceil(xpForThisMethod / xpPerAction);
 
-            // Try to get cost from different possible properties
             let costPerAction = 0;
             input.forEach(item => {
                 const cost = getItemPrice(item.item.id) ?? 0;
@@ -220,7 +281,6 @@ const MaxingGuide = () => {
         return totalCost;
     }, [getItemPrice, selectedPlans, userPlans, lastCharacter]);
 
-    // Function to estimate the time based on the plan and remaining XP
     const estimatePlanTime = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
         const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
 
@@ -236,7 +296,6 @@ const MaxingGuide = () => {
         const skillEpochs = lastCharacter?.[skillId] ?? { "0": 0 };
         const lastEpoch = Math.max(...Object.keys(skillEpochs).map(Number));
 
-        // Get the plan details
         const templatePlans = Plans[skillId];
 
         let selectedPlan = null;
@@ -250,25 +309,21 @@ const MaxingGuide = () => {
         
         if (!selectedPlan) return null;
         
-        // Check if methods exist
         if (!selectedPlan.methods || typeof selectedPlan.methods !== 'object') {
             return null;
         }
         
-        // Calculate time based on methods in the plan
         let totalHours = 0;
         let remainingXpToCalculate = remainingXP;
         
-        // Handle both array and object formats for methods
         const _methodsArray: PlanMethod[] = Array.isArray(selectedPlan.methods) 
             ? selectedPlan.methods 
             : Object.values(selectedPlan.methods);
 
         const methodsArray = [..._methodsArray];
         
-        // Sort methods by level requirement
         let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
-        sortedMethods = sortedMethods.filter((method, i) => {
+        sortedMethods = sortedMethods.filter((_, i) => {
             if (sortedMethods[i+1] && sortedMethods[i+1].from <= currentLevel) return false;
             return true;
         });
@@ -281,11 +336,10 @@ const MaxingGuide = () => {
             if (remainingXpToCalculate <= 0) break;
             
             const methodObj = method.method;
-            const xpPerHour = methodObj.xpPerHour || methodObj.xp * (methodObj.actionsPerHour || 0);
+            const xpPerHour = methodObj.xp * (methodObj.actionsPerHour || 0);
             
             if (!xpPerHour || xpPerHour <= 0) continue;
             
-            // Find the next method's level or default to 99
             const nextMethod = sortedMethods.find(m => m.from > method.from);
             const nextLevel = nextMethod ? nextMethod.from : 99;
             const currentSkillXp = skillEpochs[lastEpoch] ?? 0;
@@ -293,7 +347,6 @@ const MaxingGuide = () => {
 
             const xpForThisMethod = remainingXPToTarget(fromXp, nextLevel);
             
-            // Calculate hours needed for this method
             const hoursNeeded = xpForThisMethod / xpPerHour;
             
             totalHours += hoursNeeded;
@@ -308,20 +361,37 @@ const MaxingGuide = () => {
             <header className={styles.guideHeader}>
                 <h1>OSRS Maxing Guide</h1>
                 <div className={styles.importContainer}>
-                    <input
-                        ref={usernameRef}
-                        type="text"
-                        defaultValue={lastCharacter?.username ?? ''}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Enter RuneScape username"
-                        className={styles.usernameInput}
-                    />
+                    <div className={styles.autocompleteContainer}>
+                        <input
+                            ref={usernameRef}
+                            type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            onFocus={handleInputFocus}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Enter RuneScape username"
+                            className={styles.usernameInput}
+                        />
+                        {showSuggestions && filteredSuggestions.length > 0 && (
+                            <div ref={suggestionsRef} className={styles.suggestionsList}>
+                                {filteredSuggestions.map((username) => (
+                                    <div 
+                                        key={username} 
+                                        className={styles.suggestionItem}
+                                        onClick={() => handleSuggestionClick(username)}
+                                    >
+                                        {username}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     <button 
-                        disabled={loading || usernameRef.current?.value?.trim() === ""}
-                        onClick={handleFetchStats}
+                        disabled={loading || !inputValue.trim()}
+                        onClick={()=>handleFetchStats(inputValue)}
                         className={`${styles.snapshotButton} ${loading ? styles.loading : ''}`}
                     >
-                        {loading  ? (
+                        {loading ? (
                             <span className={styles.loadingContainer}>
                                 <span className={styles.loadingSpinner}></span>
                                 <span>Loading...</span>
@@ -331,7 +401,6 @@ const MaxingGuide = () => {
                         )}
                     </button>
                 </div>
-				{/* error */}
 				{error && <div className={styles.errorMessage}>{error}</div>}
             </header>
 
@@ -405,14 +474,11 @@ const MaxingGuide = () => {
                                     const isMaxed = currentLevel >= 99;
                                     const remainingXP = remainingXPToTarget(currentSkill, 99);
                                     
-                                    // Get plan options for this skill
                                     const planOptions = getPlanOptionsForSkill(skillName);
                                     
-                                    // Find the currently selected plan
                                     const selectedPlanId = selectedPlans[skillName as keyof typeof selectedPlans];
                                     const selectedPlanOption = planOptions.find(option => option.id === selectedPlanId) || null;
                                     
-                                    // Estimate cost based on selected plan
                                     const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
                                     const estimatedTime = !isMaxed ? estimatePlanTime(skillName, remainingXP, currentLevel) : null;
                                     return (

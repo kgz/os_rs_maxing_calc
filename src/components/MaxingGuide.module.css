@@ -255,6 +255,7 @@
 .importContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin-top: 1rem;
   width: 100%;
@@ -262,9 +263,9 @@
 }
 
 .usernameInput {
-  flex: 1;
+  /* width: 100%; */
   padding: 10px 16px;
-  border-radius: 4px;
+  border-radius: 4px 4px 0 0;
   border: 1px solid #333;
   background-color: #222;
   color: #fff;
@@ -361,4 +362,37 @@
 /* Update the border for the CustomSelect component */
 .selectControl {
   border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Add these styles to your existing CSS file */
+.autocompleteContainer {
+  position: relative;
+  /* flex: 1; */
+}
+
+.suggestionsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #222;
+  border: 1px solid #444;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.suggestionItem {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #e0d0a0;
+  transition: background-color 0.2s;
+}
+
+.suggestionItem:hover {
+  background-color: #333;
+  color: var(--osrs-gold);
 }
