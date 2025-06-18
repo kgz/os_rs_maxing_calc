@@ -113,6 +113,58 @@
   display: none; /* Hide the MAX badge as it's not in the reference image */
 }
 
+/* Overall Progress styling */
+.overallProgress {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #111;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.overallProgress h2 {
+  margin-bottom: 1rem;
+  color: #e6cc80; /* Gold color for the heading */
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.progressBar {
+  height: 12px;
+  background-color: #333;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4CAF50; /* Green progress color */
+  border-radius: 6px;
+}
+
+.progressText {
+  font-weight: bold;
+  color: #e6cc80; /* Gold color for the text */
+  min-width: 50px;
+  text-align: right;
+}
+
+/* Fix for the inconsistent class names */
+.progress-bar {
+  height: 8px;
+  background-color: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
 
 .skillIcon {
 	width: 23px;

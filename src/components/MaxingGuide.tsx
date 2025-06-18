@@ -25,6 +25,28 @@ const MaxingGuide = () => {
         return null
     }, [characters])
 
+    // Calculate overall progress
+    const overallProgress = useMemo(() => {
+        if (!lastCharacter) return 0;
+        
+        let totalLevels = 0;
+        let totalSkills = 0;
+        
+        Object.keys(skillsEnum).forEach((skillId) => {
+            const skillName = skillId as keyof typeof skillsEnum;
+            const skills = lastCharacter[skillName] ?? { "0": 0 };
+            const lastEpoch = Math.max(...Object.keys(skills).map(Number));
+            const currentSkill = skills[lastEpoch] ?? 0;
+            const currentLevel = xpToLevel(currentSkill);
+            
+            totalLevels += currentLevel;
+            totalSkills++;
+        });
+        
+        // Calculate percentage (max level is 99 * number of skills)
+        return Math.floor((totalLevels / (99 * totalSkills)) * 100);
+    }, [lastCharacter]);
+
     const handleFetchStats = () => {
         const username = usernameRef.current?.value?.trim();
         console.log('Fetching stats for:', username);
@@ -61,9 +83,14 @@ const MaxingGuide = () => {
                 <h2>Overall Progress</h2>
                 <div className={styles.progressContainer}>
                     <div className={styles.progressBar}>
-                        <div className={styles.progress}></div>
+                        <div 
+                            className={styles.progress} 
+                            style={{ width: `${overallProgress}%` }}
+                        ></div>
                     </div>
-                    <div className={styles.progressText}></div>
+                    <div className={styles.progressText}>
+                        {overallProgress}%
+                    </div>
                 </div>
             </div>
             
