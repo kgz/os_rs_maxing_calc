@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import type { SkillsRecord } from '../store/slices/characterSlice';
 import { remainingXPToTarget, xpToLevel } from '../utils/xpCalculations';
 import { Link } from 'react-router-dom';
-import { getSkillIconUrl } from '../utils/getSkillIconUrl';
 import styles from './MaxingGuide.module.css';
 
 const MaxingGuide = () => {
@@ -104,19 +103,18 @@ const MaxingGuide = () => {
                                 
                                 return (
                                     <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
-                                        <td className={styles.skillNameCell}>
-                                            <div className={styles.skillNameContainer}>
+                                        <td>
+                                            <div className={styles.skillNameCell}>
                                                 <img 
                                                     src={`/images/skills/${skillsEnum[skillName].toLowerCase()}.png`}
                                                     alt={skillName}
                                                     className={styles.skillIcon}
                                                 />
-                                                <span>{skillName}</span>
+                                                <span className={styles.skillName}>{skillName}</span>
                                             </div>
                                         </td>
                                         <td className={styles.levelCell}>
                                             {currentLevel}
-                                            {isMaxed && <span className={styles.maxedBadge}>MAX</span>}
                                         </td>
                                         <td className={styles.xpCell}>{currentSkill.toLocaleString()}</td>
                                         <td className={styles.remainingXpCell}>
