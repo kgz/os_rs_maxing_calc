@@ -236,11 +236,13 @@
 }
 
 .costPositive {
-  color: #4CAF50; /* Green for profit */
+  color: #4CAF50; /* Green for positive (makes money) */
+  font-weight: 500;
 }
 
 .costNegative {
-  color: #F44336; /* Red for expense */
+  color: #ff6b6b; /* Red for negative (costs money) */
+  font-weight: 500;
 }
 
 .guideHeader {
@@ -336,4 +338,15 @@
 .errorMessage {
 	color: #F44336;
     margin-top: 1rem;
+}
+
+/* Add a subtle separator between non-maxed and maxed skills */
+.maxedSkill {
+  opacity: 0.8;
+  background-color: rgba(34, 34, 34, 0.4);
+}
+
+/* Add a subtle border to the first maxed skill to visually separate the groups */
+.maxedSkill:first-of-type {
+  border-top: 1px solid var(--osrs-gold);
 }

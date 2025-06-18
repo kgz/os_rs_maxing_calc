@@ -301,88 +301,110 @@ const MaxingGuide = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {Object.keys(skillsEnum).map((skillId) => {
-                                const skillName = skillId as keyof typeof skillsEnum;
-                                
-                                const skills = lastCharacter[skillName] ?? {
-                                    "0": 0
-                                };
-                                const lastEpoch = Math.max(...Object.keys(skills).map(Number));
-                                const currentSkill = skills[lastEpoch] ?? 0;
-                                
-                                const currentLevel = xpToLevel(currentSkill);
-                                const isMaxed = currentLevel === 99;
-                                const remainingXP = remainingXPToTarget(currentSkill, 99);
-                                
-                                // Get plan options for this skill
-                                const planOptions = getPlanOptionsForSkill(skillName);
-                                
-                                // Find the currently selected plan
-                                const selectedPlanId = selectedPlans[skillName as keyof typeof selectedPlans];
-                                const selectedPlanOption = planOptions.find(option => option.id === selectedPlanId) || null;
-                                
-                                // Estimate cost based on selected plan
-                                const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
-                                return (
-                                    <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
-                                        <td>
-                                            <div className={styles.skillNameCell}>
-                                                <img 
-                                                    src={`/images/skills/${skillsEnum[skillName].toLowerCase()}.png`}
-                                                    alt={skillName}
-                                                    className={styles.skillIcon}
-                                                />
-                                                <span className={styles.skillName}>{skillName}</span>
-                                            </div>
-                                        </td>
-                                        <td className={styles.levelCell}>
-                                            {currentLevel}
-                                        </td>
-                                        <td className={styles.xpCell}>{currentSkill.toLocaleString('en-au', { notation: 'compact' })}</td>
-                                        <td className={styles.remainingXpCell}>
-                                            {isMaxed ? '-' : remainingXP.toLocaleString('en-au', { notation: 'compact' })}
-                                        </td>
-                                        <td className={styles.planSelectorCell}>
-                                            {!isMaxed && (
-                                                <div className={styles.planSelectorWrapper}>
-                                                    <CustomSelect
-                                                        options={planOptions}
-                                                        value={selectedPlanOption}
-                                                        onChange={(option) => handlePlanChange(skillName, option)}
-                                                        getOptionLabel={(option) => option?.label ?? ''}
-                                                        getOptionValue={(option) => option?.id ?? ''}
-                                                        placeholder="Select plan..."
-                                                        renderSelectedValue={(option) => (
-                                                            <span className={styles.selectedPlanLabel}>{option?.label || "Select plan..."}</span>
-                                                        )}
-                                                        renderOption={(option) => (
-                                                            <span>{option?.label}</span>
-                                                        )}
+                            {Object.keys(skillsEnum)
+                                .sort((a, b) => {
+                                    // First sort by maxed status (non-maxed first)
+                                    const skillsA = lastCharacter?.[a as keyof typeof skillsEnum] ?? { "0": 0 };
+                                    const skillsB = lastCharacter?.[b as keyof typeof skillsEnum] ?? { "0": 0 };
+                                    
+                                    const lastEpochA = Math.max(...Object.keys(skillsA).map(Number));
+                                    const lastEpochB = Math.max(...Object.keys(skillsB).map(Number));
+                                    
+                                    const currentSkillA = skillsA[lastEpochA] ?? 0;
+                                    const currentSkillB = skillsB[lastEpochB] ?? 0;
+                                    
+                                    const isMaxedA = xpToLevel(currentSkillA) >= 99;
+                                    const isMaxedB = xpToLevel(currentSkillB) >= 99;
+                                    
+                                    if (isMaxedA !== isMaxedB) {
+                                        return isMaxedA ? 1 : -1; // Non-maxed first
+                                    }
+                                    
+                                    // Then sort alphabetically
+                                    return a.localeCompare(b);
+                                })
+                                .map((skillId) => {
+                                    const skillName = skillId as keyof typeof skillsEnum;
+                                    
+                                    const skills = lastCharacter?.[skillName] ?? {
+                                        "0": 0
+                                    };
+                                    const lastEpoch = Math.max(...Object.keys(skills).map(Number));
+                                    const currentSkill = skills[lastEpoch] ?? 0;
+                                    
+                                    const currentLevel = xpToLevel(currentSkill);
+                                    const isMaxed = currentLevel >= 99;
+                                    const remainingXP = remainingXPToTarget(currentSkill, 99);
+                                    
+                                    // Get plan options for this skill
+                                    const planOptions = getPlanOptionsForSkill(skillName);
+                                    
+                                    // Find the currently selected plan
+                                    const selectedPlanId = selectedPlans[skillName as keyof typeof selectedPlans];
+                                    const selectedPlanOption = planOptions.find(option => option.id === selectedPlanId) || null;
+                                    
+                                    // Estimate cost based on selected plan
+                                    const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
+                                    return (
+                                        <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
+                                            <td>
+                                                <div className={styles.skillNameCell}>
+                                                    <img 
+                                                        src={`/images/skills/${skillsEnum[skillName].toLowerCase()}.png`}
+                                                        alt={skillName}
+                                                        className={styles.skillIcon}
                                                     />
+                                                    <span className={styles.skillName}>{skillName}</span>
                                                 </div>
-                                            )}
-                                            {isMaxed && (
-                                                <span className={styles.maxedText}>Maxed</span>
-                                            )}
-                                        </td>
-                                        <td className={styles.estCostCell}>
-                                            {estimatedCost !== null ? (
-                                                <span className={estimatedCost > 0 ? styles.costNegative : styles.costPositive}>
-                                                    {estimatedCost > 0 ? '-' : ''}
-                                                    {Math.abs(estimatedCost).toLocaleString('en-au', { notation: 'compact' })}
-                                                </span>
-                                            ) : '-'}
-                                        </td>
-                                        <td className={styles.actionsCell}>
-                                            {!isMaxed && (
-                                                <Link to={`/skill/${skillName}`}>
-                                                    <button className={styles.planButton}>View Plan</button>
-                                                </Link>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                                            </td>
+                                            <td className={styles.levelCell}>
+                                                {currentLevel}
+                                            </td>
+                                            <td className={styles.xpCell}>{currentSkill.toLocaleString('en-au', { notation: 'compact' })}</td>
+                                            <td className={styles.remainingXpCell}>
+                                                {isMaxed ? '-' : remainingXP.toLocaleString('en-au', { notation: 'compact' })}
+                                            </td>
+                                            <td className={styles.planSelectorCell}>
+                                                {!isMaxed && (
+                                                    <div className={styles.planSelectorWrapper}>
+                                                        <CustomSelect
+                                                            options={planOptions}
+                                                            value={selectedPlanOption}
+                                                            onChange={(option) => handlePlanChange(skillName, option)}
+                                                            getOptionLabel={(option) => option?.label ?? ''}
+                                                            getOptionValue={(option) => option?.id ?? ''}
+                                                            placeholder="Select plan..."
+                                                            renderSelectedValue={(option) => (
+                                                                <span className={styles.selectedPlanLabel}>{option?.label || "Select plan..."}</span>
+                                                            )}
+                                                            renderOption={(option) => (
+                                                                <span>{option?.label}</span>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {isMaxed && (
+                                                    <span className={styles.maxedText}>Maxed</span>
+                                                )}
+                                            </td>
+                                            <td className={styles.estCostCell}>
+                                                {estimatedCost !== null ? (
+                                                    <span className={estimatedCost > 0 ? styles.costNegative : styles.costPositive}>
+                                                        {estimatedCost > 0 ? '-' : ''}
+                                                        {Math.abs(estimatedCost).toLocaleString('en-au', { notation: 'compact' })}
+                                                    </span>
+                                                ) : '-'}
+                                            </td>
+                                            <td className={styles.actionsCell}>
+                                                {!isMaxed && (
+                                                    <Link to={`/skill/${skillName}`}>
+                                                        <button className={styles.planButton}>View Plan</button>
+                                                    </Link>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                         </tbody>
                     </table>
                 </div>
