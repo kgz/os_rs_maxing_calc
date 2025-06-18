@@ -14,6 +14,7 @@ import { useItems } from '../hooks/useItems';
 
 const MaxingGuide = () => {
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
     const usernameRef = useRef<HTMLInputElement>(null);
 	const {getItemPrice} = useItems();
@@ -60,7 +61,10 @@ const MaxingGuide = () => {
         console.log('Fetching stats for:', username);
         if (username) {
 			setLoading(true);
-            dispatch(fetchCharacterStats(username)).finally(() => setLoading(false));
+            dispatch(fetchCharacterStats(username)).then(() => setError(null)).finally(() => setLoading(false)).catch((error) => {
+				console.error('Failed to fetch character stats:', error);
+				setError('Failed to fetch character stats');
+			});
         }
     };
 
@@ -243,7 +247,7 @@ const MaxingGuide = () => {
                         className={styles.usernameInput}
                     />
                     <button 
-                        disabled={loading || !usernameRef.current?.value?.trim()}
+                        disabled={loading || usernameRef.current?.value?.trim() === ""}
                         onClick={handleFetchStats}
                         className={`${styles.snapshotButton} ${loading ? styles.loading : ''}`}
                     >
@@ -257,6 +261,8 @@ const MaxingGuide = () => {
                         )}
                     </button>
                 </div>
+				{/* error */}
+				{error && <div className={styles.errorMessage}>{error}</div>}
             </header>
 
             <div className={styles.overallProgress}>

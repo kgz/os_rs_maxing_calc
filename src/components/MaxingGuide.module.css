@@ -332,3 +332,8 @@
     transform: rotate(360deg);
   }
 }
+
+.errorMessage {
+	color: #F44336;
+    margin-top: 1rem;
+}

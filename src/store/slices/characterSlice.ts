@@ -70,12 +70,12 @@ const slice = createSlice({
 			state[characterName]['lastUpdated'] = (new Date()).valueOf();
 			const temp = current(state);
 			console.log({temp})
-
-
-
-		
 	})
-		
+	builder.addCase(fetchCharacterStats.rejected, (state, action) => {
+		console.log('Failed to fetch character stats:', action.error.message);
+		throw new Error('Failed to fetch character stats');
+	
+	})		
 		
 		
 		return builder

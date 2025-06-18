@@ -18,6 +18,7 @@ export const fetchCharacterStats = createAsyncThunk(
 		});
 
 		const status = response.status;
+		console.log('Character stats fetched:', status);
 
 		if (status < 200 || status >= 300) {
 			throw new Error(response.status === 404
