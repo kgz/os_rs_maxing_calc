@@ -91,7 +91,7 @@ const MaxingGuide = () => {
 				{
 					Object.keys(skillsEnum).map((skillId) => {
 						const skillName = skillId as keyof typeof skillsEnum;
-						if (skillsEnum[skillName] !== skillsEnum.Prayer) {return <></>}
+						// if (skillsEnum[skillName] !== skillsEnum.Prayer) {return <></>}
 
 						
 						const skills = lastCharacter[skillName]?? {
