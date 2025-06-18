@@ -110,13 +110,19 @@ const MaxingGuide = () => {
 
     // Function to estimate the cost of a plan based on the selected plan and remaining XP
     const estimatePlanCost = (skillId: string, remainingXP: number, currentLevel: number) => {
-		if (skillId !== "Prayer") return null;
+		if (skillId !== "Crafting") return null;
         const selectedPlanId = selectedPlans[skillId as keyof typeof selectedPlans];
 		console.log({selectedPlanId})
-        if (!selectedPlanId) return null;
+        if (!selectedPlanId) {
+			console.warn('No plan selected for crafting');	
+			return null
+		};
         
         const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-        if (!valInSkills(skillId)) return null;
+        if (!valInSkills(skillId)) {
+			console.warn('Invalid skill', skillId);	
+			return null
+		};
         
         // Get the plan details
         const templatePlans = Plans[skillId];
@@ -125,8 +131,16 @@ const MaxingGuide = () => {
 			console.warn(`Invalid plan ID or type for ${skillId}:`, selectedPlanId);
 		}
 		console.log({templatePlans, userPlans})
-        const selectedPlan= Object.values(templatePlans).find((plan) => plan.id === selectedPlanId) || Object.values(userPlans).find((plan) => plan.id === selectedPlanId)
-		console.log({selectedPlan})
+
+		let selectedPlan = null;
+
+		const selectedTemplatePlan = Object.entries(templatePlans).find(([key]) => key === selectedPlanId)
+		if (selectedTemplatePlan) {
+			selectedPlan = selectedTemplatePlan[1];
+		} else {
+			selectedPlan = Object.values(userPlans).find((plan) => plan.id === selectedPlanId)
+		}
+		console.log({selectedPlan, selectedPlanId})
         if (!selectedPlan) return null;
         
         // Check if methods exist and are in the expected format
@@ -174,11 +188,13 @@ const MaxingGuide = () => {
 			input.forEach(item => {
 				const cost = getItemPrice(item.item.id) ?? 0;
 				costPerAction += cost * item.amount;
+				console.log(`Cost of ${item.item.label}: ${cost}`);
 			});
 
 			output.forEach(item => {
 				const cost = getItemPrice(item.item.id) ?? 0;
-				costPerAction += cost * item.amount;
+				costPerAction -= cost * item.amount;
+				console.log(`ret of ${item.item.label}: ${cost}`);
 			});
 
             
@@ -203,7 +219,7 @@ const MaxingGuide = () => {
         }
         
         console.log(`Total estimated cost for ${skillId}: ${totalCost}`);
-        return totalCost > 0 ? totalCost : null;
+        return totalCost;
     };
 
     return (
@@ -282,7 +298,6 @@ const MaxingGuide = () => {
                                 
                                 // Estimate cost based on selected plan
                                 const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
-                                
                                 return (
                                     <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
                                         <td>
@@ -326,12 +341,17 @@ const MaxingGuide = () => {
                                             )}
                                         </td>
                                         <td className={styles.estCostCell}>
-                                            {estimatedCost !== null ? estimatedCost.toLocaleString('en-au', { notation: 'compact' }) : '-'}
+                                            {estimatedCost !== null ? (
+                                                <span className={estimatedCost > 0 ? styles.costNegative : styles.costPositive}>
+                                                    {estimatedCost > 0 ? '-' : ''}
+                                                    {Math.abs(estimatedCost).toLocaleString('en-au', { notation: 'compact' })}
+                                                </span>
+                                            ) : '-'}
                                         </td>
                                         <td className={styles.actionsCell}>
                                             {!isMaxed && (
                                                 <Link to={`/skill/${skillName}`}>
-                                                    <button className={styles.planButton}>Plan</button>
+                                                    <button className={styles.planButton}>View Plan</button>
                                                 </Link>
                                             )}
                                         </td>

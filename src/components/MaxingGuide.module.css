@@ -79,11 +79,11 @@
 }
 
 /* Actions cell styling */
-.actions-cell {
+.actionsCell {
   text-align: center;
 }
 
-.plan-button {
+.planButton {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -94,7 +94,7 @@
   transition: background-color 0.2s;
 }
 
-.plan-button:hover {
+.planButton:hover {
   background-color: #45a049;
 }
 
@@ -236,4 +236,12 @@
 
 .planSelectorWrapper :global(.custom-select__option--is-selected) {
   background-color: #4CAF50;
+}
+
+.costPositive {
+  color: #4CAF50; /* Green for profit */
+}
+
+.costNegative {
+  color: #F44336; /* Red for expense */
 }
