@@ -181,3 +181,59 @@
 	border-spacing: 16px;
 background: rgb(34, 34, 34);
 }
+
+/* Plan selector styling */
+.planSelectorCell {
+  width: 180px;
+}
+
+.planSelectorWrapper {
+  width: 100%;
+}
+
+.selectedPlanLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  display: inline-block;
+}
+
+.maxedText {
+  color: #4CAF50;
+  font-style: italic;
+}
+
+/* Make the dropdown fit well in the table */
+.planSelectorWrapper :global(.custom-select) {
+  min-height: 30px;
+  font-size: 0.9rem;
+}
+
+.planSelectorWrapper :global(.custom-select__control) {
+  min-height: 30px;
+  background-color: #222;
+  border-color: #444;
+}
+
+.planSelectorWrapper :global(.custom-select__value-container) {
+  padding: 0 8px;
+}
+
+.planSelectorWrapper :global(.custom-select__menu) {
+  background-color: #222;
+  border: 1px solid #444;
+}
+
+.planSelectorWrapper :global(.custom-select__option) {
+  background-color: #222;
+  color: #eee;
+}
+
+.planSelectorWrapper :global(.custom-select__option--is-focused) {
+  background-color: #333;
+}
+
+.planSelectorWrapper :global(.custom-select__option--is-selected) {
+  background-color: #4CAF50;
+}

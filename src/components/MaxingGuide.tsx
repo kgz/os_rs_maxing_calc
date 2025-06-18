@@ -6,12 +6,16 @@ import type { SkillsRecord } from '../store/slices/characterSlice';
 import { remainingXPToTarget, xpToLevel } from '../utils/xpCalculations';
 import { Link } from 'react-router-dom';
 import styles from './MaxingGuide.module.css';
+import CustomSelect from './CustomSelect';
+import { setSelectedPlan } from '../store/thunks/skills/setSelectedPlan';
+import { Plans } from '../plans/plans';
 
 const MaxingGuide = () => {
     const dispatch = useAppDispatch();
     const usernameRef = useRef<HTMLInputElement>(null);
 
-    const characters = useAppSelector(state => state.characterReducer)
+    const characters = useAppSelector(state => state.characterReducer);
+    const { selectedPlans, plans: userPlans } = useAppSelector((state) => state.skillsReducer);
 
     const lastCharacter: SkillsRecord & { 'username': string } | null = useMemo(() => {
         const last = Object.entries(characters).sort(([, a], [, b]) => b.lastUpdated - a.lastUpdated).at(0);
@@ -59,6 +63,46 @@ const MaxingGuide = () => {
         if (e.key === 'Enter') {
             handleFetchStats();
         }
+    };
+
+    // Function to get plan options for a specific skill
+    const getPlanOptionsForSkill = (skillId: string) => {
+        const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+        if (!valInSkills(skillId)) return [];
+
+        // Get template plans for this skill
+        const templatePlans = Plans[skillId] || {};
+        
+        // Create options from template plans
+        const templatePlanOptions = Object.entries(templatePlans).map(([key, plan]) => ({
+            id: key,
+            label: plan?.label || "Unknown",
+            plan,
+            isTemplate: true
+        }));
+
+        // Get user plans for this skill
+        const filteredUserPlans = userPlans.filter(plan => plan.type === skillId).map(plan => ({
+            id: plan.id,
+            label: plan.label,
+            plan,
+            isTemplate: false
+        }));
+
+        return [...templatePlanOptions, ...filteredUserPlans];
+    };
+
+    // Function to handle plan selection change
+    const handlePlanChange = (skillId: string, option: any) => {
+        const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
+        if (!valInSkills(skillId)) {
+            console.warn('Invalid skill', skillId);
+            return;
+        }
+
+        if (!option) return;
+
+        void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
     };
 
     return (
@@ -109,7 +153,7 @@ const MaxingGuide = () => {
                                 <th>Level</th>
                                 <th>XP</th>
                                 <th>Remaining XP</th>
-                                {/* <th>Progress</th> */}
+                                <th>Current Plan</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -126,7 +170,13 @@ const MaxingGuide = () => {
                                 const currentLevel = xpToLevel(currentSkill);
                                 const isMaxed = currentLevel === 99;
                                 const remainingXP = remainingXPToTarget(currentSkill, 99);
-                                const progressPercent = Math.min((currentLevel / 99) * 100, 100);
+                                
+                                // Get plan options for this skill
+                                const planOptions = getPlanOptionsForSkill(skillName);
+                                
+                                // Find the currently selected plan
+                                const selectedPlanId = selectedPlans[skillName as keyof typeof selectedPlans];
+                                const selectedPlanOption = planOptions.find(option => option.id === selectedPlanId) || null;
                                 
                                 return (
                                     <tr key={skillName} className={isMaxed ? styles.maxedSkill : ''}>
@@ -147,15 +197,29 @@ const MaxingGuide = () => {
                                         <td className={styles.remainingXpCell}>
                                             {isMaxed ? '-' : remainingXP.toLocaleString('en-au', { notation: 'compact' })}
                                         </td>
-                                        {/* <td className={styles.progressCell}>
-                                            <div className={styles.progressBar}>
-                                                <div 
-                                                    className={styles.progress} 
-                                                    style={{ width: `${progressPercent}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className={styles.progressText}>{Math.floor(progressPercent)}%</span>
-                                        </td> */}
+                                        <td className={styles.planSelectorCell}>
+                                            {!isMaxed && (
+                                                <div className={styles.planSelectorWrapper}>
+                                                    <CustomSelect
+                                                        options={planOptions}
+                                                        value={selectedPlanOption}
+                                                        onChange={(option) => handlePlanChange(skillName, option)}
+                                                        getOptionLabel={(option) => option?.label ?? ''}
+                                                        getOptionValue={(option) => option?.id ?? ''}
+                                                        placeholder="Select plan..."
+                                                        renderSelectedValue={(option) => (
+                                                            <span className={styles.selectedPlanLabel}>{option?.label || "Select plan..."}</span>
+                                                        )}
+                                                        renderOption={(option) => (
+                                                            <span>{option?.label}</span>
+                                                        )}
+                                                    />
+                                                </div>
+                                            )}
+                                            {isMaxed && (
+                                                <span className={styles.maxedText}>Maxed</span>
+                                            )}
+                                        </td>
                                         <td className={styles.actionsCell}>
                                             {!isMaxed && (
                                                 <Link to={`/skill/${skillName}`}>
