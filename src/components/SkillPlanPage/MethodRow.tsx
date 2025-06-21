@@ -55,10 +55,10 @@ const MethodRow = ({
 		if (!plan.method.actionsPerHour || plan.method.actionsPerHour <= 0) {
 			return "Unknown";
 		}
-		
+
 		// Calculate how many hours it will take
 		const hours = itemsToNext / plan.method.actionsPerHour;
-		
+
 		// Format the time nicely
 		if (hours < 1) {
 			// Less than an hour, show minutes
@@ -82,7 +82,7 @@ const MethodRow = ({
 		color: isActive ? 'inherit' : '#888',
 		height: isActive ? 'auto' : '30px', // Reduce height for inactive rows
 		overflow: 'hidden',
-		
+
 	};
 
 	return (
@@ -97,7 +97,7 @@ const MethodRow = ({
 						top: '50%',
 						left: 0
 					}}></div>
-					
+
 				</td>
 				<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 			</tr>
@@ -160,36 +160,32 @@ const MethodRow = ({
 				</td>
 				<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
 				<td style={{ paddingBottom: 5 }}>
-					{isActive ? (
-						<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
-							<CustomSelect
-								showSearch
-								searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
-								options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-								value={plan.method} // This is correct - accessing the nested method object
-								onChange={(newMethod) => {
-									void dispatch(updatePlanMethod({
-										methodIndex: Number(index),
-										planId: currentSelectedPlan.id,
-										method: newMethod,
-										skill: skillId ?? '',
-										characterName: character?.username ?? ''
+					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
+						<CustomSelect
+							showSearch
+							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+							options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+							value={plan.method} // This is correct - accessing the nested method object
+							onChange={(newMethod) => {
+								void dispatch(updatePlanMethod({
+									methodIndex: Number(index),
+									planId: currentSelectedPlan.id,
+									method: newMethod,
+									skill: skillId ?? '',
+									characterName: character?.username ?? ''
 
-									}));
-								}}
-								getOptionLabel={(option) => option.label}
-								getOptionValue={(option) => option.id}
-								renderSelectedValue={(option) => (
-									<span>{option.label}</span> // Only show the label, no image
-								)}
-								renderOption={(option) => (
-									<span>{option.label}</span> // Only show the label, no image
-								)}
-							/>
-						</div>
-					) : (
-						<span>{plan.method.label}</span> // Show method name as text for inactive rows
-					)}
+								}));
+							}}
+							getOptionLabel={(option) => option.label}
+							getOptionValue={(option) => option.id}
+							renderSelectedValue={(option) => (
+								<span style={{ color: isActive ? 'white' : 'grey' }}>{option.label}</span> // Only show the label, no image
+							)}
+							renderOption={(option) => (
+								<span>{option.label}</span> // Only show the label, no image
+							)}
+						/>
+					</div>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
 				{isActive ? (
@@ -261,11 +257,11 @@ const MethodRow = ({
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-                                    costPerAction -= cost * item.amount;
-                                });
-								
+									costPerAction -= cost * item.amount;
+								});
+
 								const totalCost = -(costPerAction * itemsToNext);
-								
+
 								const isProfit = totalCost < 0;
 
 								return (
@@ -295,13 +291,13 @@ const MethodRow = ({
 
 // Create a forwardRef version of MethodRow
 const MethodRowWithRef = forwardRef((props, ref) => {
-  // Your existing MethodRow implementation
-  return (
-    <tr ref={ref}>
-      {/* Your existing row content */}
-      <MethodRow {...props} />
-    </tr>
-  );
+	// Your existing MethodRow implementation
+	return (
+		<tr ref={ref}>
+			{/* Your existing row content */}
+			<MethodRow {...props} />
+		</tr>
+	);
 });
 
 // Export both versions
