@@ -84,99 +84,67 @@ const SkillPlanPage = () => {
 			<table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
 				<TableHeader />
 				<tbody>
+					{currentSelectedPlan && (
+						<>
+							{Object.entries(currentSelectedPlan?.methods ?? {})
+								.map((plan, key) => ({
+									key,
+									plan: plan[1],
+								}))
+								.sort((a, b) => a.plan?.from - b.plan?.from)
+								.map((ob, index, array) => {
+									const from = ob.plan.from;
+									const isGreyedOut = from < currentSkillLevel;
+									const isLastMethod = index === array.length - 1;
 
-					{
-						currentSelectedPlan && (
-							<>
-								{
-									Object.entries(currentSelectedPlan?.methods ?? {})
-										.map((plan, key) => ({
-											key, plan: plan[1],
-										}))
-										.sort((a, b) => a.plan?.from - b.plan?.from) // Sort by level requirement
-										.filter((ob) => {
-											// Show methods that are applicable to the player's current level
-											// This means either:
-											// 1. The method's level requirement is exactly at the player's level
-											// 2. The method's level requirement is below the player's level, but it's the highest such method
-											// 3. The method's level requirement is above the player's level, but it's the lowest such method
-											if (ob.plan.from === currentSkillLevel) {
-												// Exact match for player's level
-												return true;
-											}
+									// Find the next method's level or default to 99
+									const nextLevel = (
+										Object.values(currentSelectedPlan.methods)
+											.filter(p => p?.from > from)
+											.sort((a, b) => a.from - b.from)[0] || { from: 99 }
+									).from;
 
-											// Find the highest method level that's below or equal to the player's level
-											const highestBelowOrEqual = Math.max(
-												...Object.values(currentSelectedPlan.methods)
-													.filter(p => p.from <= currentSkillLevel)
-													.map(p => p.from)
-											);
+									const currentStartXp = levelToXp(from);
+									const fromXp = Math.max(currentStartXp, currentSkillXp);
 
-											// Find the lowest method level that's above the player's level
-											const lowestAbove = Math.min(
-												...Object.values(currentSelectedPlan.methods)
-													.filter(p => p.from > currentSkillLevel)
-													.map(p => p.from),
-												99 // Default to 99 if no methods above
-											);
+									const xpToNext = remainingXPToTarget(fromXp, nextLevel);
+									const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
 
+									// Find the previous method's level
+									const prevLevel = (
+										Object.values(currentSelectedPlan.methods)
+											.filter(p => p?.from < from)
+											.sort((a, b) => b.from - a.from)[0] || { from: 0 }
+									).from;
 
-											// Show this method if it's either the highest below or the lowest above
-											return ob.plan.from === highestBelowOrEqual || ob.plan.from === lowestAbove;
+									return (
+										<MethodRow
+											key={ob.key.toString()}
+											index={ob.key.toString()}
+											plan={ob.plan}
+											from={from}
+											nextLevel={nextLevel}
+											prevLevel={prevLevel}
+											currentSkillLevel={currentSkillLevel}
+											xpToNext={xpToNext}
+											itemsToNext={itemsToNext}
+											currentSelectedPlan={currentSelectedPlan}
+											skillId={skillId}
+											isGreyedOut={isGreyedOut}
+											isLastMethod={isLastMethod}
+										/>
+									);
+								})}
 
-										})
-										.map((ob) => {
-											const from = Math.max(ob.plan.from, currentSkillLevel);
-
-											// Find the next method's level or default to 99
-											const nextLevel = (
-												Object.values(currentSelectedPlan.methods)
-													.filter(p => p?.from > from)
-													.sort((a, b) => a.from - b.from)[0] || { from: 99 }
-											).from;
-
-											const currentStartXp = levelToXp(from);
-											const fromXp = Math.max(currentStartXp, currentSkillXp);
-
-											const xpToNext = remainingXPToTarget(fromXp, nextLevel);
-											const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
-
-											// Find the previous method's level
-											const prevLevel = (
-												Object.values(currentSelectedPlan.methods)
-													.filter(p => p?.from < from)
-													.sort((a, b) => b.from - a.from)[0] || { from: 0 }
-											).from;
-											return (
-												<MethodRow
-													key={ob.key.toString()}
-													index={ob.key.toString()}
-													plan={ob.plan}
-													from={from}
-													nextLevel={nextLevel}
-													prevLevel={prevLevel}
-													currentSkillLevel={currentSkillLevel}
-													xpToNext={xpToNext}
-													itemsToNext={itemsToNext}
-													currentSelectedPlan={currentSelectedPlan}
-													skillId={skillId}
-												/>
-											)
-										})
-								}
-
-								{/* New row for inserting methods */}
-								<InsertMethodRow
-									currentSelectedPlan={currentSelectedPlan}
-									skillId={skillId}
-								/>
-							</>
-						)
-					}
-
+							{/* New row for inserting methods */}
+							<InsertMethodRow
+								currentSelectedPlan={currentSelectedPlan}
+								skillId={skillId}
+							/>
+						</>
+					)}
 				</tbody>
 			</table>
-
 		</div>
 	)
 };

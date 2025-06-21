@@ -25,6 +25,8 @@ export const MethodRow = ({
 	itemsToNext,
 	currentSelectedPlan,
 	skillId,
+	isGreyedOut,
+	isLastMethod,
 }: {
 	index: string;
 	plan: PlanMethod;
@@ -36,6 +38,8 @@ export const MethodRow = ({
 	itemsToNext: number;
 	currentSelectedPlan: Plan;
 	skillId: string | undefined;
+	isGreyedOut: boolean;
+	isLastMethod: boolean;
 }) => {
 	const dispatch = useAppDispatch();
 	const { getItemIconUrl, getItemPrice } = useItems();
@@ -66,6 +70,11 @@ export const MethodRow = ({
 			const remainingHours = Math.ceil(hours % 24);
 			return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
 		}
+	};
+
+	const rowStyle = {
+		opacity: (isGreyedOut && !isLastMethod) ? 0.5 : 1,
+		color: (isGreyedOut && !isLastMethod) ? '#888' : 'inherit',
 	};
 
 	return (
@@ -121,7 +130,7 @@ export const MethodRow = ({
 				</td>
 				<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 			</tr>
-			<tr key={index}>
+			<tr key={index} style={rowStyle}>
 				<td >
 					{/* // add remove button */}
 					<button
