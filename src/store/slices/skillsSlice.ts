@@ -9,6 +9,7 @@ import { updatePlanMethod } from '../thunks/skills/updatePlanMethod';
 import { removeMethodFromPlan } from '../thunks/skills/removeMethodFromPlan';
 import { v4 } from 'uuid';
 import { renamePlan } from '../thunks/skills/renamePlan';
+import { deletePlan } from '../thunks/skills/deletePlan';
 
 function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
     return key in obj;
@@ -375,6 +376,25 @@ const skillsSlice = createSlice({
                     label: newName
                 };
             }
+        });
+
+        builder.addCase(deletePlan.fulfilled, (state, action) => {
+          const { planId, characterName } = action.payload;
+          
+          // Remove the plan from the plans array
+          state.plans = state.plans.filter(plan => !(plan.id === planId && plan.character === characterName));
+          
+          // Remove the plan from selectedPlans if it's selected
+          if (state.selectedPlans[characterName] && 
+              Object.entries(state.selectedPlans[characterName]).some(([_, value]) => value === planId)) {
+            // Find which skill had this plan selected
+            for (const skill in state.selectedPlans[characterName]) {
+              if (state.selectedPlans[characterName][skill] === planId) {
+                // Remove this skill's selected plan
+                delete state.selectedPlans[characterName][skill];
+              }
+            }
+          }
         });
 
         return builder;

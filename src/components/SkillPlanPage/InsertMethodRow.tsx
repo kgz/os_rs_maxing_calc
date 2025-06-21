@@ -4,8 +4,10 @@ import { addNewMethodToPlan } from '../../store/thunks/skills/addNewMethodToPlan
 import { Plans } from '../../plans/plans';
 import type { Plan } from '../../types/plan';
 import { useLastCharacter } from '../../hooks/useLastCharacter';
-import { Edit, PlusCircleIcon } from 'lucide-react';
+import { Edit, PlusCircleIcon, Trash2 } from 'lucide-react';
 import { RenameModal } from './RenameModal';
+import { deletePlan } from '../../store/thunks/skills/deletePlan';
+import styles from '../SkillPlanPage.module.css';
 
 export const InsertMethodRow = ({
 	currentSelectedPlan,
@@ -18,7 +20,7 @@ export const InsertMethodRow = ({
 	const characters = useAppSelector(state => state.characterReducer);
 	const character = useLastCharacter(characters);
 	const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-	const [isAddMethodModalOpen, setIsAddMethodModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
 	const handleAddMethod = () => {
 		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
@@ -34,9 +36,24 @@ export const InsertMethodRow = ({
 				planId: currentSelectedPlan.id,
 				index: Object.keys(currentSelectedPlan.methods).length,
 				skill: skillId,
-				characterName: character?.username, // Add character name here if available
+				characterName: character?.username,
 			})
 		);
+	};
+
+	const handleDeletePlan = () => {
+		if (!character?.username) {
+			return;
+		}
+		
+		void dispatch(
+			deletePlan({
+				planId: currentSelectedPlan.id,
+				characterName: character.username,
+			})
+		);
+		
+		setIsDeleteModalOpen(false);
 	};
 
 	// Check if this is a custom plan (not a template)
@@ -65,30 +82,50 @@ export const InsertMethodRow = ({
 					>
 						<PlusCircleIcon size={16} /> Add New Method
 					</button>
-					{isCustomPlan && (
-						<button
-							onClick={() => setIsRenameModalOpen(true)}
-							style={{
-								background: '#4a6fa5',
-								color: 'white',
-								border: 'none',
-								padding: '5px 10px',
-								borderRadius: '4px',
-								cursor: 'pointer',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								gap: '5px',
-								fontSize: '14px',
-								fontWeight: 'bold',
-							}}
-						>
-							<Edit size={16} /> Rename Plan
-						</button>
-						
-					)}
-
 					
+					{isCustomPlan && (
+						<>
+							<button
+								onClick={() => setIsRenameModalOpen(true)}
+								style={{
+									background: '#4a6fa5',
+									color: 'white',
+									border: 'none',
+									padding: '5px 10px',
+									borderRadius: '4px',
+									cursor: 'pointer',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									gap: '5px',
+									fontSize: '14px',
+									fontWeight: 'bold',
+								}}
+							>
+								<Edit size={16} /> Rename Plan
+							</button>
+							
+							<button
+								onClick={() => setIsDeleteModalOpen(true)}
+								style={{
+									background: '#d32f2f',
+									color: 'white',
+									border: 'none',
+									padding: '5px 10px',
+									borderRadius: '4px',
+									cursor: 'pointer',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									gap: '5px',
+									fontSize: '14px',
+									fontWeight: 'bold',
+								}}
+							>
+								<Trash2 size={16} /> Delete Plan
+							</button>
+						</>
+					)}
 				</div>
 
 				{/* Rename Modal */}
@@ -102,39 +139,18 @@ export const InsertMethodRow = ({
 					/>
 				)}
 
-				{/* Add Method Modal */}
-				{isAddMethodModalOpen && (
-					<div className="modalOverlay" style={{
-						position: 'fixed',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						backgroundColor: 'rgba(0, 0, 0, 0.7)',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						zIndex: 1000,
-					}}>
-						<div className="modalContent" style={{
-							backgroundColor: '#2a2a2a',
-							padding: '20px',
-							borderRadius: '8px',
-							width: '300px',
-							boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-						}}>
-							<h3>Add New Method</h3>
-							<p>Are you sure you want to add a new method to this plan?</p>
-							<div style={{
-								display: 'flex',
-								justifyContent: 'flex-end',
-								gap: '10px',
-								marginTop: '15px',
-							}}>
-								<button
-									onClick={handleAddMethod}
+				{/* Delete Plan Confirmation Modal */}
+				{isDeleteModalOpen && (
+					<div className={styles.modalOverlay}>
+						<div className={styles.modalContent}>
+							<h3>Delete Plan</h3>
+							<p>Are you sure you want to delete the plan "{currentSelectedPlan.label}"?</p>
+							<p style={{ color: '#ff6b6b', fontWeight: 'bold' }}>This action cannot be undone.</p>
+							<div className={styles.modalButtons}>
+								<button 
+									onClick={handleDeletePlan}
 									style={{
-										backgroundColor: '#4CAF50',
+										backgroundColor: '#d32f2f',
 										color: 'white',
 										border: 'none',
 										padding: '8px 16px',
@@ -142,18 +158,11 @@ export const InsertMethodRow = ({
 										cursor: 'pointer',
 									}}
 								>
-									Add
+									Delete
 								</button>
-								<button
-									onClick={() => setIsAddMethodModalOpen(false)}
-									style={{
-										backgroundColor: '#666',
-										color: 'white',
-										border: 'none',
-										padding: '8px 16px',
-										borderRadius: '4px',
-										cursor: 'pointer',
-									}}
+								<button 
+									onClick={() => setIsDeleteModalOpen(false)}
+									className={styles.modalCancelButton}
 								>
 									Cancel
 								</button>
