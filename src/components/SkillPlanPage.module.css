@@ -11,6 +11,7 @@
   height: 20px;
   text-align: center;
   margin: 8px 0;
+  transition: all 0.3s ease;
 }
 
 .addMethodLine {
@@ -86,4 +87,66 @@
 .selectedPlanLabel {
   font-size: 16px;
   font-weight: 500;
+}
+
+.methodRow-enter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.methodRow-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.methodRow-exit {
+  opacity: 1;
+}
+
+.methodRow-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.methodRowEnter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.methodRowEnterActive {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.methodRowExit {
+  opacity: 1;
+}
+
+.methodRowExitActive {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.flip-move {
+  position: relative;
+}
+
+.animatedTableBody tr {
+  transition: all 0.5s ease;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

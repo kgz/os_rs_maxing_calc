@@ -13,9 +13,10 @@ import { updatePlanMethod } from "../../store/thunks/skills/updatePlanMethod";
 import { useItems } from "../../hooks/useItems";
 import { Items } from "../../types/items";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
+import React, { forwardRef } from 'react';
 
 // Component for the method row
-export const MethodRow = ({
+const MethodRow = ({
 	index,
 	plan,
 	from,
@@ -87,7 +88,7 @@ export const MethodRow = ({
 	};
 
 	return (
-		<Fragment key={index}>
+		<Fragment key={index} >
 			<tr>
 				<td style={{ position: 'relative', paddingTop: 4, paddingBottom: 4, paddingRight: 10 }}>
 					<div style={{
@@ -102,7 +103,7 @@ export const MethodRow = ({
 				</td>
 				<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 			</tr>
-			<tr key={index} style={rowStyle}>
+			<tr key={index} style={rowStyle} className="method-row">
 				<td >
 					{/* Remove button */}
 					<button
@@ -297,3 +298,18 @@ export const MethodRow = ({
 		</Fragment>
 	)
 };
+
+// Create a forwardRef version of MethodRow
+const MethodRowWithRef = forwardRef((props, ref) => {
+  // Your existing MethodRow implementation
+  return (
+    <tr ref={ref}>
+      {/* Your existing row content */}
+      <MethodRow {...props} />
+    </tr>
+  );
+});
+
+// Export both versions
+export { MethodRowWithRef };
+export { MethodRow }

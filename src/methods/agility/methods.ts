@@ -23,7 +23,7 @@ export default {
 		xp: 571, // XP per lap
 		items: [],
 		returns: [
-			{ item: Items.WildernessAgilityTicket, amount: 1 }, // Approximate drop rate
+			{ item: Items.Coins, amount: 16_022 }, // Approximate drop rate
 		],
 		actionsPerHour: 100, // Approximate laps per hour
 		requirments: {

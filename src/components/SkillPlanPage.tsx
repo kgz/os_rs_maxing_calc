@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import style from './SkillPlanPage.module.css';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { Plans } from '../plans/plans';
 import { levelToXp, remainingXPToTarget } from '../utils/xpCalculations';
@@ -10,9 +10,9 @@ import { useCurrentSkillStats } from '../hooks/usecurrentSkillStats';
 import { useLastCharacter } from '../hooks/useLastCharacter';
 import { MethodRow } from './SkillPlanPage/MethodRow';
 import { TableHeader } from './SkillPlanPage/TableHeader';
-import { InsertMethodRow } from './SkillPlanPage/InsertMethodRow';
 import { SkillHeader } from './SkillPlanPage/SkillHeader';
-
+import { InsertMethodRow } from './SkillPlanPage/InsertMethodRow';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 const SkillPlanPage = () => {
 	const { skillId } = useParams();
@@ -69,6 +69,50 @@ const SkillPlanPage = () => {
 		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId, characterName: lastCharacter?.username ?? '' }));
 	};
 
+	// Process methods for rendering
+	const methodRows = useMemo(() => {
+		if (!currentSelectedPlan) return [];
+		
+		return Object.entries(currentSelectedPlan?.methods ?? {})
+			.map((plan, key) => ({
+				key,
+				plan: plan[1],
+			}))
+			.sort((a, b) => a.plan?.from - b.plan?.from)
+			.map((ob, index, array) => {
+				const from = ob.plan.from;
+				const nextMethod = array[index + 1];
+				const nextFrom = nextMethod ? nextMethod.plan.from : 99;
+
+				const isActive = (nextFrom > currentSkillLevel || index === array.length - 1);
+				const isLastMethod = index === array.length - 1;
+
+				// Find the next method's level or default to 99
+				const nextLevel = nextFrom;
+
+				const currentStartXp = levelToXp(from);
+				const fromXp = Math.max(currentStartXp, currentSkillXp);
+
+				const xpToNext = remainingXPToTarget(fromXp, nextLevel);
+				const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
+
+				// Find the previous method's level
+				const prevLevel = index > 0 ? array[index - 1].plan.from : 1;
+
+				return {
+					key: ob.key.toString(),
+					from,
+					nextLevel,
+					prevLevel,
+					isActive,
+					isLastMethod,
+					plan: ob.plan,
+					xpToNext,
+					itemsToNext
+				};
+			});
+	}, [currentSelectedPlan, currentSkillLevel, currentSkillXp]);
+
 	return (
 		<div className={style.container}>
 			{/* Redesigned Skill Header with Plan Selector */}
@@ -83,54 +127,27 @@ const SkillPlanPage = () => {
 
 			<table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
 				<TableHeader />
-				<tbody>
+				<tbody className={style.animatedTableBody}>
 					{currentSelectedPlan && (
 						<>
-							{Object.entries(currentSelectedPlan?.methods ?? {})
-								.map((plan, key) => ({
-									key,
-									plan: plan[1],
-								}))
-								.sort((a, b) => a.plan?.from - b.plan?.from)
-								.map((ob, index, array) => {
-									const from = ob.plan.from;
-									const nextMethod = array[index + 1];
-									const nextFrom = nextMethod ? nextMethod.plan.from : 99;
-
-									const isActive =  (nextFrom > currentSkillLevel || index === array.length - 1);
-									const isLastMethod = index === array.length - 1;
-
-									// Find the next method's level or default to 99
-									const nextLevel = nextFrom;
-
-									const currentStartXp = levelToXp(from);
-									const fromXp = Math.max(currentStartXp, currentSkillXp);
-
-									const xpToNext = remainingXPToTarget(fromXp, nextLevel);
-									const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
-
-									// Find the previous method's level
-									const prevLevel = index > 0 ? array[index - 1].plan.from : 1;
-
-									return (
-										<MethodRow
-											key={ob.key.toString()}
-											index={ob.key.toString()}
-											plan={ob.plan}
-											from={from}
-											nextLevel={nextLevel}
-											prevLevel={prevLevel}
-											currentSkillLevel={currentSkillLevel}
-											xpToNext={xpToNext}
-											itemsToNext={itemsToNext}
-											currentSelectedPlan={currentSelectedPlan}
-											skillId={skillId}
-											isGreyedOut={from >= currentSkillLevel}
-											isLastMethod={isLastMethod}
-            								isActive={isActive}
-										/>
-									);
-								})}
+							{methodRows.map((rowData) => (
+								<MethodRow
+									key={rowData.key}
+									index={rowData.key}
+									plan={rowData.plan}
+									from={rowData.from}
+									nextLevel={rowData.nextLevel}
+									prevLevel={rowData.prevLevel}
+									currentSkillLevel={currentSkillLevel}
+									xpToNext={rowData.xpToNext}
+									itemsToNext={rowData.itemsToNext}
+									currentSelectedPlan={currentSelectedPlan}
+									skillId={skillId}
+									isGreyedOut={rowData.from >= currentSkillLevel}
+									isLastMethod={rowData.isLastMethod}
+									isActive={rowData.isActive}
+								/>
+							))}
 
 							{/* New row for inserting methods */}
 							<InsertMethodRow
