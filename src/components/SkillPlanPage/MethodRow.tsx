@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { useAppDispatch } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
 import { CirclePlus, Trash2 } from "lucide-react";
 import { addNewMethodToPlan } from "../../store/thunks/skills/addNewMethodToPlan";
@@ -12,6 +12,7 @@ import type { Method } from "../../types/method";
 import { updatePlanMethod } from "../../store/thunks/skills/updatePlanMethod";
 import { useItems } from "../../hooks/useItems";
 import { Items } from "../../types/items";
+import { useLastCharacter } from "../../hooks/useLastCharacter";
 
 // Component for the method row
 export const MethodRow = ({
@@ -27,6 +28,7 @@ export const MethodRow = ({
 	skillId,
 	isGreyedOut,
 	isLastMethod,
+	isActive,
 }: {
 	index: string;
 	plan: PlanMethod;
@@ -40,9 +42,13 @@ export const MethodRow = ({
 	skillId: string | undefined;
 	isGreyedOut: boolean;
 	isLastMethod: boolean;
+	isActive: boolean;
 }) => {
 	const dispatch = useAppDispatch();
 	const { getItemIconUrl, getItemPrice } = useItems();
+
+	const characters = useAppSelector(state => state.characterReducer)
+	const character = useLastCharacter(characters);
 
 	// Calculate time to complete based on actions per hour
 	const calculateTimeToComplete = () => {
@@ -73,8 +79,11 @@ export const MethodRow = ({
 	};
 
 	const rowStyle = {
-		opacity: (isGreyedOut && !isLastMethod) ? 0.5 : 1,
-		color: (isGreyedOut && !isLastMethod) ? '#888' : 'inherit',
+		// opacity: isActive ? 1 : 0.5,
+		color: isActive ? 'inherit' : '#888',
+		height: isActive ? 'auto' : '30px', // Reduce height for inactive rows
+		overflow: 'hidden',
+		
 	};
 
 	return (
@@ -89,50 +98,13 @@ export const MethodRow = ({
 						top: '50%',
 						left: 0
 					}}></div>
-					<button
-						disabled={nextLevel - from <= 1}
-						style={{
-							position: 'relative',
-							zIndex: 2,
-							height: 1,
-							border: 'none',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							background: 'none',
-							cursor: nextLevel - from <= 1 ? 'default' : 'pointer',
-							opacity: nextLevel - from <= 1 ? 0.5 : 1,
-							margin: '0 auto',
-							padding: 0,
-							marginRight: 2,
-							fontSize: '16px',
-							fontWeight: 'bold',
-							marginTop: 0,
-							outline: 'none',
-							color: '#4CAF50'
-						}}
-						onClick={() => {
-							const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
-							if (!skillId || !valInSkills(skillId)) {
-								console.warn('Invalid skill', skillId);
-								return;
-							}
-
-							void dispatch(addNewMethodToPlan({
-								planId: currentSelectedPlan.id,
-								skill: skillId,
-								index: Number(index),
-							}));
-						}}
-					>
-						<span style={{ marginTop: -4 }}><CirclePlus size={15} /></span>
-					</button>
+					
 				</td>
 				<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 			</tr>
 			<tr key={index} style={rowStyle}>
 				<td >
-					{/* // add remove button */}
+					{/* Remove button */}
 					<button
 						style={{
 							background: 'none',
@@ -143,24 +115,26 @@ export const MethodRow = ({
 							padding: 0,
 							color: '#ff4747',
 							outline: 'none',
+							// opacity: isActive ? 1 : 0.5, // Reduce opacity for inactive rows
 						}}
 						onClick={() => {
 							void dispatch(removeMethodFromPlan({
 								planId: currentSelectedPlan.id,
 								methodIndex: Number(index),
-								skill: skillId ?? ''
+								skill: skillId ?? '',
+								characterName: character?.username ?? ''
+
 							}))
 						}}
 					><Trash2 size={15} /></button>
 				</td>
 				<td style={{ paddingBottom: 5 }}>
 					<input
-
 						data-min={prevLevel + 1}
 						value={from}
 						type="number"
-						min={Math.max(prevLevel + 1, currentSkillLevel)}
-						max={nextLevel - 1}
+						min={1}
+						max={99}
 						step={1}
 						onChange={(e) => {
 							const val = Number(e.target.value);
@@ -168,136 +142,157 @@ export const MethodRow = ({
 								level: val,
 								methodIndex: Number(index),
 								plan: currentSelectedPlan.id,
-								skill: skillId ?? ''
+								skill: skillId ?? '',
+								characterName: character?.username ?? ''
 							}))
-						}
-						}
-					></input>
-
+						}}
+						style={{
+							opacity: 1, // Always fully visible
+							background: 'inherit',
+							border: '1px solid #ccc',
+							// color: 'inherit',
+							padding: '2px 5px',
+							width: '50px',
+							textAlign: 'center',
+						}}
+					/>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
 				<td style={{ paddingBottom: 5 }}>
-					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
-						<CustomSelect
-							showSearch
-							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
-							options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-							value={plan.method} // This is correct - accessing the nested method object
-							onChange={(newMethod) => {
-								console.log(index)
-								console.log(currentSelectedPlan.methods)
-								void dispatch(updatePlanMethod({
-									methodIndex: Number(index),
-									planId: currentSelectedPlan.id,
-									method: newMethod,
-									skill: skillId ?? ''
-								}));
-							}}
-							getOptionLabel={(option) => option.label}
-							getOptionValue={(option) => option.id}
-							renderSelectedValue={(option) => (
-								<span>{option.label}</span> // Only show the label, no image
-							)}
-							renderOption={(option) => (
-								<span>{option.label}</span> // Only show the label, no image
-							)}
-						/>
-					</div>
+					{isActive ? (
+						<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
+							<CustomSelect
+								showSearch
+								searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+								options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+								value={plan.method} // This is correct - accessing the nested method object
+								onChange={(newMethod) => {
+									console.log(index)
+									console.log(currentSelectedPlan.methods)
+									void dispatch(updatePlanMethod({
+										methodIndex: Number(index),
+										planId: currentSelectedPlan.id,
+										method: newMethod,
+										skill: skillId ?? '',
+										characterName: character?.username ?? ''
+
+									}));
+								}}
+								getOptionLabel={(option) => option.label}
+								getOptionValue={(option) => option.id}
+								renderSelectedValue={(option) => (
+									<span>{option.label}</span> // Only show the label, no image
+								)}
+								renderOption={(option) => (
+									<span>{option.label}</span> // Only show the label, no image
+								)}
+							/>
+						</div>
+					) : (
+						<span>{plan.method.label}</span> // Show method name as text for inactive rows
+					)}
 				</td>
 				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
-				<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-						{plan.method.items.map((itemData, idx) => {
-							const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-							return (
-								<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-									<img
-										src={getItemIconUrl(item?.id ?? 0)}
-										width="24"
-										height="24"
-										alt={itemData.item.label}
-										title={itemData.item.label}
-										style={{ marginRight: '4px' }}
-									/>
-									<span>
-										{(itemData.amount * itemsToNext).toLocaleString("en-AU", {
-											maximumFractionDigits: 0,
-											style: 'decimal',
-										})}
+				{isActive ? (
+					<>
+						<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
+							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+								{plan.method.items.map((itemData, idx) => {
+									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
+									return (
+										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
+											<img
+												src={getItemIconUrl(item?.id ?? 0)}
+												width="24"
+												height="24"
+												alt={itemData.item.label}
+												title={itemData.item.label}
+												style={{ marginRight: '4px' }}
+											/>
+											<span>
+												{(itemData.amount * itemsToNext).toLocaleString("en-AU", {
+													maximumFractionDigits: 0,
+													style: 'decimal',
+												})}
+											</span>
+										</div>
+									)
+								})}
+							</div>
+						</td>
+						{/* New output column */}
+						<td style={{ paddingBottom: 5 }}>
+							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+								{plan.method.returns?.map((outputData, idx) => {
+									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
+									return (
+										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
+											<img
+												src={getItemIconUrl(outputItem?.id ?? 0)}
+												width="24"
+												height="24"
+												alt={outputData.item.label}
+												title={outputData.item.label}
+												style={{ marginRight: '4px' }}
+												data-id={outputData.item.id}
+											/>
+											<span>
+												{(outputData.amount * itemsToNext).toLocaleString("en-AU", {
+													maximumFractionDigits: 0,
+													style: 'decimal',
+												})}
+											</span>
+										</div>
+									)
+								}) || <span>-</span>}
+							</div>
+						</td>
+						{/* New Profit/Loss column */}
+						<td style={{ paddingBottom: 5 }}>
+							{(() => {
+								const inputItems = plan.method.items
+								const outputItems = plan.method.returns
+
+								let costPerAction = 0;
+
+								inputItems.forEach(item => {
+									const cost = getItemPrice(item.item.id) ?? 0;
+									costPerAction += cost * item.amount;
+									console.log(`Cost of ${item.item.label}: ${cost}`);	
+								});
+
+								outputItems.forEach(item => {
+									const cost = getItemPrice(item.item.id) ?? 0;
+                                    costPerAction -= cost * item.amount;
+                                    console.log(`Cost of ${item.item.label}: ${cost}`);    
+                                });
+								
+								console.log(`Cost per action: ${costPerAction}`);	
+
+								const totalCost = -(costPerAction * itemsToNext);
+								
+								const isProfit = totalCost < 0;
+
+								return (
+									<span style={{
+										color: !isProfit ? '#4CAF50' : '#ff4747',
+										fontWeight: 'bold',
+									}}>
+										{/* {isProfit ? '+' : ''} */}
+										{totalCost.toLocaleString("en-AU", {
+											notation: 'compact',
+										})} gp
 									</span>
-								</div>
-							)
-						})}
-					</div>
-				</td>
-				{/* New output column */}
-				<td style={{ paddingBottom: 5 }}>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-						{plan.method.returns?.map((outputData, idx) => {
-							const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
-							return (
-								<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-									<img
-										src={getItemIconUrl(outputItem?.id ?? 0)}
-										width="24"
-										height="24"
-										alt={outputData.item.label}
-										title={outputData.item.label}
-										style={{ marginRight: '4px' }}
-										data-id={outputData.item.id}
-									/>
-									<span>
-										{(outputData.amount * itemsToNext).toLocaleString("en-AU", {
-											maximumFractionDigits: 0,
-											style: 'decimal',
-										})}
-									</span>
-								</div>
-							)
-						}) || <span>-</span>}
-					</div>
-				</td>
-				{/* New Profit/Loss column */}
-				<td style={{ paddingBottom: 5 }}>
-					{(() => {
-						const inputItems = plan.method.items
-						const outputItems = plan.method.returns
-
-						let costPerAction = 0;
-
-						inputItems.forEach(item => {
-							const cost = getItemPrice(item.item.id) ?? 0;
-							costPerAction += cost * item.amount;
-							console.log(`Cost of ${item.item.label}: ${cost}`);	
-						});
-
-						outputItems.forEach(item => {
-							const cost = getItemPrice(item.item.id) ?? 0;
-                            costPerAction -= cost * item.amount;
-                            console.log(`Cost of ${item.item.label}: ${cost}`);    
-                        });
-						
-						console.log(`Cost per action: ${costPerAction}`);	
-
-						const totalCost = -(costPerAction * itemsToNext);
-						
-						const isProfit = totalCost < 0;
-
-						return (
-							<span style={{
-								color: !isProfit ? '#4CAF50' : '#ff4747',
-								fontWeight: 'bold',
-							}}>
-								{/* {isProfit ? '+' : ''} */}
-								{totalCost.toLocaleString("en-AU", {
-									notation: 'compact',
-								})} gp
-							</span>
-						);
-					})()}
-				</td>
-				<td>{calculateTimeToComplete()}</td>
-				{/* <td>{currentStartXp.toLocaleString()} {"->"} {xpToNext.toLocaleString()} </td> */}
+								);
+							})()}
+						</td>
+						<td>{calculateTimeToComplete()}</td>
+					</>
+				) : (
+					<td colSpan={4} style={{ textAlign: 'center', color: '#4CAF50', fontWeight: 'bold' }}>
+						Completed
+					</td>
+				)}
 			</tr>
 		</Fragment>
 	)

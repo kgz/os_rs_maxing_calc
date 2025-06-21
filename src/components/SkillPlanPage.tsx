@@ -96,6 +96,7 @@ const SkillPlanPage = () => {
 									const from = ob.plan.from;
 									const isGreyedOut = from < currentSkillLevel;
 									const isLastMethod = index === array.length - 1;
+									const isActive = from >= currentSkillLevel || isLastMethod;
 
 									// Find the next method's level or default to 99
 									const nextLevel = (
@@ -132,6 +133,7 @@ const SkillPlanPage = () => {
 											skillId={skillId}
 											isGreyedOut={isGreyedOut}
 											isLastMethod={isLastMethod}
+											isActive={isActive}
 										/>
 									);
 								})}

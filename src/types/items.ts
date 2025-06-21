@@ -179,7 +179,7 @@ export const Items = {
         label: 'Jug of blessed wine',
     },
     SunfireSplinters: {
-        id: 29100,
+        id: 28924,
         label: 'Sunfire splinters',
     },
     JugOfBlessedSunfireWine: {
