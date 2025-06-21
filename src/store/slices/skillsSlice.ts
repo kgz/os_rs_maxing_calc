@@ -167,7 +167,7 @@ const skillsSlice = createSlice({
             if (!state.selectedPlans[characterName]) {
                 state.selectedPlans[characterName] = {};
             }
-
+			
             // If plan doesn't exist in user plans but exists in template plans, create a copy
             if (planIndex === -1) {
                 // Check if skill is a valid key in Plans
@@ -201,45 +201,25 @@ const skillsSlice = createSlice({
 
                 // Update planIndex to point to the newly created plan
                 planIndex = state.plans.length - 1;
+
+				
             }
 
             const userPlans = state.plans[planIndex];
+			console.log(current(userPlans).methods)
 
-            const availableSkillMethods = Plans[skill];
+			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods));
+			const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0);
+			console.log(Object.values(_lastMethod).sort((a, b) => b.from - a.from))
 
-            // Get the first key and ensure it exists
-            const _firstKey = Object.keys(availableSkillMethods).at(-1);
-            if (!_firstKey || !(_firstKey in availableSkillMethods)) {
-                console.error('No default method found for', skill);
-                return;
-            }
-
-            // Get the plan using the key
-            const firstPlan = availableSkillMethods[_firstKey as keyof typeof availableSkillMethods];
-
-            // Use type assertion to help TypeScript understand the structure
-            if (!firstPlan || !('methods' in firstPlan) || !Array.isArray((firstPlan as Plan).methods) || (firstPlan as Plan).methods.length === 0) {
-                console.error('No default method found for ', skill);
-                return;
-            }
-
-            // Now we can safely access the first method with proper type assertion
-            const defaultMethod = (firstPlan as Plan).methods.at(-1);
-			console.log({defaultMethod})
-
-			if (!defaultMethod) {
-				throw new Error('No default method found for ' + skill);
-				//TODO, need to handle this error condition
-			}
+			// if (!defaultMethod) {
+			// 	throw new Error('No default method found for ' + skill);
+			// 	//TODO, need to handle this error condition
+			// }
 
             // Add the new method to the user's plan at the specified index
-            const newMethods = [...Object.values(userPlans.methods)];
-            newMethods.splice(index, 0, {
-                from: defaultMethod.from,
-                method: defaultMethod.method
-            });
+            const newMethods = [...Object.values(userPlans.methods), lastMethod];
 
-			console.log(current(state).plans)
 			
             state.plans[planIndex] = {
 				...userPlans,
