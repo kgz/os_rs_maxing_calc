@@ -316,7 +316,7 @@ const skillsSlice = createSlice({
 
             // If plan doesn't exist in user plans but exists in template plans, create a copy
             if (planIndex === -1) {
-                // Check if skill is a valid key in Plans
+                 // Check if skill is a valid key in Plans
                 if (!skill || !isValidSkill(skill)) {
                     console.error(`No plans found for skill: ${skill}`);
                     return;
@@ -324,19 +324,12 @@ const skillsSlice = createSlice({
 
                 const skillPlans = Plans[skill];
 
-                if (!isValidPlan(skill, planId)) {
+                // For this case, we need to find the plan by ID since we're using Object.values
+                const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan | undefined;
+                if (!templatePlan) {
                     console.error(`Template plan not found: ${planId} for skill: ${skill}`);
                     return;
                 }
-
-                // Check if planId is a valid key in skillPlans
-                if (!isKeyOfObject(planId, skillPlans)) {
-                    console.error(`Invalid plan key: ${planId} for skill: ${skill}`);
-                    return;
-                }
-
-                // Now TypeScript knows planId is a valid key
-                const templatePlan = skillPlans[planId] as Plan;
 
                 // Create a new custom plan based on the template
                 const newPlan = {

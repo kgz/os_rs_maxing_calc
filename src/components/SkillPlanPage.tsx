@@ -23,7 +23,7 @@ const SkillPlanPage = () => {
 
 	const lastCharacter = useLastCharacter(characters);
 	const { currentSkillXp, currentSkillLevel } = useCurrentSkillStats(lastCharacter, skillId);
-	const { templatePlans, currentSelectedPlan } = usePlans(skillId, _UserPlans, selectedPlans[lastCharacter?.username?? '']?? null);
+	const { templatePlans, currentSelectedPlan } = usePlans(skillId, _UserPlans, selectedPlans[lastCharacter?.username ?? ''] ?? null);
 
 	// Create an array of plan options for the CustomSelect component
 	const planOptions = useMemo(() => {
@@ -37,7 +37,7 @@ const SkillPlanPage = () => {
 			isTemplate: true
 		}));
 
-		const userPlanOptions = _UserPlans.filter(plan=>{
+		const userPlanOptions = _UserPlans.filter(plan => {
 			return plan.type === skillId
 		}).map(plan => ({
 			id: plan.id,
@@ -51,7 +51,7 @@ const SkillPlanPage = () => {
 
 	// Find the currently selected plan option
 	const selectedPlanOption = useMemo(() => {
-		const characterPlans = selectedPlans[lastCharacter?.username?? ''] ?? {};
+		const characterPlans = selectedPlans[lastCharacter?.username ?? ''] ?? {};
 		if (!skillId || !characterPlans[skillId as keyof typeof characterPlans] || !planOptions.length) return null;
 		return planOptions.find(option => option.id === characterPlans[skillId as keyof typeof characterPlans]) || null;
 	}, [lastCharacter?.username, planOptions, selectedPlans, skillId]);
@@ -66,7 +66,7 @@ const SkillPlanPage = () => {
 
 		if (!option) return;
 
-		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId, characterName: lastCharacter?.username?? '' }));
+		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId, characterName: lastCharacter?.username ?? '' }));
 	};
 
 	return (
@@ -96,8 +96,8 @@ const SkillPlanPage = () => {
 									const from = ob.plan.from;
 									const nextMethod = array[index + 1];
 									const nextFrom = nextMethod ? nextMethod.plan.from : 99;
-									
-									const isActive = from < currentSkillLevel && nextFrom > currentSkillLevel;
+
+									const isActive =  (nextFrom > currentSkillLevel || index === array.length - 1);
 									const isLastMethod = index === array.length - 1;
 
 									// Find the next method's level or default to 99
@@ -127,8 +127,7 @@ const SkillPlanPage = () => {
 											skillId={skillId}
 											isGreyedOut={from >= currentSkillLevel}
 											isLastMethod={isLastMethod}
-											isActive={isActive || isLastMethod}
-											isFirstActiveRow={isActive && !array.slice(0, index).some(item => item.plan.from < currentSkillLevel && nextFrom > currentSkillLevel)}
+            								isActive={isActive}
 										/>
 									);
 								})}
