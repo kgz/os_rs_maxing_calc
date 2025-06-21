@@ -206,7 +206,6 @@ const skillsSlice = createSlice({
             }
 
             const userPlans = state.plans[planIndex];
-			console.log(current(userPlans).methods)
 
 			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods));
 			const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0);

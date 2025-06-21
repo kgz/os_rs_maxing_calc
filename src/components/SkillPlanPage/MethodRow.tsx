@@ -256,13 +256,13 @@ export const MethodRow = ({
 								let costPerAction = 0;
 
 								inputItems.forEach(item => {
-									const cost = getItemPrice(item.item.id) ?? 0;
+									const cost = getItemPrice(item.item?.id) ?? 0;
 									costPerAction += cost * item.amount;
 									console.log(`Cost of ${item.item.label}: ${cost}`);	
 								});
 
 								outputItems.forEach(item => {
-									const cost = getItemPrice(item.item.id) ?? 0;
+									const cost = getItemPrice(item.item?.id) ?? 0;
                                     costPerAction -= cost * item.amount;
                                     console.log(`Cost of ${item.item.label}: ${cost}`);    
                                 });

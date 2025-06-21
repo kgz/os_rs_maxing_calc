@@ -33,12 +33,12 @@ for file in $FILES; do
   echo -ne "Processing file $PROCESSED of $FILE_COUNT: $file\r"
   
   # Check if the file contains any HTML entities we want to replace
-  if grep -q "&lt;" "$file" || grep -q "&gt;" "$file"; then
+  if grep -q "&lt;" "$file" || grep -q "&gt;" "$file" || grep -q "&quot;" "$file"; then
     # Create a backup of the original file
     cp "$file" "${file}.bak"
     
     # Replace HTML entities with their proper characters
-    sed -i 's/&lt;/</g; s/&gt;/>/g' "$file"
+    sed -i 's/&lt;/</g; s/&gt;/>/g; s/&quot;/"/g' "$file"
     
     MODIFIED=$((MODIFIED + 1))
     echo -e "\nModified: $file"

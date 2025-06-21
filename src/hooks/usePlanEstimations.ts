@@ -88,12 +88,14 @@ export const usePlanEstimations = () => {
 
 			let costPerAction = 0;
 			input.forEach(item => {
-				const cost = getItemPrice(item.item.id) ?? 0;
+				const cost = getItemPrice(item.item?.id) ?? 0;
 				costPerAction += cost * item.amount;
 			});
 
 			output.forEach(item => {
-				const cost = getItemPrice(item.item.id) ?? 0;
+				console.log({item})
+
+				const cost = getItemPrice(item.item?.id) ?? 0;
 				costPerAction -= cost * item.amount;
 			});
 

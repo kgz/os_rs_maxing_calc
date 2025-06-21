@@ -1,0 +1,23 @@
+import { SkillMethods } from "../../methods/methods";
+import type { Plan } from "../../types/plan";
+
+export default {
+    id: "fastest",
+    type: "Agility",
+    label: "Fastest",
+    methods: [
+        {
+            from: 20,
+            method: SkillMethods.Agility.brimhavenArena,
+        },
+        {
+            from: 47,
+            method: SkillMethods.Agility.wildernessAgilityCourse,
+        },
+        {
+            from: 62,
+            method: SkillMethods.Agility.hallowedsepulchre,
+        },
+       
+    ]
+} as const satisfies Plan

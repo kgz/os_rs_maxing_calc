@@ -238,4 +238,16 @@ export const Items = {
         id: 24952,
         label: "Zealot's boots",
     },
+	CrystalShard: {
+		id: 23962,
+        label: "Crystal Shard",
+	},
+	MarkOfGrace: {
+		id: 11849,
+        label: "Mark of Grace",
+	},
+	WildernessAgilityTicket: {
+		id: 29460,
+        label: "Wilderness Agility Ticket",
+	}
 } as const;
