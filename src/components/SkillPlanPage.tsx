@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import style from './SkillPlanPage.module.css';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { Plans } from '../plans/plans';
 import { levelToXp, remainingXPToTarget } from '../utils/xpCalculations';
@@ -18,12 +18,20 @@ const SkillPlanPage = () => {
 	const { skillId } = useParams();
 	const characters = useAppSelector(state => state.characterReducer)
 
+	// Force re-render when plans change
+	const [, forceUpdate] = useState({});
 	const { selectedPlans, plans: _UserPlans } = useAppSelector((state) => state.skillsReducer);
 	const dispatch = useAppDispatch();
 
 	const lastCharacter = useLastCharacter(characters);
 	const { currentSkillXp, currentSkillLevel } = useCurrentSkillStats(lastCharacter, skillId);
 	const { templatePlans, currentSelectedPlan } = usePlans(skillId, _UserPlans, selectedPlans[lastCharacter?.username ?? ''] ?? null);
+
+	// Add effect to force re-render when plans change
+	useEffect(() => {
+		// This will trigger a re-render when _UserPlans or selectedPlans change
+		forceUpdate({});
+	}, [_UserPlans, selectedPlans]);
 
 	// Create an array of plan options for the CustomSelect component
 	const planOptions = useMemo(() => {

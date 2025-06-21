@@ -14,6 +14,22 @@ import { Items } from "../../types/items";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { forwardRef } from 'react';
 
+
+type Props = {
+	index: string;
+	plan: PlanMethod;
+	from: number;
+	nextLevel: number;
+	prevLevel: number;
+	currentSkillLevel: number;
+	xpToNext: number;
+	itemsToNext: number;
+	currentSelectedPlan: Plan;
+	skillId: string | undefined;
+	isGreyedOut: boolean;
+	isLastMethod: boolean;
+	isActive: boolean;
+}
 // Component for the method row
 const MethodRow = ({
 	index,
@@ -29,21 +45,7 @@ const MethodRow = ({
 	isGreyedOut,
 	isLastMethod,
 	isActive,
-}: {
-	index: string;
-	plan: PlanMethod;
-	from: number;
-	nextLevel: number;
-	prevLevel: number;
-	currentSkillLevel: number;
-	xpToNext: number;
-	itemsToNext: number;
-	currentSelectedPlan: Plan;
-	skillId: string | undefined;
-	isGreyedOut: boolean;
-	isLastMethod: boolean;
-	isActive: boolean;
-}) => {
+}: Props) => {
 	const dispatch = useAppDispatch();
 	const { getItemIconUrl, getItemPrice } = useItems();
 
@@ -290,13 +292,13 @@ const MethodRow = ({
 };
 
 // Create a forwardRef version of MethodRow
-const MethodRowWithRef = forwardRef((props, ref) => {
+const MethodRowWithRef = forwardRef<HTMLSpanElement, Props>((props, ref) => {
 	// Your existing MethodRow implementation
 	return (
-		<tr ref={ref}>
+		<span  ref={ref}>
 			{/* Your existing row content */}
-			<MethodRow {...props} />
-		</tr>
+			<MethodRow  {...props} />
+		</span>
 	);
 });
 
