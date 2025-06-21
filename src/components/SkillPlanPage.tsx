@@ -10,7 +10,7 @@ import { useCurrentSkillStats } from '../hooks/usecurrentSkillStats';
 import { useLastCharacter } from '../hooks/useLastCharacter';
 import { MethodRow } from './SkillPlanPage/MethodRow';
 import { TableHeader } from './SkillPlanPage/TableHeader';
-import { AddMethodButtonRow } from './SkillPlanPage/AddMethodButton';
+import { InsertMethodRow } from './SkillPlanPage/InsertMethodRow';
 import { SkillHeader } from './SkillPlanPage/SkillHeader';
 
 
@@ -51,7 +51,7 @@ const SkillPlanPage = () => {
 
 	// Find the currently selected plan option
 	const selectedPlanOption = useMemo(() => {
-		const characterPlans = selectedPlans[lastCharacter?.username?? ''];
+		const characterPlans = selectedPlans[lastCharacter?.username?? ''] ?? {};
 		if (!skillId || !characterPlans[skillId as keyof typeof characterPlans] || !planOptions.length) return null;
 		return planOptions.find(option => option.id === characterPlans[skillId as keyof typeof characterPlans]) || null;
 	}, [lastCharacter?.username, planOptions, selectedPlans, skillId]);
@@ -120,8 +120,10 @@ const SkillPlanPage = () => {
 												99 // Default to 99 if no methods above
 											);
 
+
 											// Show this method if it's either the highest below or the lowest above
 											return ob.plan.from === highestBelowOrEqual || ob.plan.from === lowestAbove;
+
 										})
 										.map((ob) => {
 											const from = Math.max(ob.plan.from, currentSkillLevel);
@@ -136,8 +138,6 @@ const SkillPlanPage = () => {
 											const currentStartXp = levelToXp(from);
 											const fromXp = Math.max(currentStartXp, currentSkillXp);
 
-											
-
 											const xpToNext = remainingXPToTarget(fromXp, nextLevel);
 											const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
 
@@ -149,6 +149,7 @@ const SkillPlanPage = () => {
 											).from;
 											return (
 												<MethodRow
+													key={ob.key.toString()}
 													index={ob.key.toString()}
 													plan={ob.plan}
 													from={from}
@@ -164,8 +165,8 @@ const SkillPlanPage = () => {
 										})
 								}
 
-								{/* Add new method at the end of the list */}
-								<AddMethodButtonRow
+								{/* New row for inserting methods */}
+								<InsertMethodRow
 									currentSelectedPlan={currentSelectedPlan}
 									skillId={skillId}
 								/>

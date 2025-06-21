@@ -184,20 +184,20 @@ const skillsSlice = createSlice({
                 }
 
                 const skillPlans = Plans[skill];
+				console.log({skill, skillPlans, planId});
 
-                if (!isValidPlan(skill, planId)) {
+				const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan|null;
+				console.log({templatePlan});
+                // if (!isValidPlan(skill, planId)) {
+                if (!templatePlan) {
                     console.error(`Template plan not found: ${planId} for skill: ${skill}`);
                     return;
                 }
 
-                // Check if planId is a valid key in skillPlans
-                if (!isKeyOfObject(planId, skillPlans)) {
-                    console.error(`Invalid plan key: ${planId} for skill: ${skill}`);
-                    return;
-                }
-
+		
+        
                 // Now TypeScript knows planId is a valid key
-                const templatePlan = skillPlans[planId] as Plan;
+                // const templatePlan = skillPlans[planId] as Plan;
 
                 // Create a new custom plan based on the template
                 const newPlan = {
@@ -239,7 +239,7 @@ const skillsSlice = createSlice({
             }
 
             // Now we can safely access the first method with proper type assertion
-            const defaultMethod = (firstPlan as Plan).methods[0];
+            const defaultMethod = (firstPlan as Plan).methods.at(-1);
 
             // Add the new method to the user's plan at the specified index
             const newMethods = [...Object.values(userPlans.methods)];
@@ -248,10 +248,13 @@ const skillsSlice = createSlice({
                 method: defaultMethod.method
             });
 
+			console.log(current(state).plans)
+			
             state.plans[planIndex] = {
-                ...userPlans,
+				...userPlans,
                 methods: newMethods
             };
+			console.log(current(state).plans)
         });
 
         builder.addCase(updatePlanMethod.fulfilled, (state, action) => {

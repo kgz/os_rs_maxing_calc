@@ -8,7 +8,7 @@ export const usePlans = (skillId: string | undefined, userPlans: Plan[], selecte
   }, [skillId]);
 
   const currentSelectedPlan = useMemo(() => {
-	const keyExists = (key: string): key is keyof typeof selectedPlans => key in selectedPlans;
+	const keyExists = (key: string): key is keyof typeof selectedPlans => key in (selectedPlans ?? {});
 	if (!skillId || !keyExists(skillId)) {
 	  console.warn('No skill data found for', skillId);
 	  return null;
