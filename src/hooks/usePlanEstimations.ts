@@ -25,7 +25,7 @@ export const usePlanEstimations = () => {
 
 		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
 		if (!valInSkills(skillId)) {
-			console.log('Invalid skill', skillId);
+			console.warn('Invalid skill', skillId);
 			return null;
 		}
 	
@@ -93,8 +93,6 @@ export const usePlanEstimations = () => {
 			});
 
 			output.forEach(item => {
-				console.log({item})
-
 				const cost = getItemPrice(item.item?.id) ?? 0;
 				costPerAction -= cost * item.amount;
 			});

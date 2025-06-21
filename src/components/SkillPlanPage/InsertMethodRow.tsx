@@ -27,7 +27,6 @@ export const InsertMethodRow = ({
       console.warn('Invalid skill', skillId);
       return;
     }
-	console.log({currentSelectedPlan})
     void dispatch(
       addNewMethodToPlan({
         planId: currentSelectedPlan.id,

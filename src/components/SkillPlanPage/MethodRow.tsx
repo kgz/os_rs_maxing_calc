@@ -56,7 +56,6 @@ const MethodRow = ({
 		if (!plan.method.actionsPerHour || plan.method.actionsPerHour <= 0) {
 			return "Unknown";
 		}
-		console.log(xpToNext)
 		
 		// Calculate how many hours it will take
 		const hours = itemsToNext / plan.method.actionsPerHour;
@@ -168,8 +167,6 @@ const MethodRow = ({
 								options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
 								value={plan.method} // This is correct - accessing the nested method object
 								onChange={(newMethod) => {
-									console.log(index)
-									console.log(currentSelectedPlan.methods)
 									void dispatch(updatePlanMethod({
 										methodIndex: Number(index),
 										planId: currentSelectedPlan.id,
@@ -259,17 +256,13 @@ const MethodRow = ({
 								inputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
 									costPerAction += cost * item.amount;
-									console.log(`Cost of ${item.item.label}: ${cost}`);	
 								});
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
                                     costPerAction -= cost * item.amount;
-                                    console.log(`Cost of ${item.item.label}: ${cost}`);    
                                 });
 								
-								console.log(`Cost per action: ${costPerAction}`);	
-
 								const totalCost = -(costPerAction * itemsToNext);
 								
 								const isProfit = totalCost < 0;

@@ -27,7 +27,7 @@ export const useSkillPlans = () => {
 			isTemplate: true
 		}));
 
-		const filteredUserPlans = userPlans.filter(plan => plan.type === skillId).map(plan => ({
+		const filteredUserPlans = userPlans.filter(plan => plan.type === skillId && plan.character === character?.username).map(plan => ({
 			id: plan.id,
 			label: plan.label,
 			plan,

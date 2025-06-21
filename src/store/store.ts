@@ -64,7 +64,6 @@ bc.onmessage = (ev) => {
         return;
     }
 
-    console.log({ uuid, uid: window.uid });
     // rehydrate store from indexeddb
     void getStoredState(persistConfig).then((state) => {
         locked = true;
@@ -73,7 +72,6 @@ bc.onmessage = (ev) => {
             key: "root",
             payload: state,
         });
-        console.log({ state });
     });
 };
 

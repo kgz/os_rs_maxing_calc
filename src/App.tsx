@@ -7,8 +7,10 @@ import Sidebar from './components/Sidebar/Sidebar';
 import { useAppDispatch } from './store/store';
 import { fetchItemMapping } from './store/thunks/items/fetchItemMapping';
 import { fetchLatestPrices } from './store/thunks/items/fetchLatestPrices';
+import { useValidateUserPlans } from './utils/validatePlans';
 
 function AppContent() {
+	useValidateUserPlans()
   useEffect(() => {
     const lastUsername = localStorage.getItem('lastUsername');
     if (lastUsername) {

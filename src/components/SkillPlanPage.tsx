@@ -38,7 +38,7 @@ const SkillPlanPage = () => {
 		}));
 
 		const userPlanOptions = _UserPlans.filter(plan => {
-			return plan.type === skillId
+			return plan.type === skillId && plan.character === lastCharacter?.username;
 		}).map(plan => ({
 			id: plan.id,
 			label: plan.label,
@@ -47,7 +47,7 @@ const SkillPlanPage = () => {
 		}));
 
 		return [...templatePlanOptions, ...userPlanOptions];
-	}, [templatePlans, _UserPlans, skillId]);
+	}, [skillId, templatePlans, _UserPlans, lastCharacter?.username]);
 
 	// Find the currently selected plan option
 	const selectedPlanOption = useMemo(() => {

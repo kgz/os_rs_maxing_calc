@@ -209,7 +209,6 @@ const skillsSlice = createSlice({
 
 			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods));
 			const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0);
-			console.log(Object.values(_lastMethod).sort((a, b) => b.from - a.from))
 
 			// if (!defaultMethod) {
 			// 	throw new Error('No default method found for ' + skill);
@@ -224,14 +223,11 @@ const skillsSlice = createSlice({
 				...userPlans,
                 methods: newMethods
             };
-			console.log(current(state).plans)
         });
 
         builder.addCase(updatePlanMethod.fulfilled, (state, action) => {
             const { planId, methodIndex, method, skill, characterName } = action.payload;
-            console.log({methodIndex})
             let planIndex = state.plans.findIndex(p => p.id === planId);
-            console.log({ planIndex }, current(state).plans);
 
             // Initialize the character entry if it doesn't exist
             if (!state.selectedPlans[characterName]) {
@@ -295,7 +291,6 @@ const skillsSlice = createSlice({
                         methods: updatedMethods
                     };
                     
-                    console.log('Updated methods with new approach:', current(state).plans[planIndex].methods, methodIndex, method);
                 } else {
                     console.error('Method index out of bounds:', methodIndex, 'length:', state.plans[planIndex].methods.length);
                 }
