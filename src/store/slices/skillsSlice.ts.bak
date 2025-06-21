@@ -9,7 +9,7 @@ import { updatePlanMethod } from '../thunks/skills/updatePlanMethod';
 import { removeMethodFromPlan } from '../thunks/skills/removeMethodFromPlan';
 import { v4 } from 'uuid';
 
-function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
+function isKeyOfObject&lt;T extends object&gt;(key: string | number | symbol, obj: T): key is keyof T {
     return key in obj;
 }
 
@@ -49,12 +49,12 @@ const skillsSlice = createSlice({
     initialState,
     reducers: {
         // Add a new reducer to handle adding custom plans
-        addCustomPlan(state, action: PayloadAction<Plan & { type: keyof typeof skillsEnum, id: string, character: string }>) {
+        addCustomPlan(state, action: PayloadAction&lt;Plan & { type: keyof typeof skillsEnum, id: string, character: string }&gt;) {
             state.plans.push(action.payload);
         }
     },
-    extraReducers: (builder) => {
-        builder.addCase(setSelectedPlan.fulfilled, (state, action) => {
+    extraReducers: (builder) =&gt; {
+        builder.addCase(setSelectedPlan.fulfilled, (state, action) =&gt; {
             const { skill, plan, characterName } = action.payload;
 
             // Initialize the character entry if it doesn't exist
@@ -63,12 +63,12 @@ const skillsSlice = createSlice({
             }
 
             // Check if the plan is a template plan or a custom plan
-            const isCustomPlan = state.plans.some(p => p.id === plan);
+            const isCustomPlan = state.plans.some(p =&gt; p.id === plan);
             const isTemplatePlan = isValidPlan(skill, plan);
 
             // If it's a template plan and not already in user plans, just set it as selected
             // without creating a custom copy
-            if (isTemplatePlan && !isCustomPlan) {
+            if (isTemplatePlan &amp;&amp; !isCustomPlan) {
                 state.selectedPlans[characterName][skill] = plan;
             } else {
                 // For custom plans, just set it as selected
@@ -76,9 +76,9 @@ const skillsSlice = createSlice({
             }
         });
 
-        builder.addCase(setPlanFromLevel.fulfilled, (state, action) => {
+        builder.addCase(setPlanFromLevel.fulfilled, (state, action) =&gt; {
             const { level, plan, methodIndex, skill, characterName } = action.payload;
-            const planIndex = state.plans.findIndex(p => p.id === plan);
+            const planIndex = state.plans.findIndex(p =&gt; p.id === plan);
 
             // Initialize the character entry if it doesn't exist
             if (!state.selectedPlans[characterName]) {
@@ -166,9 +166,9 @@ const skillsSlice = createSlice({
             }
         });
 
-        builder.addCase(addNewMethodToPlan.fulfilled, (state, action) => {
+        builder.addCase(addNewMethodToPlan.fulfilled, (state, action) =&gt; {
             const { skill, planId, index, characterName } = action.payload;
-            let planIndex = state.plans.findIndex(p => p.id === planId);
+            let planIndex = state.plans.findIndex(p =&gt; p.id === planId);
 
             // Initialize the character entry if it doesn't exist
             if (!state.selectedPlans[characterName]) {
@@ -254,10 +254,10 @@ const skillsSlice = createSlice({
             };
         });
 
-        builder.addCase(updatePlanMethod.fulfilled, (state, action) => {
+        builder.addCase(updatePlanMethod.fulfilled, (state, action) =&gt; {
             const { planId, methodIndex, method, skill, characterName } = action.payload;
             console.log({methodIndex})
-            let planIndex = state.plans.findIndex(p => p.id === planId);
+            let planIndex = state.plans.findIndex(p =&gt; p.id === planId);
             console.log({ planIndex }, current(state).plans);
 
             // Initialize the character entry if it doesn't exist
@@ -276,7 +276,7 @@ const skillsSlice = createSlice({
                 const skillPlans = Plans[skill];
 
                 // For this case, we need to find the plan by ID since we're using Object.values
-                const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan | undefined;
+                const templatePlan = Object.values(skillPlans).find(p =&gt; p.id === planId) as Plan | undefined;
                 if (!templatePlan) {
                     console.error(`Template plan not found: ${planId} for skill: ${skill}`);
                     return;
@@ -305,7 +305,7 @@ const skillsSlice = createSlice({
 
             if (Array.isArray(userPlan.methods)) {
                 // Replace the direct assignment with a more explicit update
-                if (methodIndex > -1 && methodIndex < state.plans[planIndex].methods.length) {
+                if (methodIndex &gt; -1 &amp;&amp; methodIndex &lt; state.plans[planIndex].methods.length) {
                     // Create a new method object to ensure proper update
                     const updatedMethod = {
                         ...state.plans[planIndex].methods[methodIndex],
@@ -331,9 +331,9 @@ const skillsSlice = createSlice({
             }
         });
 
-        builder.addCase(removeMethodFromPlan.fulfilled, (state, action) => {
+        builder.addCase(removeMethodFromPlan.fulfilled, (state, action) =&gt; {
             const { planId, methodIndex, skill, characterName } = action.payload;
-            let planIndex = state.plans.findIndex(p => p.id === planId);
+            let planIndex = state.plans.findIndex(p =&gt; p.id === planId);
 
             // Initialize the character entry if it doesn't exist
             if (!state.selectedPlans[characterName]) {
@@ -387,7 +387,7 @@ const skillsSlice = createSlice({
 
             if (Array.isArray(userPlan.methods)) {
                 // Create a new methods array without the removed method
-                const updatedMethods = userPlan.methods.filter((_, idx) => idx !== methodIndex);
+                const updatedMethods = userPlan.methods.filter((_, idx) =&gt; idx !== methodIndex);
 
                 state.plans[planIndex] = {
                     ...userPlan,

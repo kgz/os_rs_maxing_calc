@@ -23,7 +23,7 @@ const SkillPlanPage = () => {
 
 	const lastCharacter = useLastCharacter(characters);
 	const { currentSkillXp, currentSkillLevel } = useCurrentSkillStats(lastCharacter, skillId);
-	const { templatePlans, currentSelectedPlan } = usePlans(skillId, _UserPlans, selectedPlans);
+	const { templatePlans, currentSelectedPlan } = usePlans(skillId, _UserPlans, selectedPlans[lastCharacter?.username?? '']?? null);
 
 	// Create an array of plan options for the CustomSelect component
 	const planOptions = useMemo(() => {
@@ -51,9 +51,10 @@ const SkillPlanPage = () => {
 
 	// Find the currently selected plan option
 	const selectedPlanOption = useMemo(() => {
-		if (!skillId || !selectedPlans[skillId as keyof typeof selectedPlans] || !planOptions.length) return null;
-		return planOptions.find(option => option.id === selectedPlans[skillId as keyof typeof selectedPlans]) || null;
-	}, [planOptions, selectedPlans, skillId]);
+		const characterPlans = selectedPlans[lastCharacter?.username?? ''];
+		if (!skillId || !characterPlans[skillId as keyof typeof characterPlans] || !planOptions.length) return null;
+		return planOptions.find(option => option.id === characterPlans[skillId as keyof typeof characterPlans]) || null;
+	}, [lastCharacter?.username, planOptions, selectedPlans, skillId]);
 
 	// Handle plan selection change
 	const handlePlanChange = (option: typeof planOptions[0] | null) => {
@@ -65,7 +66,7 @@ const SkillPlanPage = () => {
 
 		if (!option) return;
 
-		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId }));
+		void dispatch(setSelectedPlan({ plan: option.id, skill: skillId, characterName: lastCharacter?.username?? '' }));
 	};
 
 	return (

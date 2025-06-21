@@ -19,11 +19,11 @@ import {
 import storage from "redux-persist-indexeddb-storage";
 
 import { v4 } from "uuid";
-import getStoredState from "redux-persist/es/getStoredState";
 import { characterReducer } from "./slices/characterSlice";
 import { skillsReducer } from "./slices/skillsSlice";
 import itemsReducer from './slices/itemsSlice';
 import { fetchItemMapping } from './thunks/items/fetchItemMapping';
+import getStoredState from "redux-persist/es/getStoredState";
 
 const persistConfig: PersistConfig<DefaultRootState> = {
     key: "root",

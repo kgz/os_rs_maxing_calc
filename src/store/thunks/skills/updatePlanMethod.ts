@@ -7,7 +7,8 @@ export const updatePlanMethod = createAsyncThunk(
         planId: string,
         methodIndex: number,
         method: Method,
-        skill: string // Changed from optional to required
+        skill: string, // Changed from optional to required,
+		characterName: string
     }) => {
         return args;
     }

@@ -30,7 +30,7 @@ export const useMaxingGuide = () => {
   } = useCharacterStats();
   
   const { estimatePlanCost, estimatePlanTime, calculateOverallStats } = usePlanEstimations();
-  const { selectedPlans, getPlanOptionsForSkill, handlePlanChange } = useSkillPlans();
+  const { userSelectedPlan, getPlanOptionsForSkill, handlePlanChange } = useSkillPlans();
 
   // Calculate overall stats
   const overallStats = useMemo(() => calculateOverallStats(), [calculateOverallStats]);
@@ -121,6 +121,11 @@ export const useMaxingGuide = () => {
   const getSkillsData = () => {
     return Object.keys(skillsEnum)
       .sort((a, b) => {
+		const keyInSkillsEnum = (s:string): s is keyof typeof skillsEnum => s in skillsEnum;
+		if (!keyInSkillsEnum(a) ||!keyInSkillsEnum(b)) {
+			console.warn('Invalid skill ID:', a, b);
+			return 0;
+		}
         const isMaxedA = isSkillMaxed(a);
         const isMaxedB = isSkillMaxed(b);
         if (isMaxedA !== isMaxedB) {
@@ -135,7 +140,7 @@ export const useMaxingGuide = () => {
         const remainingXP = getRemainingXP(skillName);
         const isMaxed = isSkillMaxed(skillName);
         const planOptions = getPlanOptionsForSkill(skillName);
-        const selectedPlanOption = planOptions.find(option => option.id === selectedPlans[skillName]) || null;
+        const selectedPlanOption = planOptions.find(option => option.id === (userSelectedPlan || {})[skillName as keyof typeof userSelectedPlan]) || null;
         const estimatedCost = !isMaxed ? estimatePlanCost(skillName, remainingXP, currentLevel) : null;
         const estimatedTime = !isMaxed ? estimatePlanTime(skillName, remainingXP, currentLevel) : null;
         

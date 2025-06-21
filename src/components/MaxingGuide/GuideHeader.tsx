@@ -14,8 +14,8 @@ interface GuideHeaderProps {
   handleSuggestionClick: (username: string) => void;
   handleInputFocus: () => void;
   handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  usernameRef: React.RefObject<HTMLInputElement>;
-  suggestionsRef: React.RefObject<HTMLDivElement>;
+  usernameRef: React.RefObject<HTMLInputElement|null>;
+  suggestionsRef: React.RefObject<HTMLDivElement|null>;
 }
 
 

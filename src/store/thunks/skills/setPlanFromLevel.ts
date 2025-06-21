@@ -7,6 +7,7 @@ export const setPlanFromLevel = createAsyncThunk(
         plan: string,
         methodIndex: number,
         skill: string // Changed from optional to required
+		characterName: string
     }) => {
         return args;
     }

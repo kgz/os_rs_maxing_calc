@@ -7,7 +7,7 @@ type TPlans = keyof typeof Plans;
 
 export const setSelectedPlan = createAsyncThunk(
 	'skills/setSelectedPlan',
-	async (args: {skill: TPlans, plan: string}) => {
+	async (args: {skill: TPlans, plan: string, characterName:string}) => {
 		return args;
 	}
 );

@@ -1,4 +1,4 @@
-import { skillsEnum } from '../../types/skillsResponse';
+import type { Plan } from "../../types/plan";
 
 export interface GuideHeaderProps {
   inputValue: string;
@@ -33,7 +33,7 @@ export interface OverallRowProps {
 export interface PlanOption {
   id: string;
   label: string;
-  plan: any;
+  plan: Plan;
   isTemplate: boolean;
 }
 
@@ -45,7 +45,7 @@ export interface SkillRowProps {
   remainingXP: number;
   planOptions: PlanOption[];
   selectedPlanOption: PlanOption | null;
-  handlePlanChange: (skillId: string, option: any) => void;
+  handlePlanChange: (skillId: string, option: unknown) => void;
   estimatedCost: number | null;
   estimatedTime: number | null;
 }

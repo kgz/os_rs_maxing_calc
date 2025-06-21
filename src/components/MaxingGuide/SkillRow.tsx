@@ -4,12 +4,13 @@ import styles from '../MaxingGuide.module.css';
 import { skillsEnum } from '../../types/skillsResponse';
 import { formatTime } from '../../utils/timeFormatting';
 import CustomSelect from '../CustomSelect';
+import type { Plan } from '../../types/plan';
 
 
 interface PlanOption {
   id: string;
   label: string;
-  plan: any;
+  plan: Plan;
   isTemplate: boolean;
 }
 
@@ -21,7 +22,7 @@ interface SkillRowProps {
   remainingXP: number;
   planOptions: PlanOption[];
   selectedPlanOption: PlanOption | null;
-  handlePlanChange: (skillId: string, option: any) => void;
+  handlePlanChange: (skillId: string, option: unknown) => void;
   estimatedCost: number | null;
   estimatedTime: number | null;
 }
@@ -42,7 +43,7 @@ const SkillRow: React.FC<SkillRowProps> = ({
     <td>
       <div className={styles.skillNameCell}>
         <img 
-          src={`/images/skills/${skillsEnum[skillName].toLowerCase()}.png`}
+          src={`/images/skills/${skillsEnum[skillName as keyof typeof skillsEnum].toLowerCase()}.png`}
           alt={skillName}
           className={styles.skillIcon}
         />

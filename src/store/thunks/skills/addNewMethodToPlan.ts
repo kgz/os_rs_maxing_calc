@@ -10,6 +10,7 @@ export const addNewMethodToPlan = createAsyncThunk(
 		index: number,
 		planId: string,
 		skill: TSkill,
+		characterName: string
 	}) => {
         return args
     }
