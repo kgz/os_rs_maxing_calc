@@ -108,7 +108,11 @@ export const usePlanEstimations = () => {
 	}, [getItemPrice, selectedPlans, userPlans, lastCharacter]);
 
 	const estimatePlanTime = useCallback((skillId: string, remainingXP: number, currentLevel: number) => {
-		const selectedPlanId = selectedPlans[lastCharacter?.username ?? ''][skillId as keyof typeof selectedPlans[string]];
+		const _selectedPlanId = selectedPlans[lastCharacter?.username ?? ''];
+		if (!_selectedPlanId) {
+			return null;
+        }
+		const selectedPlanId = _selectedPlanId[skillId as keyof typeof _selectedPlanId];
 
 		if (!selectedPlanId) {
 			return null;

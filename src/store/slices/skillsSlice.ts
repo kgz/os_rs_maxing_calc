@@ -208,7 +208,7 @@ const skillsSlice = createSlice({
             const availableSkillMethods = Plans[skill];
 
             // Get the first key and ensure it exists
-            const _firstKey = Object.keys(availableSkillMethods)[0];
+            const _firstKey = Object.keys(availableSkillMethods).at(-1);
             if (!_firstKey || !(_firstKey in availableSkillMethods)) {
                 console.error('No default method found for', skill);
                 return;
@@ -225,6 +225,7 @@ const skillsSlice = createSlice({
 
             // Now we can safely access the first method with proper type assertion
             const defaultMethod = (firstPlan as Plan).methods.at(-1);
+			console.log({defaultMethod})
 
 			if (!defaultMethod) {
 				throw new Error('No default method found for ' + skill);

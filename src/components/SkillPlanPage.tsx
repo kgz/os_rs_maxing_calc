@@ -94,16 +94,14 @@ const SkillPlanPage = () => {
 								.sort((a, b) => a.plan?.from - b.plan?.from)
 								.map((ob, index, array) => {
 									const from = ob.plan.from;
-									const isGreyedOut = from < currentSkillLevel;
+									const nextMethod = array[index + 1];
+									const nextFrom = nextMethod ? nextMethod.plan.from : 99;
+									
+									const isActive = from < currentSkillLevel && nextFrom > currentSkillLevel;
 									const isLastMethod = index === array.length - 1;
-									const isActive = from >= currentSkillLevel || isLastMethod;
 
 									// Find the next method's level or default to 99
-									const nextLevel = (
-										Object.values(currentSelectedPlan.methods)
-											.filter(p => p?.from > from)
-											.sort((a, b) => a.from - b.from)[0] || { from: 99 }
-									).from;
+									const nextLevel = nextFrom;
 
 									const currentStartXp = levelToXp(from);
 									const fromXp = Math.max(currentStartXp, currentSkillXp);
@@ -112,11 +110,7 @@ const SkillPlanPage = () => {
 									const itemsToNext = Math.ceil(xpToNext / ob.plan.method.xp);
 
 									// Find the previous method's level
-									const prevLevel = (
-										Object.values(currentSelectedPlan.methods)
-											.filter(p => p?.from < from)
-											.sort((a, b) => b.from - a.from)[0] || { from: 0 }
-									).from;
+									const prevLevel = index > 0 ? array[index - 1].plan.from : 1;
 
 									return (
 										<MethodRow
@@ -131,9 +125,10 @@ const SkillPlanPage = () => {
 											itemsToNext={itemsToNext}
 											currentSelectedPlan={currentSelectedPlan}
 											skillId={skillId}
-											isGreyedOut={isGreyedOut}
+											isGreyedOut={from >= currentSkillLevel}
 											isLastMethod={isLastMethod}
-											isActive={isActive}
+											isActive={isActive || isLastMethod}
+											isFirstActiveRow={isActive && !array.slice(0, index).some(item => item.plan.from < currentSkillLevel && nextFrom > currentSkillLevel)}
 										/>
 									);
 								})}
