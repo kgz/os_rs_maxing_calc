@@ -4,6 +4,7 @@ import { addNewMethodToPlan } from '../../store/thunks/skills/addNewMethodToPlan
 import { Plans } from '../../plans/plans';
 import type { Plan } from '../../types/plan';
 import { useLastCharacter } from '../../hooks/useLastCharacter';
+import { PlusCircleIcon } from 'lucide-react';
 
 export const InsertMethodRow = ({
   currentSelectedPlan,
@@ -49,9 +50,16 @@ export const InsertMethodRow = ({
             padding: '5px 10px',
             borderRadius: '4px',
             cursor: 'pointer',
+			display: 'flex',
+			alignItems: 'center',
+            justifyContent: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+			float: 'right',
           }}
         >
-          Insert New Method
+          <PlusCircleIcon size={16}/> Add New Method
         </button>
       </td>
     </tr>

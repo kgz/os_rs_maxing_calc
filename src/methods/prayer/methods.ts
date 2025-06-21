@@ -122,7 +122,7 @@ export default {
         xp: 288, // 400% of base XP
         items: [
             { amount: 1, item: Items.DragonBones },
-            { amount: 1, item: Items.PotOfSlime },
+            { amount: 1, item: Items.BucketOfSlime },
         ],
         returns: [],
         actionsPerHour: 600, // Much slower method
@@ -130,7 +130,6 @@ export default {
             "levels": {
                 "Prayer": 30
             },
-            "quests": ["Ghosts Ahoy"],
         },
     },
     ensouled: {
@@ -149,7 +148,6 @@ export default {
                 "Prayer": 30,
                 "Magic": 65
             },
-            "spellbook": "Arceuus",
         },
     },
     demonic: {
@@ -168,7 +166,6 @@ export default {
                 "Prayer": 60,
                 "Magic": 60
             },
-            "spellbook": "Arceuus",
         },
     }
 } as const satisfies Methods

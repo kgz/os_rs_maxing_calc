@@ -1,8 +1,7 @@
 import { Fragment } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
-import { CirclePlus, Trash2 } from "lucide-react";
-import { addNewMethodToPlan } from "../../store/thunks/skills/addNewMethodToPlan";
+import { Trash2 } from "lucide-react";
 import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";
@@ -13,7 +12,7 @@ import { updatePlanMethod } from "../../store/thunks/skills/updatePlanMethod";
 import { useItems } from "../../hooks/useItems";
 import { Items } from "../../types/items";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 // Component for the method row
 const MethodRow = ({
@@ -131,12 +130,12 @@ const MethodRow = ({
 				<td style={{ paddingBottom: 5 }}>
 					<input
 						data-min={prevLevel + 1}
-						value={from}
+						defaultValue={from}
 						type="number"
 						min={1}
 						max={99}
 						step={1}
-						onChange={(e) => {
+						onBlur={(e) => {
 							const val = Number(e.target.value);
 							void dispatch(setPlanFromLevel({
 								level: val,
@@ -146,6 +145,8 @@ const MethodRow = ({
 								characterName: character?.username ?? ''
 							}))
 						}}
+						// onclick select whole value
+						onFocus={(e) => { e.target.select(); }}
 						style={{
 							opacity: 1, // Always fully visible
 							background: 'inherit',

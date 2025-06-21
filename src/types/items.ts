@@ -186,9 +186,9 @@ export const Items = {
         id: 29102,
         label: 'Jug of blessed sunfire wine',
     },
-    PotOfSlime: {
+    BucketOfSlime: {
         id: 4286,
-        label: 'Pot of slime',
+        label: 'Bucket of slime',
     },
     EnsouledDragonHead: {
         id: 13511,

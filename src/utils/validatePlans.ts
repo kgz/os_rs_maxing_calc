@@ -1,6 +1,6 @@
 import { Plans } from '../plans/plans';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Method } from '../types/method';
 import { SkillMethods } from '../methods/methods';
 import { updatePlanMethod } from '../store/thunks/skills/updatePlanMethod';
@@ -34,14 +34,18 @@ const isEqual = (obj1: any, obj2: any): boolean => {
 export const useValidateUserPlans = () => {
 	const plans = useAppSelector(state=>state.skillsReducer.plans)
 	const dispatch = useAppDispatch();
-	
+	const [safetyCount, setSafetyCount] = useState(20);
+
 	return useEffect(()=> {
-		console.log(plans)
+		if (safetyCount <= 0) {
+			console.warn('Safety count reached. Skipping fetching plan options.');
+			return;
+		}
+		setSafetyCount(safetyCount - 1);
 		// Object.entries(plans).forEach(([name, character]) => {
 		// 	console.log({name, character})
 		// });
 		for(const [, plan] of Object.entries(plans)) {
-			console.log(plan)
 			const type = plan.type;
 			plan.methods.forEach(({method}) => {
 				const {items, returns} = method;
@@ -59,8 +63,8 @@ export const useValidateUserPlans = () => {
                 }
 				if (!isEqual(method, originalMethod)) {
 					console.error(`Method mismatch for`, method, originalMethod);
-
-
+					// issue here not updating method...
+					console.log('Updating method in plan', {originalMethod});
 					void dispatch(updatePlanMethod({
 						planId: plan.id,
 						methodIndex: methodIndex,
@@ -68,6 +72,8 @@ export const useValidateUserPlans = () => {
 						skill: type,
 						characterName: plan.character
 					}));
+					return;
+
                 }
 				// items.forEach(item => {
 				// 	//...
@@ -78,6 +84,6 @@ export const useValidateUserPlans = () => {
                 // });
 			});
 		}
-	}, [plans]);
+	}, [dispatch, plans, safetyCount]);
   
 };

@@ -15,6 +15,7 @@ export const useSkillPlans = () => {
 		return selectedPlans[character?.username ?? '']?? null;
 	}, [character?.username, selectedPlans])
 	const getPlanOptionsForSkill = (skillId: string) => {
+
 		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
 		if (!valInSkills(skillId)) return [];
 

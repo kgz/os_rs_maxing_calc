@@ -92,7 +92,7 @@ const SkillRow: React.FC<SkillRowProps> = ({
     <td className={styles.actionsCell}>
       {!isMaxed && (
         <Link to={`/skill/${skillName}`}>
-          <button className={styles.planButton}>View Plan</button>
+          <button className={styles.planButton}>Edit</button>
         </Link>
       )}
     </td>

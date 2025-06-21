@@ -35,7 +35,7 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({
   suggestionsRef 
 }) => (
   <header className={styles.guideHeader}>
-    <h1>OSRS Maxing Guide</h1>
+    <h1>OSRS Maxing Calculator</h1>
     <div className={styles.importContainer}>
       <div className={styles.autocompleteContainer}>
         <input

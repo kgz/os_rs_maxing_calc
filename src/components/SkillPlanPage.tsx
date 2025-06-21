@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import style from './SkillPlanPage.module.css';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { Plans } from '../plans/plans';
 import { levelToXp, remainingXPToTarget } from '../utils/xpCalculations';
@@ -12,7 +12,7 @@ import { MethodRow } from './SkillPlanPage/MethodRow';
 import { TableHeader } from './SkillPlanPage/TableHeader';
 import { SkillHeader } from './SkillPlanPage/SkillHeader';
 import { InsertMethodRow } from './SkillPlanPage/InsertMethodRow';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { NoSelectedPlan } from './SkillPlanPage/NoSelectedPlan';
 
 const SkillPlanPage = () => {
 	const { skillId } = useParams();
@@ -125,39 +125,42 @@ const SkillPlanPage = () => {
 				handlePlanChange={handlePlanChange}
 			/>
 
-			<table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
-				<TableHeader />
-				<tbody className={style.animatedTableBody}>
-					{currentSelectedPlan && (
-						<>
-							{methodRows.map((rowData) => (
-								<MethodRow
-									key={rowData.key}
-									index={rowData.key}
-									plan={rowData.plan}
-									from={rowData.from}
-									nextLevel={rowData.nextLevel}
-									prevLevel={rowData.prevLevel}
-									currentSkillLevel={currentSkillLevel}
-									xpToNext={rowData.xpToNext}
-									itemsToNext={rowData.itemsToNext}
-									currentSelectedPlan={currentSelectedPlan}
-									skillId={skillId}
-									isGreyedOut={rowData.from >= currentSkillLevel}
-									isLastMethod={rowData.isLastMethod}
-									isActive={rowData.isActive}
-								/>
-							))}
-
-							{/* New row for inserting methods */}
-							<InsertMethodRow
+			{currentSelectedPlan ? (
+				<table style={{ background: '#222', padding: 10, width: '100%', marginTop: '20px' }}>
+					<TableHeader />
+					<tbody className={style.animatedTableBody}>
+						{methodRows.map((rowData) => (
+							<MethodRow
+								key={rowData.key}
+								index={rowData.key}
+								plan={rowData.plan}
+								from={rowData.from}
+								nextLevel={rowData.nextLevel}
+								prevLevel={rowData.prevLevel}
+								currentSkillLevel={currentSkillLevel}
+								xpToNext={rowData.xpToNext}
+								itemsToNext={rowData.itemsToNext}
 								currentSelectedPlan={currentSelectedPlan}
 								skillId={skillId}
+								isGreyedOut={rowData.from >= currentSkillLevel}
+								isLastMethod={rowData.isLastMethod}
+								isActive={rowData.isActive}
 							/>
-						</>
-					)}
-				</tbody>
-			</table>
+						))}
+
+						{/* New row for inserting methods */}
+						<InsertMethodRow
+							currentSelectedPlan={currentSelectedPlan}
+							skillId={skillId}
+						/>
+					</tbody>
+				</table>
+			) : (
+				<NoSelectedPlan 
+					planOptions={planOptions} 
+					handlePlanChange={handlePlanChange} 
+				/>
+			)}
 		</div>
 	)
 };

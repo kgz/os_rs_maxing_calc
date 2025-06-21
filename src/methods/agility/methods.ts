@@ -7,7 +7,7 @@ export default {
 		label: "Brimhaven Agility Arena",
 		xp: 30, // Base XP, increases with level
 		items: [
-			{ amount: 200, item: Items.Coins }, // Entry fee
+			// { amount: 200, item: Items.Coins }, // Entry fee
 		],
 		returns: [],
 		actionsPerHour: 1200, // Approximate, varies based on efficiency

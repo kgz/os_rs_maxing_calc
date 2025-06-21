@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { useAppSelector } from "../../store/store";
 import { useCurrentSkillStats } from "../../hooks/usecurrentSkillStats";
@@ -18,7 +17,7 @@ export const TableHeader = () => {
             <tr>
                 <th></th> {/* For the remove button */}
                 <th>From</th>
-                <th>XP Left {currentSkillLevel ?  '(from ' + currentSkillLevel + ')' :''}</th>
+                <th style={{whiteSpace: 'nowrap'}}>XP Left {currentSkillLevel ?  <><br/>(from {currentSkillLevel}) </> :''}</th>
                 <th>Method</th>
                 <th>XP/Action</th>
                 <th>Items</th>
