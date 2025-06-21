@@ -8,6 +8,7 @@ import { addNewMethodToPlan } from '../thunks/skills/addNewMethodToPlan';
 import { updatePlanMethod } from '../thunks/skills/updatePlanMethod';
 import { removeMethodFromPlan } from '../thunks/skills/removeMethodFromPlan';
 import { v4 } from 'uuid';
+import { renamePlan } from '../thunks/skills/renamePlan';
 
 function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
     return key in obj;
@@ -360,6 +361,18 @@ const skillsSlice = createSlice({
                 state.plans[planIndex] = {
                     ...userPlan,
                     methods: updatedMethods
+                };
+            }
+        });
+
+        builder.addCase(renamePlan.fulfilled, (state, action) => {
+            const { planId, newName } = action.payload;
+            const planIndex = state.plans.findIndex(p => p.id === planId);
+            
+            if (planIndex !== -1) {
+                state.plans[planIndex] = {
+                    ...state.plans[planIndex],
+                    label: newName
                 };
             }
         });

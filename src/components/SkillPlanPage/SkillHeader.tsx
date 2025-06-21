@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import type { SkillsRecord } from "../../store/slices/characterSlice";
 import type { PlanMethod } from "../../types/plan";
 import { getSkillIconUrl } from "../../utils/getSkillIconUrl";
 import CustomSelect from "../CustomSelect";
 import style from '../SkillPlanPage.module.css';
+import { useAppDispatch } from '../../store/store';
+import { renamePlan } from '../../store/thunks/skills/renamePlan';
 
 export const SkillHeader = ({
 	skillId,
@@ -29,7 +32,29 @@ export const SkillHeader = ({
 	} | null;
 	handlePlanChange: (option: typeof planOptions[0] | null) => void;
 }) => {
-	return (
+  const dispatch = useAppDispatch();
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newPlanName, setNewPlanName] = useState('');
+
+  const handleRenameClick = () => {
+    if (selectedPlanOption) {
+      setNewPlanName(selectedPlanOption.label);
+      setIsRenaming(true);
+    }
+  };
+
+  const handleRenameSubmit = () => {
+    if (selectedPlanOption && newPlanName.trim() && lastCharacter) {
+      dispatch(renamePlan({
+        planId: selectedPlanOption.id,
+        newName: newPlanName.trim(),
+        characterName: lastCharacter.username
+      }));
+      setIsRenaming(false);
+    }
+  };
+
+  return (
 		<div className="skill-header">
 			<div className={style.headerLeft}>
 				{skillId && (
@@ -71,6 +96,25 @@ export const SkillHeader = ({
 						/>
 					</div>
 				</div>
+
+				{selectedPlanOption && !selectedPlanOption.isTemplate && (
+					<div className="plan-actions">
+						{isRenaming ? (
+							<div className="rename-form">
+								<input
+									type="text"
+									value={newPlanName}
+									onChange={(e) => setNewPlanName(e.target.value)}
+									autoFocus
+								/>
+								<button onClick={handleRenameSubmit}>Save</button>
+								<button onClick={() => setIsRenaming(false)}>Cancel</button>
+							</div>
+						) : (
+							<button onClick={handleRenameClick}>Rename Plan</button>
+						)}
+					</div>
+				)}
 			</div>
 		</div>
 	)
