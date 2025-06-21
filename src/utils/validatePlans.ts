@@ -32,58 +32,52 @@ const isEqual = (obj1: any, obj2: any): boolean => {
 };
 
 export const useValidateUserPlans = () => {
-	const plans = useAppSelector(state=>state.skillsReducer.plans)
-	const dispatch = useAppDispatch();
-	const [safetyCount, setSafetyCount] = useState(20);
+    const plans = useAppSelector(state=>state.skillsReducer.plans)
+    const dispatch = useAppDispatch();
+    const [processedMethods, setProcessedMethods] = useState<Set<string>>(new Set());
 
-	return useEffect(()=> {
-		if (safetyCount <= 0) {
-			console.warn('Safety count reached. Skipping fetching plan options.');
-			return;
-		}
-		setSafetyCount(safetyCount - 1);
-		// Object.entries(plans).forEach(([name, character]) => {
-		// 	console.log({name, character})
-		// });
-		for(const [, plan] of Object.entries(plans)) {
-			const type = plan.type;
-			plan.methods.forEach(({method}) => {
-				const {items, returns} = method;
-				// const origionalMethod = Object.values(Plans[type as keyof typeof Plans])
-				// // can we group
+    useEffect(()=> {
+        const methodsToProcess = new Set<string>();
+        
+        // First pass: identify all methods that need updating
+        for(const [, plan] of Object.entries(plans)) {
+            const type = plan.type;
+            plan.methods.forEach(({method}, methodIndex) => {
+                
+                
+                let originalMethod = SkillMethods[type as keyof typeof SkillMethods]
+                originalMethod = Object.values(originalMethod).find(m => m.id === method.id)
+				
+                
+                // const methodIndex = plan.methods.findIndex(m => m.method.id === method.id);
+                if (methodIndex === -1 || !originalMethod) {
+					console.warn(`Method not found in original plan: ${method.id} for skill: ${type}`);
+					return
+				};
 
-				let originalMethod = SkillMethods[type as keyof typeof SkillMethods]
-				originalMethod = Object.values(originalMethod).find(m => m.id === method.id)
-				// console.log({method, origionalMethod, id: method.id})
+				const methodId = `${plan.id}-${method.id}-${methodIndex}`;
+                if (processedMethods.has(methodId)) return; // Skip already processed methods
 
-				const methodIndex = plan.methods.findIndex(m => m.method.id === method.id);
-				if (methodIndex === -1) {
-                    console.error(`Method not found for`, method);
-                    return;
+                
+                if (!isEqual(method, originalMethod)) {
+                    methodsToProcess.add(methodId);
+                    
+                    dispatch(updatePlanMethod({
+                        planId: plan.id,
+                        methodIndex: methodIndex,
+                        method: originalMethod,
+                        skill: type,
+                        characterName: plan.character
+                    }));
+					return
                 }
-				if (!isEqual(method, originalMethod)) {
-					console.error(`Method mismatch for`, method, originalMethod);
-					// issue here not updating method...
-					console.log('Updating method in plan', {originalMethod});
-					void dispatch(updatePlanMethod({
-						planId: plan.id,
-						methodIndex: methodIndex,
-						method: originalMethod,
-						skill: type,
-						characterName: plan.character
-					}));
-					return;
-
-                }
-				// items.forEach(item => {
-				// 	//...
-				// });
-
-				// returns.forEach(returnItem => {
-                //     console.log(returnItem)
-                // });
-			});
-		}
-	}, [dispatch, plans, safetyCount]);
+            });
+        }
+        console.log('asdasdasd', {methodsToProcess});
+        // Update processed methods
+        if (methodsToProcess.size > 0) {
+            setProcessedMethods(prev => new Set([...prev, ...methodsToProcess]));
+        }
+    }, [dispatch, plans, processedMethods]);
   
 };

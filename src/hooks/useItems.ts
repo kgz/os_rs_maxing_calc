@@ -10,13 +10,23 @@ export const useItems = () => {
     return allItems[id];
   };
   
-  const getItemIconUrl = (id: number): string | undefined => {
+  const getItemIconUrl = (id: number, name?:string): string | undefined => {
     const item = allItems[id];
-    if (!item) return undefined;
+    if (!item && !name) return undefined;
     
     // Construct the URL for the item icon
     // You might need to adjust this based on your requirements
-    const url = item.icon.replaceAll(/\s/g, '_');
+	let url: string|null = null;
+
+    if (item) {
+		url = item.icon.replaceAll(/\s/g, '_');
+	} else if (name && name.length > 0 && name.trim()!== '') {
+		url = name?.toLowerCase().replaceAll(/\s/g, '_') + ".png";
+		url = url.charAt(0).toUpperCase() + url.slice(1);
+	}
+	if (!url) {
+		return undefined;
+	}
 
     return `https://oldschool.runescape.wiki/images/thumb/${url}/180px-${url}?9e894`;
   };

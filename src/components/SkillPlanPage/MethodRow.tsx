@@ -201,7 +201,7 @@ const MethodRow = ({
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
-												src={getItemIconUrl(item?.id ?? 0)}
+												src={getItemIconUrl(item?.id ?? 0, item?.label)}
 												width="24"
 												height="24"
 												alt={itemData.item.label}
@@ -227,7 +227,7 @@ const MethodRow = ({
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
-												src={getItemIconUrl(outputItem?.id ?? 0)}
+												src={getItemIconUrl(outputItem?.id ?? 0, outputItem?.label)}
 												width="24"
 												height="24"
 												alt={outputData.item.label}
