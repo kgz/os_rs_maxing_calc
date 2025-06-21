@@ -95,19 +95,11 @@ const skillsSlice = createSlice({
 
                 const skillPlans = Plans[skill];
 
-                if (!isValidPlan(skill, plan)) {
+				const templatePlan = Object.values(skillPlans).find(p => p.id === plan) as Plan|null;
+                if (!templatePlan) {
                     console.error(`Template plan not found: ${plan} for skill: ${skill}`);
                     return;
                 }
-
-                // Check if plan is a valid key in skillPlans
-                if (!isKeyOfObject(plan, skillPlans)) {
-                    console.error(`Invalid plan key: ${plan} for skill: ${skill}`);
-                    return;
-                }
-
-                // Now TypeScript knows plan is a valid key
-                const templatePlan = skillPlans[plan] as Plan;
 
                 // Create a new custom plan based on the template
                 const newPlan = {
@@ -124,8 +116,9 @@ const skillsSlice = createSlice({
                 // Update the selected plan to point to the new custom plan
                 state.selectedPlans[characterName][skill] = newPlan.id;
 
-                // Now update the level in the newly created plan
+                // Update planIndex to point to the newly created plan
                 const newPlanIndex = state.plans.length - 1;
+
                 const method = state.plans[newPlanIndex].methods[methodIndex];
 
                 const plansBefore = Array.isArray(state.plans[newPlanIndex].methods) ?
@@ -184,20 +177,12 @@ const skillsSlice = createSlice({
                 }
 
                 const skillPlans = Plans[skill];
-				console.log({skill, skillPlans, planId});
 
 				const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan|null;
-				console.log({templatePlan});
-                // if (!isValidPlan(skill, planId)) {
                 if (!templatePlan) {
                     console.error(`Template plan not found: ${planId} for skill: ${skill}`);
                     return;
                 }
-
-		
-        
-                // Now TypeScript knows planId is a valid key
-                // const templatePlan = skillPlans[planId] as Plan;
 
                 // Create a new custom plan based on the template
                 const newPlan = {
@@ -234,12 +219,17 @@ const skillsSlice = createSlice({
 
             // Use type assertion to help TypeScript understand the structure
             if (!firstPlan || !('methods' in firstPlan) || !Array.isArray((firstPlan as Plan).methods) || (firstPlan as Plan).methods.length === 0) {
-                console.error('No default method found for', skill);
+                console.error('No default method found for ', skill);
                 return;
             }
 
             // Now we can safely access the first method with proper type assertion
             const defaultMethod = (firstPlan as Plan).methods.at(-1);
+
+			if (!defaultMethod) {
+				throw new Error('No default method found for ' + skill);
+				//TODO, need to handle this error condition
+			}
 
             // Add the new method to the user's plan at the specified index
             const newMethods = [...Object.values(userPlans.methods)];
