@@ -35,15 +35,11 @@ const MethodRow = ({
 	index,
 	plan,
 	from,
-	nextLevel,
 	prevLevel,
-	currentSkillLevel,
 	xpToNext,
 	itemsToNext,
 	currentSelectedPlan,
 	skillId,
-	isGreyedOut,
-	isLastMethod,
 	isActive,
 }: Props) => {
 	const dispatch = useAppDispatch();
@@ -221,6 +217,10 @@ const MethodRow = ({
 						<td style={{ paddingBottom: 5 }}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{plan.method.returns?.map((outputData, idx) => {
+									if (!outputData.item) {
+										console.warn(`No item found for output: ${JSON.stringify(outputData)}`);
+										return <span>-</span>;
+									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>

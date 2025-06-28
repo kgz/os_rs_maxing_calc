@@ -60,7 +60,7 @@ export const usePlanEstimations = () => {
 		const methodsArray = [..._methodsArray];
 
 		let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
-		sortedMethods = sortedMethods.filter((method, i) => {
+		sortedMethods = sortedMethods.filter((_, i) => {
 			if (sortedMethods[i + 1] && sortedMethods[i + 1].from <= currentLevel) return false;
 			return true;
 		});
@@ -71,8 +71,10 @@ export const usePlanEstimations = () => {
 
 		for (const method of sortedMethods) {
 			if (remainingXpToCalculate <= 0) break;
-
 			const methodObj = method.method;
+			if (!methodObj) {
+				console.warn('Invalid method', method);
+			}
 			const xpPerAction = methodObj.xp;
 			const input = methodObj.items;
 			const output = methodObj.returns;

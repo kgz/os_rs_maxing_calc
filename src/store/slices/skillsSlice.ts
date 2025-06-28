@@ -273,7 +273,6 @@ const skillsSlice = createSlice({
             }
 
             const userPlan = state.plans[planIndex];
-			console.log('userPlan', current(userPlan));
             if (Array.isArray(userPlan.methods)) {
                 // Replace the direct assignment with a more explicit update
                 if (methodIndex > -1 && methodIndex < state.plans[planIndex].methods.length) {
@@ -282,9 +281,6 @@ const skillsSlice = createSlice({
                         ...state.plans[planIndex].methods[methodIndex],
                         method: method
                     };
-
-					console.log('userPlan', {updatedMethod, methodIndex, userPlan: current(userPlan) });
-
                     
                     // Create a new methods array
                     const updatedMethods = [...state.plans[planIndex].methods];

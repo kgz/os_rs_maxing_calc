@@ -1,0 +1,191 @@
+import { Items } from "../../types/items";
+import type { Methods } from "../../types/method";
+
+export default {
+    shrimpAnchovies: {
+        id: "shrimpAnchovies",
+        label: "Shrimp & Anchovies",
+        xp: 30, // Average XP per cook
+        items: [
+            { amount: 1, item: Items.RawShrimps },
+        ],
+        returns: [
+            { amount: 0.7, item: Items.Shrimps }, // Accounting for burn rate
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {},
+        },
+    },
+    trout: {
+        id: "trout",
+        label: "Trout",
+        xp: 70,
+        items: [
+            { amount: 1, item: Items.RawTrout },
+        ],
+        returns: [
+            { amount: 0.8, item: Items.Trout },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 15
+            },
+        },
+    },
+    salmon: {
+        id: "salmon",
+        label: "Salmon",
+        xp: 90,
+        items: [
+            { amount: 1, item: Items.RawSalmon },
+        ],
+        returns: [
+            { amount: 0.8, item: Items.Salmon },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 25
+            },
+        },
+    },
+    karambwan: {
+        id: "karambwan",
+        label: "Karambwan",
+        xp: 190,
+        items: [
+            { amount: 1, item: Items.RawKarambwan },
+        ],
+        returns: [
+            { amount: 0.9, item: Items.CookedKarambwan },
+        ],
+        actionsPerHour: 1500,
+        requirments: {
+            "levels": {
+                "Cooking": 30
+            },
+        },
+    },
+    lobster: {
+        id: "lobster",
+        label: "Lobster",
+        xp: 120,
+        items: [
+            { amount: 1, item: Items.RawLobster },
+        ],
+        returns: [
+            { amount: 0.85, item: Items.Lobster },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 40
+            },
+        },
+    },
+    swordfish: {
+        id: "swordfish",
+        label: "Swordfish",
+        xp: 140,
+        items: [
+            { amount: 1, item: Items.RawSwordfish },
+        ],
+        returns: [
+            { amount: 0.85, item: Items.Swordfish },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 45
+            },
+        },
+    },
+    monkfish: {
+        id: "monkfish",
+        label: "Monkfish",
+        xp: 150,
+        items: [
+            { amount: 1, item: Items.RawMonkfish },
+        ],
+        returns: [
+            { amount: 0.9, item: Items.Monkfish },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 62
+            },
+        },
+    },
+    shark: {
+        id: "shark",
+        label: "Shark",
+        xp: 210,
+        items: [
+            { amount: 1, item: Items.RawShark },
+        ],
+        returns: [
+            { amount: 0.85, item: Items.SharkCooked },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 80
+            },
+        },
+    },
+    anglerfish: {
+        id: "anglerfish",
+        label: "Anglerfish",
+        xp: 230,
+        items: [
+            { amount: 1, item: Items.RawAnglerfish },
+        ],
+        returns: [
+            { amount: 0.85, item: Items.Anglerfish },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 84
+            },
+        },
+    },
+    darkCrab: {
+        id: "darkCrab",
+        label: "Dark Crab",
+        xp: 215,
+        items: [
+            { amount: 1, item: Items.RawDarkCrab },
+        ],
+        returns: [
+            { amount: 0.9, item: Items.DarkCrab },
+        ],
+        actionsPerHour: 1300,
+        requirments: {
+            "levels": {
+                "Cooking": 90
+            },
+        },
+    },
+    wine: {
+        id: "wine",
+        label: "Wine",
+        xp: 200,
+        items: [
+            { amount: 1, item: Items.Grapes },
+            { amount: 1, item: Items.JugOfWater },
+        ],
+        returns: [
+            { amount: 1, item: Items.JugOfWine },
+        ],
+        actionsPerHour: 1500,
+        requirments: {
+            "levels": {
+                "Cooking": 65
+            },
+        },
+    }
+} as const satisfies Methods
