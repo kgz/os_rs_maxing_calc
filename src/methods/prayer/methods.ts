@@ -12,7 +12,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 2500,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 15
             },
@@ -28,7 +28,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 2500,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30
             },
@@ -45,7 +45,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 2550,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 70
             },
@@ -61,7 +61,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 2000,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30
             },
@@ -77,7 +77,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 2000,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 70
             },
@@ -93,7 +93,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 200000, // Approximately 10,000 shards per inventory, multiple inventories per hour
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30
             },
@@ -110,7 +110,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 200000,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30
             },
@@ -126,7 +126,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 600, // Much slower method
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30
             },
@@ -143,7 +143,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 180,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 30,
                 "Magic": 65
@@ -161,7 +161,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 1200,
-        requirments: {
+        requirement: {
             "levels": {
                 "Prayer": 60,
                 "Magic": 60

@@ -172,9 +172,9 @@ const MethodRow = ({
 				<td style={{ paddingBottom: 5 }}>
 
 					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
-						{(origMethod.requirments.levels[skillId as keyof typeof origMethod.requirments.levels] ?? 0) > from && (
+						{(origMethod.requirement.levels[skillId as keyof typeof origMethod.requirement.levels] ?? 0) > from && (
 							<Tooltip
-								content={`This method requires ${skillId} level ${origMethod.requirments.levels[skillId as keyof typeof origMethod.requirments.levels]}, but starts at level ${from}`}
+								content={`This method requires ${skillId} level ${origMethod.requirement.levels[skillId as keyof typeof origMethod.requirement.levels]}, but starts at level ${from}`}
 								position="top"
 							>
 								<span
@@ -203,7 +203,7 @@ const MethodRow = ({
 								}));
 							}}
 							getOptionLabel={(option) => {
-								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+								const requiredLevel = option.requirement?.levels?.[skillId as keyof typeof option.requirement.levels] || 0;
 								const hasRequirementWarning = requiredLevel > from;
 								return hasRequirementWarning
 									? `${option.label} ⚠️`

@@ -65,7 +65,7 @@ export default {
         }
     ],
     actionsPerHour: 1300,
-    requirments: {
+    requirement: {
         "levels": {},
     },
 	},
@@ -74,13 +74,20 @@ export default {
 		label: "Trout",
 		xp: 70,
 		items: [
-			{ amount: 1, item: Items.RawTrout },
+			{ amount: (fromLevel: number, toLevel: number) => {
+                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
+                return 1 / avgSuccessRate;
+            }, item: Items.RawTrout },
 		],
 		returns: [
 			{ amount: 1, item: Items.Trout },
+				{ amount: (fromLevel: number, toLevel: number) => {
+                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
+                return (1 - avgSuccessRate) / avgSuccessRate;
+            }, item: Items.BurntTrout, link: "https://oldschool.runescape.wiki/w/Trout#Cooking_chance" },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 15
 			},
@@ -91,13 +98,21 @@ export default {
 		label: "Salmon",
 		xp: 90,
 		items: [
-			{ amount: 1, item: Items.RawSalmon },
+			{ amount: (fromLevel: number, toLevel: number) => {
+                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
+                return 1 / avgSuccessRate;
+            }, item: Items.RawSalmon },
 		],
 		returns: [
-			{ amount: 0.8, item: Items.Salmon },
+			{ amount: 1, item: Items.Salmon },
+			{ amount: (fromLevel: number, toLevel: number) => {
+				const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
+                return (1 - avgSuccessRate) / avgSuccessRate;
+            }, item: Items.BurntSalmon, link: "https://oldschool.runescape.wiki/w/Salmon#Cooking_chance" },
+			
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 25
 			},
@@ -114,7 +129,7 @@ export default {
 			{ amount: 0.9, item: Items.CookedKarambwan },
 		],
 		actionsPerHour: 1500,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 30
 			},
@@ -144,7 +159,7 @@ export default {
         }
     ],
     actionsPerHour: 1300,
-    requirments: {
+    requirement: {
         "levels": {
             "Cooking": 40
         },
@@ -161,7 +176,7 @@ export default {
 			{ amount: 0.85, item: Items.Swordfish },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 45
 			},
@@ -178,7 +193,7 @@ export default {
 			{ amount: 0.9, item: Items.Monkfish },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 62
 			},
@@ -195,7 +210,7 @@ export default {
 			{ amount: 0.85, item: Items.SharkCooked },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 80
 			},
@@ -212,7 +227,7 @@ export default {
 			{ amount: 0.85, item: Items.Anglerfish },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 84
 			},
@@ -229,7 +244,7 @@ export default {
 			{ amount: 0.9, item: Items.DarkCrab },
 		],
 		actionsPerHour: 1300,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 90
 			},
@@ -247,7 +262,7 @@ export default {
 			{ amount: 1, item: Items.JugOfWine },
 		],
 		actionsPerHour: 1500,
-		requirments: {
+		requirement: {
 			"levels": {
 				"Cooking": 65
 			},

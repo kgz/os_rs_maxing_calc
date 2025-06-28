@@ -13,7 +13,7 @@ export default {
       { amount: 1, item: Items.LeatherGloves }
     ],
     actionsPerHour: 1000,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 1
       },
@@ -30,7 +30,7 @@ export default {
       { amount: 1, item: Items.LeatherBoots }
     ],
     actionsPerHour: 1000,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 7
       },
@@ -47,7 +47,7 @@ export default {
       { amount: 1, item: Items.LeatherCowl }
     ],
     actionsPerHour: 1000,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 9
       },
@@ -64,7 +64,7 @@ export default {
       { amount: 1, item: Items.LeatherVambraces }
     ],
     actionsPerHour: 1000,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 11
       },
@@ -81,7 +81,7 @@ export default {
       { amount: 1, item: Items.LeatherBody }
     ],
     actionsPerHour: 1000,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 14
       },
@@ -99,7 +99,7 @@ export default {
       { amount: 1, item: Items.Sapphire }
     ],
     actionsPerHour: 2780,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 20
       },
@@ -117,7 +117,7 @@ export default {
       { amount: 1, item: Items.Emerald }
     ],
     actionsPerHour: 2780,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 27
       },
@@ -135,7 +135,7 @@ export default {
       { amount: 1, item: Items.Ruby }
     ],
     actionsPerHour: 2780,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 34
       },
@@ -153,7 +153,7 @@ export default {
       { amount: 1, item: Items.Diamond }
     ],
     actionsPerHour: 2780,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 43
       },
@@ -171,7 +171,7 @@ export default {
       { amount: 1, item: Items.WaterBattlestaff }
     ],
     actionsPerHour: 2800,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 54
       },
@@ -189,7 +189,7 @@ export default {
       { amount: 1, item: Items.EarthBattlestaff }
     ],
     actionsPerHour: 2800,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 58
       },
@@ -207,7 +207,7 @@ export default {
       { amount: 1, item: Items.FireBattlestaff }
     ],
     actionsPerHour: 2800,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 62
       },
@@ -224,7 +224,7 @@ export default {
       { amount: 1, item: Items.GreenDhideBody }
     ],
     actionsPerHour: 1750,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 63
       },
@@ -241,7 +241,7 @@ export default {
       { amount: 1, item: Items.BlueDhideBody }
     ],
     actionsPerHour: 1750,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 71
       },
@@ -258,7 +258,7 @@ export default {
       { amount: 1, item: Items.RedDhideBody }
     ],
     actionsPerHour: 1750,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 77
       },
@@ -275,7 +275,7 @@ export default {
       { amount: 1, item: Items.BlackDhideBody }
     ],
     actionsPerHour: 1750,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 84
       },
@@ -293,7 +293,7 @@ export default {
       { amount: 15, item: Items.AmethystArrowtips }
     ],
     actionsPerHour: 2780,
-    requirments: {
+    requirement: {
       "levels": {
         "Crafting": 83
       },

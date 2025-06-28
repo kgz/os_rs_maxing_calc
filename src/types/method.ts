@@ -14,7 +14,7 @@ export type Method = {
 	returns: { amount: number | ((fromLevel: number, toLevel:number) => number), item: Item, link?: string }[];
 	// pehaps we add a lower and upper bound on the number of actions
 	actionsPerHour: number;
-	requirments: {
+	requirement: {
 		levels: SkillLevels;
 		other?: unknown;
 	}

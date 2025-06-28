@@ -8,7 +8,7 @@ export default {
         items: [],
         returns: [],
         actionsPerHour: 1, // One-time quest
-        requirments: {
+        requirement: {
             "levels": {},
         },
     },
@@ -22,7 +22,7 @@ export default {
         ],
         returns: [],
         actionsPerHour: 1200, // Estimated kills per hour
-        requirments: {
+        requirement: {
             "levels": {
                 "Attack": 30
             },
@@ -40,7 +40,7 @@ export default {
             { amount: 400, item: Items.NightmareZonePoints }, // Estimated points per hour
         ],
         actionsPerHour: 1500, // Estimated kills per hour
-        requirments: {
+        requirement: {
             "levels": {
                 "Attack": 50
             },
@@ -58,7 +58,7 @@ export default {
             { amount: 800, item: Items.NightmareZonePoints }, // Estimated points per hour
         ],
         actionsPerHour: 1800, // Estimated kills per hour
-        requirments: {
+        requirement: {
             "levels": {
                 "Attack": 70
             },
