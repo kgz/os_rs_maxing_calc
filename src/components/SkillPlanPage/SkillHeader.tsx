@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import type { SkillsRecord } from "../../store/slices/characterSlice";
 import type { PlanMethod } from "../../types/plan";
 import { getSkillIconUrl } from "../../utils/getSkillIconUrl";
 import CustomSelect from "../CustomSelect";
 import style from '../SkillPlanPage.module.css';
-import { useAppDispatch } from '../../store/store';
-import { renamePlan } from '../../store/thunks/skills/renamePlan';
+import { NotificationAlert } from '../NotificationAlert/NotificationAlert';
 
 export const SkillHeader = ({
 	skillId,
@@ -32,51 +30,72 @@ export const SkillHeader = ({
 	} | null;
 	handlePlanChange: (option: typeof planOptions[0] | null) => void;
 }) => {
-  return (
-		<div className="skill-header">
-			<div className={style.headerLeft}>
-				{skillId && (
-					<>
-						<img
-							src={getSkillIconUrl(skillId)}
-							alt={`${skillId} icon`}
-							width="50"
-							height="50"
-						/>
-						<h3>{skillId} Training Plan</h3>
-					</>
-				)}
-			</div>
-
-			<div className={style.headerRight}>
-				{lastCharacter && (
-					<div className={style.character}>
-						Player: {lastCharacter.username} - Level: {currentSkillLevel}
-					</div>
-				)}
-
-				<div className={style.planSelectorContainer}>
-					<div className={style.planSelectorLabel}>Current Plan:</div>
-					<div className={style.planSelectorWrapper}>
-						<CustomSelect
-							options={planOptions}
-							value={selectedPlanOption}
-							onChange={handlePlanChange}
-							getOptionLabel={(option) => option?.label ?? ''}
-							getOptionValue={(option) => option?.id ?? ''}
-							placeholder="Select a plan..."
-							renderSelectedValue={(option) => (
-								<span className={style.selectedPlanLabel}>{option?.label}</span>
-							)}
-							renderOption={(option) => (
-								<span>{option?.label}</span>
-							)}
-						/>
-					</div>
+	return (
+		<>
+			<div className="skill-header">
+				<div className={style.headerLeft}>
+					{skillId && (
+						<>
+							<img
+								src={getSkillIconUrl(skillId)}
+								alt={`${skillId} icon`}
+								width="50"
+								height="50"
+							/>
+							<h3>{skillId} Training Plan</h3>
+						</>
+					)}
 				</div>
 
-				
+				<div className={style.headerRight}>
+					{lastCharacter && (
+						<div className={style.character}>
+							Player: {lastCharacter.username} - Level: {currentSkillLevel}
+						</div>
+					)}
+
+					<div className={style.planSelectorContainer}>
+						<div className={style.planSelectorLabel}>Current Plan:</div>
+						<div className={style.planSelectorWrapper}>
+							<CustomSelect
+								options={planOptions}
+								value={selectedPlanOption}
+								onChange={handlePlanChange}
+								getOptionLabel={(option) => option?.label ?? ''}
+								getOptionValue={(option) => option?.id ?? ''}
+								placeholder="Select a plan..."
+								renderSelectedValue={(option) => (
+									<span className={style.selectedPlanLabel}>{option?.label}</span>
+								)}
+								renderOption={(option) => (
+									<span>{option?.label}</span>
+								)}
+							/>
+						</div>
+					</div>
+
+
+				</div>
+
 			</div>
-		</div>
+
+			{/* <div className={style.headerNotificatons}>
+				<div className={style.notificationBox}>
+					<h4>About Training</h4>
+					<p>
+						Success rates improve as your level increases. Higher levels often lead to better outcomes.
+						Special equipment and locations can provide bonuses to your training efficiency.
+					</p>
+				</div>
+			</div> */}
+			<NotificationAlert
+				message={<>
+
+					Burn Rates are calculated linearly based on the Runescape wiki and assume cooking at a fire/range. <br /> Using cooking gloves, Lumbridge Range, and/or Hosidius range will reflect lower burn rates.
+				</>}
+				type='info'
+
+			/>
+		</>
 	)
 };

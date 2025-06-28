@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
-import { Trash2 } from "lucide-react";
+import { ExternalLinkIcon, InfoIcon, Trash2 } from "lucide-react";
 import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";
@@ -84,10 +84,10 @@ const MethodRow = ({
 
 	};
 
-	const origMethod = useMemo(()=> {
+	const origMethod = useMemo(() => {
 
 		const methods = SkillMethods[skillId as keyof typeof Plans];
-		const orig = Object.values(methods)?.find(m => m.id === plan.method.id) as Method|null
+		const orig = Object.values(methods)?.find(m => m.id === plan.method.id) as Method | null
 		if (!orig) {
 			throw new Error(`Method not found for skill ${skillId} and method id ${plan.method.id}`);
 		}
@@ -171,81 +171,81 @@ const MethodRow = ({
 				<td style={{ paddingBottom: 5 }}>
 					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
 						<CustomSelect
-  showSearch
-  searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
-  options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-  value={origMethod}
-  onChange={(newMethod) => {
-    void dispatch(updatePlanMethod({
-      methodIndex: Number(index),
-      planId: currentSelectedPlan.id,
-      method: newMethod,
-      skill: skillId ?? '',
-      characterName: character?.username ?? ''
-    }));
-  }}
-  getOptionLabel={(option) => {
-    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
-    const hasRequirementWarning = requiredLevel > from;
-    return hasRequirementWarning 
-      ? `${option.label} ⚠️` 
-      : option.label;
-  }}
-  getOptionValue={(option) => option.id}
-  renderSelectedValue={(option) => {
-    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
-    const hasRequirementWarning = requiredLevel > from;
-    
-    return (
-      <span style={{ 
-        color: isActive ? 'white' : 'grey',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        {option.label}
-        {hasRequirementWarning && (
-          <span 
-            title={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
-            style={{ 
-              color: '#ff9800', 
-              marginLeft: '5px',
-              cursor: 'help'
-            }}
-          >
-            ⚠️
-          </span>
-        )}
-      </span>
-    );
-  }}
-  renderOption={(option) => {
-    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
-    const hasRequirementWarning = requiredLevel > from;
-    
-    return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        width: '100%'
-      }}>
-        <span>{option.label}</span>
-        {hasRequirementWarning && (
-          <span 
-            title={`Requires ${skillId} level ${requiredLevel}`}
-            style={{ 
-              color: '#ff9800', 
-              marginLeft: '8px',
-              fontSize: '0.85em'
-            }}
-          >
-            Req: Lvl {requiredLevel}
-          </span>
-        )}
-      </div>
-    );
-  }}
-/>
+							showSearch
+							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+							options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+							value={origMethod}
+							onChange={(newMethod) => {
+								void dispatch(updatePlanMethod({
+									methodIndex: Number(index),
+									planId: currentSelectedPlan.id,
+									method: newMethod,
+									skill: skillId ?? '',
+									characterName: character?.username ?? ''
+								}));
+							}}
+							getOptionLabel={(option) => {
+								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+								const hasRequirementWarning = requiredLevel > from;
+								return hasRequirementWarning
+									? `${option.label} ⚠️`
+									: option.label;
+							}}
+							getOptionValue={(option) => option.id}
+							renderSelectedValue={(option) => {
+								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+								const hasRequirementWarning = requiredLevel > from;
+
+								return (
+									<span style={{
+										color: isActive ? 'white' : 'grey',
+										display: 'flex',
+										alignItems: 'center'
+									}}>
+										{option.label}
+										{hasRequirementWarning && (
+											<span
+												title={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
+												style={{
+													color: '#ff9800',
+													marginLeft: '5px',
+													cursor: 'help'
+												}}
+											>
+												⚠️
+											</span>
+										)}
+									</span>
+								);
+							}}
+							renderOption={(option) => {
+								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+								const hasRequirementWarning = requiredLevel > from;
+
+								return (
+									<div style={{
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'space-between',
+										width: '100%'
+									}}>
+										<span>{option.label}</span>
+										{hasRequirementWarning && (
+											<span
+												title={`Requires ${skillId} level ${requiredLevel}`}
+												style={{
+													color: '#ff9800',
+													marginLeft: '8px',
+													fontSize: '0.85em'
+												}}
+											>
+												Req: Lvl {requiredLevel}
+											</span>
+										)}
+									</div>
+								);
+							}}
+						/>
 					</div>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
@@ -255,8 +255,8 @@ const MethodRow = ({
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{origMethod.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-									const amount = typeof itemData.amount === 'function'? itemData.amount(from, nextLevel) : itemData.amount;
-									
+									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel) : itemData.amount;
+
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
@@ -287,8 +287,8 @@ const MethodRow = ({
 										return <span>-</span>;
 									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
-									console.log({ outputData, outputItem  });
-									const amount = typeof outputData.amount === 'function'? outputData.amount(from, nextLevel) : outputData.amount;
+									console.log({ outputData, outputItem });
+									const amount = typeof outputData.amount === 'function' ? outputData.amount(from, nextLevel) : outputData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -307,6 +307,13 @@ const MethodRow = ({
 													style: 'decimal',
 												})}
 											</span>
+											{
+												outputData.link && (
+													<a style={{marginLeft: 5, color: 'var(--osrs-gold)'}} title="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
+                                                        <InfoIcon size={12} />
+                                                    </a>
+                                                )
+											}
 										</div>
 									)
 								}) || <span>-</span>}
@@ -321,14 +328,14 @@ const MethodRow = ({
 								let costPerAction = 0;
 
 								inputItems.forEach(item => {
-									const amount = typeof item.amount === 'function'? item.amount(from, nextLevel) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel) : item.amount;
 									const cost = getItemPrice(item.item?.id) ?? 0;
 									costPerAction += cost * amount;
 								});
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									const amount = typeof item.amount === 'function'? item.amount(from, nextLevel) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel) : item.amount;
 									costPerAction -= cost * amount;
 								});
 
@@ -365,7 +372,7 @@ const MethodRow = ({
 const MethodRowWithRef = forwardRef<HTMLSpanElement, Props>((props, ref) => {
 	// Your existing MethodRow implementation
 	return (
-		<span  ref={ref}>
+		<span ref={ref}>
 			{/* Your existing row content */}
 			<MethodRow  {...props} />
 		</span>
