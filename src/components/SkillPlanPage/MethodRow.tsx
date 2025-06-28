@@ -171,29 +171,81 @@ const MethodRow = ({
 				<td style={{ paddingBottom: 5 }}>
 					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
 						<CustomSelect
-							showSearch
-							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
-							options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-							value={origMethod} // This is correct - accessing the nested method object
-							onChange={(newMethod) => {
-								void dispatch(updatePlanMethod({
-									methodIndex: Number(index),
-									planId: currentSelectedPlan.id,
-									method: newMethod,
-									skill: skillId ?? '',
-									characterName: character?.username ?? ''
-
-								}));
-							}}
-							getOptionLabel={(option) => option.label}
-							getOptionValue={(option) => option.id}
-							renderSelectedValue={(option) => (
-								<span style={{ color: isActive ? 'white' : 'grey' }}>{option.label}</span> // Only show the label, no image
-							)}
-							renderOption={(option) => (
-								<span>{option.label}</span> // Only show the label, no image
-							)}
-						/>
+  showSearch
+  searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
+  options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
+  value={origMethod}
+  onChange={(newMethod) => {
+    void dispatch(updatePlanMethod({
+      methodIndex: Number(index),
+      planId: currentSelectedPlan.id,
+      method: newMethod,
+      skill: skillId ?? '',
+      characterName: character?.username ?? ''
+    }));
+  }}
+  getOptionLabel={(option) => {
+    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+    const hasRequirementWarning = requiredLevel > from;
+    return hasRequirementWarning 
+      ? `${option.label} ⚠️` 
+      : option.label;
+  }}
+  getOptionValue={(option) => option.id}
+  renderSelectedValue={(option) => {
+    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+    const hasRequirementWarning = requiredLevel > from;
+    
+    return (
+      <span style={{ 
+        color: isActive ? 'white' : 'grey',
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        {option.label}
+        {hasRequirementWarning && (
+          <span 
+            title={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
+            style={{ 
+              color: '#ff9800', 
+              marginLeft: '5px',
+              cursor: 'help'
+            }}
+          >
+            ⚠️
+          </span>
+        )}
+      </span>
+    );
+  }}
+  renderOption={(option) => {
+    const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
+    const hasRequirementWarning = requiredLevel > from;
+    
+    return (
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        width: '100%'
+      }}>
+        <span>{option.label}</span>
+        {hasRequirementWarning && (
+          <span 
+            title={`Requires ${skillId} level ${requiredLevel}`}
+            style={{ 
+              color: '#ff9800', 
+              marginLeft: '8px',
+              fontSize: '0.85em'
+            }}
+          >
+            Req: Lvl {requiredLevel}
+          </span>
+        )}
+      </div>
+    );
+  }}
+/>
 					</div>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
