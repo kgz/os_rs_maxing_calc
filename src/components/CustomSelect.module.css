@@ -50,6 +50,7 @@
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
+  width:max-content;
 }
 
 .option {

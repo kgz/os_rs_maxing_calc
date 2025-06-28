@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
-import { InfoIcon, Trash2 } from "lucide-react";
+import { FileWarningIcon, InfoIcon, MessageCircleWarningIcon, Trash2, TriangleAlert } from "lucide-react";
 import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";
@@ -91,6 +91,7 @@ const MethodRow = ({
 		if (!orig) {
 			throw new Error(`Method not found for skill ${skillId} and method id ${plan.method.id}`);
 		}
+		console.log({orig})
 		return orig;
 	}, [plan.method, skillId])
 
@@ -169,7 +170,24 @@ const MethodRow = ({
 				</td>
 				<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
 				<td style={{ paddingBottom: 5 }}>
+
 					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
+						{(origMethod.requirments.levels[skillId as keyof typeof origMethod.requirments.levels] ?? 0) > from && (
+							<Tooltip
+								content={`This method requires ${skillId} level ${origMethod.requirments.levels[skillId as keyof typeof origMethod.requirments.levels]}, but starts at level ${from}`}
+								position="top"
+							>
+								<span
+									style={{
+										color: '#ff9800',
+										marginLeft: '5px',
+										cursor: 'help'
+									}}
+								>
+									<TriangleAlert style={{ marginTop: 5 }} size={16} />
+								</span>
+							</Tooltip>
+						)}
 						<CustomSelect
 							showSearch
 							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
@@ -193,8 +211,6 @@ const MethodRow = ({
 							}}
 							getOptionValue={(option) => option.id}
 							renderSelectedValue={(option) => {
-								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
-								const hasRequirementWarning = requiredLevel > from;
 
 								return (
 									<span style={{
@@ -203,28 +219,11 @@ const MethodRow = ({
 										alignItems: 'center'
 									}}>
 										{option.label}
-										{hasRequirementWarning && (
-											<Tooltip 
-												content={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
-												position="top"
-											>
-												<span
-													style={{
-														color: '#ff9800',
-														marginLeft: '5px',
-														cursor: 'help'
-													}}
-												>
-													⚠️
-												</span>
-											</Tooltip>
-										)}
+
 									</span>
 								);
 							}}
 							renderOption={(option) => {
-								const requiredLevel = option.requirments?.levels?.[skillId as keyof typeof option.requirments.levels] || 0;
-								const hasRequirementWarning = requiredLevel > from;
 
 								return (
 									<div style={{
@@ -234,7 +233,7 @@ const MethodRow = ({
 										width: '100%'
 									}}>
 										<span>{option.label}</span>
-										{hasRequirementWarning && (
+										{/* {hasRequirementWarning && (
 											<span
 												title={`Requires ${skillId} level ${requiredLevel}`}
 												style={{
@@ -245,14 +244,15 @@ const MethodRow = ({
 											>
 												Req: Lvl {requiredLevel}
 											</span>
-										)}
+										)} */}
 									</div>
 								);
 							}}
 						/>
 					</div>
+
 				</td>
-				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
+				<td style={{ paddingBottom: 5 }}>{origMethod.xp}</td>
 				{isActive ? (
 					<>
 						<td style={{ paddingBottom: 5 }}>
@@ -297,7 +297,7 @@ const MethodRow = ({
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-											<Tooltip 
+											<Tooltip
 												content={outputData.item.label}
 												position="top"
 											>
@@ -318,13 +318,13 @@ const MethodRow = ({
 											</span>
 											{
 												outputData.link && (
-													<Tooltip 
-													content={"View burn rates"}
-													position="top"
-												>
-													<a style={{marginLeft: 5, color: 'var(--osrs-gold)'}} aria-label="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
-														<InfoIcon size={12} />
-													</a>
+													<Tooltip
+														content={"View burn rates"}
+														position="top"
+													>
+														<a style={{ marginLeft: 5, color: 'var(--osrs-gold)' }} aria-label="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
+															<InfoIcon size={12} />
+														</a>
 													</Tooltip>
 												)
 											}
@@ -358,7 +358,7 @@ const MethodRow = ({
 								const isProfit = totalCost < 0;
 
 								return (
-									<Tooltip 
+									<Tooltip
 										content={isProfit ? "Profit from this method" : "Cost of this method"}
 										position="top"
 									>
@@ -375,7 +375,7 @@ const MethodRow = ({
 							})()}
 						</td>
 						<td>
-							<Tooltip 
+							<Tooltip
 								content={`Estimated time to complete: ${calculateTimeToComplete()}`}
 								position="top"
 							>

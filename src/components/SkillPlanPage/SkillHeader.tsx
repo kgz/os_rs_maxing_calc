@@ -91,7 +91,7 @@ export const SkillHeader = ({
 			<NotificationAlert
 				message={<>
 
-					Burn Rates are calculated linearly based on the Runescape wiki and assume cooking at a fire/range. <br /> Using cooking gloves, Lumbridge Range, and/or Hosidius range will reflect lower burn rates.
+					Burn Rates are calculated linearly based on the Runescape wiki and assumes cooking at a fire/range. <br /> Using cooking gloves, Lumbridge Range, and/or Hosidius range will reflect lower burn rates.
 				</>}
 				type='info'
 

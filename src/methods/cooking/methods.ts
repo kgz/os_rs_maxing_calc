@@ -47,20 +47,20 @@ export default {
     items: [
         { 
             amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
+                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
                 return 1 / avgSuccessRate;
             }, 
-            item: Items.RawLobster 
+            item: Items.RawShrimps 
         },
     ],
     returns: [
-        { amount: 1, item: Items.Lobster },
+        { amount: 1, item: Items.Shrimps },
         {
             amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
+                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
                 return (1 - avgSuccessRate) / avgSuccessRate;
             },
-            item: Items.BurntLobster,
+            item: Items.BurntShrimps,
 			link: "https://oldschool.runescape.wiki/w/Shrimps#Cooking_chance"
         }
     ],
