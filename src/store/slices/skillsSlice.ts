@@ -11,10 +11,6 @@ import { v4 } from 'uuid';
 import { renamePlan } from '../thunks/skills/renamePlan';
 import { deletePlan } from '../thunks/skills/deletePlan';
 
-function isKeyOfObject<T extends object>(key: string | number | symbol, obj: T): key is keyof T {
-    return key in obj;
-}
-
 function isValidSkill(skill: string): skill is keyof typeof Plans {
     return skill in Plans;
 }
@@ -162,7 +158,7 @@ const skillsSlice = createSlice({
         });
 
         builder.addCase(addNewMethodToPlan.fulfilled, (state, action) => {
-            const { skill, planId, index, characterName } = action.payload;
+            const { skill, planId, characterName } = action.payload;
             let planIndex = state.plans.findIndex(p => p.id === planId);
 
             // Initialize the character entry if it doesn't exist
@@ -209,7 +205,7 @@ const skillsSlice = createSlice({
 
             const userPlans = state.plans[planIndex];
 
-			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods));
+			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods)) as typeof userPlans.methods;
 			const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0);
 
 			// if (!defaultMethod) {
@@ -218,7 +214,7 @@ const skillsSlice = createSlice({
 			// }
 
             // Add the new method to the user's plan at the specified index
-            const newMethods = [...Object.values(userPlans.methods), lastMethod];
+            const newMethods = [...Object.values(userPlans.methods), lastMethod] as typeof userPlans.methods;
 
 			
             state.plans[planIndex] = {
@@ -382,7 +378,7 @@ const skillsSlice = createSlice({
           
           // Remove the plan from selectedPlans if it's selected
           if (state.selectedPlans[characterName] && 
-              Object.entries(state.selectedPlans[characterName]).some(([_, value]) => value === planId)) {
+              Object.entries(state.selectedPlans[characterName]).some(([, value]) => value === planId)) {
             // Find which skill had this plan selected
             for (const skill in state.selectedPlans[characterName]) {
               if (state.selectedPlans[characterName][skill] === planId) {

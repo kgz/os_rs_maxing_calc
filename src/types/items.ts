@@ -401,5 +401,9 @@ export const Items = {
 	WineOfZamorak: {
 		id: 245,
         label: 'Wine of Zamorak',
-	}
+	},
+    BurntLobster: {
+        id: 381,
+        label: 'Burnt lobster',
+    },
 } as const;

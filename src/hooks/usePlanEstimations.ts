@@ -90,13 +90,15 @@ export const usePlanEstimations = () => {
 
 			let costPerAction = 0;
 			input.forEach(item => {
+				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
 				const cost = getItemPrice(item.item?.id) ?? 0;
-				costPerAction += cost * item.amount;
+				costPerAction += cost * amount;
 			});
 
 			output.forEach(item => {
 				const cost = getItemPrice(item.item?.id) ?? 0;
-				costPerAction -= cost * item.amount;
+				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
+				costPerAction -= cost * amount;
 			});
 
 			if (xpPerAction <= 0) continue;

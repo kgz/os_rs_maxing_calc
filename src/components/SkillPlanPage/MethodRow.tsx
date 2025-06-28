@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
 import { Trash2 } from "lucide-react";
@@ -51,12 +51,12 @@ const MethodRow = ({
 
 	// Calculate time to complete based on actions per hour
 	const calculateTimeToComplete = () => {
-		if (!plan.method.actionsPerHour || plan.method.actionsPerHour <= 0) {
+		if (!origMethod.actionsPerHour || origMethod.actionsPerHour <= 0) {
 			return "Unknown";
 		}
 
 		// Calculate how many hours it will take
-		const hours = itemsToNext / plan.method.actionsPerHour;
+		const hours = itemsToNext / origMethod.actionsPerHour;
 
 		// Format the time nicely
 		if (hours < 1) {
@@ -83,6 +83,16 @@ const MethodRow = ({
 		overflow: 'hidden',
 
 	};
+
+	const origMethod = useMemo(()=> {
+
+		const methods = SkillMethods[skillId as keyof typeof Plans];
+		const orig = Object.values(methods)?.find(m => m.id === plan.method.id) as Method|null
+		if (!orig) {
+			throw new Error(`Method not found for skill ${skillId} and method id ${plan.method.id}`);
+		}
+		return orig;
+	}, [plan.method, skillId])
 
 	return (
 		<Fragment key={index} >
@@ -164,7 +174,7 @@ const MethodRow = ({
 							showSearch
 							searchFn={(option, searchText) => option.label.toLowerCase().includes(searchText.toLowerCase())}
 							options={Object.values(SkillMethods[skillId as keyof typeof Plans]) as Method[]}
-							value={plan.method} // This is correct - accessing the nested method object
+							value={origMethod} // This is correct - accessing the nested method object
 							onChange={(newMethod) => {
 								void dispatch(updatePlanMethod({
 									methodIndex: Number(index),
@@ -191,9 +201,10 @@ const MethodRow = ({
 					<>
 						<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-								{plan.method.items.map((itemData, idx) => {
+								{origMethod.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
 									const amount = typeof itemData.amount === 'function'? itemData.amount(from, nextLevel) : itemData.amount;
+									
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
@@ -218,17 +229,14 @@ const MethodRow = ({
 						{/* New output column */}
 						<td style={{ paddingBottom: 5 }}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-								{plan.method.returns?.map((outputData, idx) => {
+								{origMethod.returns?.map((outputData, idx) => {
 									if (!outputData.item) {
 										console.warn(`No item found for output: ${JSON.stringify(outputData)}`);
 										return <span>-</span>;
 									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
-									let amount = outputData.amount;
-
-									if (typeof amount === 'function') {
-                                        amount = amount(from, nextLevel);
-                                    }
+									console.log({ outputData, outputItem  });
+									const amount = typeof outputData.amount === 'function'? outputData.amount(from, nextLevel) : outputData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -255,23 +263,20 @@ const MethodRow = ({
 						{/* New Profit/Loss column */}
 						<td style={{ paddingBottom: 5 }}>
 							{(() => {
-								const inputItems = plan.method.items
-								const outputItems = plan.method.returns
+								const inputItems = origMethod.items
+								const outputItems = origMethod.returns
 
 								let costPerAction = 0;
 
 								inputItems.forEach(item => {
+									const amount = typeof item.amount === 'function'? item.amount(from, nextLevel) : item.amount;
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									costPerAction += cost * item.amount;
+									costPerAction += cost * amount;
 								});
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									let amount = item.amount;
-
-									if (typeof amount === 'function') {
-                                        amount = amount(from, nextLevel);
-                                    }
+									const amount = typeof item.amount === 'function'? item.amount(from, nextLevel) : item.amount;
 									costPerAction -= cost * amount;
 								});
 
