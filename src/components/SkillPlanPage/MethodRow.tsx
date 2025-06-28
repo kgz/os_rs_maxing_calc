@@ -41,6 +41,7 @@ const MethodRow = ({
 	currentSelectedPlan,
 	skillId,
 	isActive,
+	nextLevel
 }: Props) => {
 	const dispatch = useAppDispatch();
 	const { getItemIconUrl, getItemPrice } = useItems();
@@ -192,6 +193,7 @@ const MethodRow = ({
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{plan.method.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
+									const amount = typeof itemData.amount === 'function'? itemData.amount(from, nextLevel) : itemData.amount;
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
@@ -203,7 +205,7 @@ const MethodRow = ({
 												style={{ marginRight: '4px' }}
 											/>
 											<span>
-												{(itemData.amount * itemsToNext).toLocaleString("en-AU", {
+												{(amount * itemsToNext).toLocaleString("en-AU", {
 													maximumFractionDigits: 0,
 													style: 'decimal',
 												})}
@@ -222,6 +224,12 @@ const MethodRow = ({
 										return <span>-</span>;
 									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
+									let amount = outputData.amount;
+
+									if (typeof amount === 'function') {
+                                        amount = amount(from, nextLevel);
+                                    }
+
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
 											<img
@@ -234,7 +242,7 @@ const MethodRow = ({
 												data-id={outputData.item.id}
 											/>
 											<span>
-												{(outputData.amount * itemsToNext).toLocaleString("en-AU", {
+												{(amount * itemsToNext).toLocaleString("en-AU", {
 													maximumFractionDigits: 0,
 													style: 'decimal',
 												})}
@@ -259,7 +267,12 @@ const MethodRow = ({
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									costPerAction -= cost * item.amount;
+									let amount = item.amount;
+
+									if (typeof amount === 'function') {
+                                        amount = amount(from, nextLevel);
+                                    }
+									costPerAction -= cost * amount;
 								});
 
 								const totalCost = -(costPerAction * itemsToNext);

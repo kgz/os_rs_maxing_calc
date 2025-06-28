@@ -1,6 +1,17 @@
 import { Items } from "../../types/items";
 import type { Methods } from "../../types/method";
 
+// Helper function to calculate success rate based on level
+const getCookSuccessRate = (currentLevel: number, baseLevel: number, maxLevel: number, minRate: number = 0.6, maxRate: number = 1.0) => {
+  if (currentLevel >= maxLevel) return maxRate;
+  if (currentLevel <= baseLevel) return minRate;
+  
+  // Linear interpolation between min and max rates
+  const levelRange = maxLevel - baseLevel;
+  const levelProgress = currentLevel - baseLevel;
+  return minRate + (maxRate - minRate) * (levelProgress / levelRange);
+};
+
 export default {
     shrimpAnchovies: {
         id: "shrimpAnchovies",
@@ -25,7 +36,7 @@ export default {
             { amount: 1, item: Items.RawTrout },
         ],
         returns: [
-            { amount: 0.8, item: Items.Trout },
+            { amount: 1, item: Items.Trout },
         ],
         actionsPerHour: 1300,
         requirments: {
@@ -73,10 +84,26 @@ export default {
         label: "Lobster",
         xp: 120,
         items: [
-            { amount: 1, item: Items.RawLobster },
+            { 
+                amount: (fromLevel: number, toLevel: number) => {
+                    // Calculate average success rate across the level range
+                    let totalRate = 0;
+                    let levels = 0;
+                    
+                    for (let level = fromLevel; level <= toLevel; level++) {
+                        totalRate += getCookSuccessRate(level, 40, 74, 0.6, 1.0);
+                        levels++;
+                    }
+                    
+                    const avgSuccessRate = levels > 0 ? totalRate / levels : getCookSuccessRate(fromLevel, 40, 74, 0.6, 1.0);
+                    // Return the number of raw items needed per cooked item (inverse of success rate)
+                    return 1 / avgSuccessRate;
+                },
+                item: Items.RawLobster 
+            },
         ],
         returns: [
-            { amount: 0.85, item: Items.Lobster },
+            { amount: 1, item: Items.Lobster },
         ],
         actionsPerHour: 1300,
         requirments: {
