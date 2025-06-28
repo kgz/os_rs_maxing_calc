@@ -249,5 +249,66 @@ export const Items = {
 	WildernessAgilityTicket: {
 		id: 29460,
         label: "Wilderness Agility Ticket",
-	}
+	},
+    // Prayer and combat potions
+    PrayerPotion4: {
+        id: 2434,
+        label: 'Prayer potion(4)',
+    },
+    PrayerPotion3: {
+        id: 139,
+        label: 'Prayer potion(3)',
+    },
+    PrayerPotion2: {
+        id: 141,
+        label: 'Prayer potion(2)',
+    },
+    PrayerPotion1: {
+        id: 143,
+        label: 'Prayer potion(1)',
+    },
+    
+    // Food items
+    SharkCooked: {
+        id: 385,
+        label: 'Shark',
+    },
+    
+    // Nightmare Zone items
+    AbsorptionPotion4: {
+        id: 11734,
+        label: 'Absorption (4)',
+    },
+    AbsorptionPotion3: {
+        id: 11735,
+        label: 'Absorption (3)',
+    },
+    AbsorptionPotion2: {
+        id: 11736,
+        label: 'Absorption (2)',
+    },
+    AbsorptionPotion1: {
+        id: 11737,
+        label: 'Absorption (1)',
+    },
+    OverloadPotion4: {
+        id: 11730,
+        label: 'Overload (4)',
+    },
+    OverloadPotion3: {
+        id: 11731,
+        label: 'Overload (3)',
+    },
+    OverloadPotion2: {
+        id: 11732,
+        label: 'Overload (2)',
+    },
+    OverloadPotion1: {
+        id: 11733,
+        label: 'Overload (1)',
+    },
+    NightmareZonePoints: {
+        id: -1, // No actual item ID for points
+        label: 'Nightmare Zone points',
+    },
 } as const;

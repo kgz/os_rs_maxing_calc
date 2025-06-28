@@ -6,7 +6,9 @@ import prayer_expensive from './prayer/prayer_expensive';
 import prayer_wilderness from './prayer/prayer_wilderness';
 import prayer_alternative from './prayer/prayer_alternative';
 import agility_fastest from './agility/agility_fastest';
+
 import { crafting_low_cost, crafting_medium_cost, crafting_high_cost } from './crafting';
+import attack_training from './attack/attack_training';
 
 type SkillPlans = {
 	[K in keyof typeof skillsEnum]?: {
@@ -15,6 +17,10 @@ type SkillPlans = {
 };
 
 export const Plans = {
+	"Attack": {
+		// Add attack plans here
+		attack_training
+    },
 	"Agility": {
 		agility_fastest
 	},
