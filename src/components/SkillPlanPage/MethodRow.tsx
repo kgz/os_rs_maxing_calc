@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
-import { ExternalLinkIcon, InfoIcon, Trash2 } from "lucide-react";
+import { InfoIcon, Trash2 } from "lucide-react";
 import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";
@@ -13,7 +13,7 @@ import { useItems } from "../../hooks/useItems";
 import { Items } from "../../types/items";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { forwardRef } from 'react';
-
+import { Tooltip } from '../Tooltip/Tooltip';
 
 type Props = {
 	index: string;
@@ -113,28 +113,29 @@ const MethodRow = ({
 			<tr key={index} style={rowStyle} className="method-row">
 				<td >
 					{/* Remove button */}
-					<button
-						style={{
-							background: 'none',
-							width: 10,
-							aspectRatio: '1',
-							marginRight: 16,
-							marginLeft: 0,
-							padding: 0,
-							color: '#ff4747',
-							outline: 'none',
-							// opacity: isActive ? 1 : 0.5, // Reduce opacity for inactive rows
-						}}
-						onClick={() => {
-							void dispatch(removeMethodFromPlan({
-								planId: currentSelectedPlan.id,
-								methodIndex: Number(index),
-								skill: skillId ?? '',
-								characterName: character?.username ?? ''
+					<Tooltip content="Remove method" position="top">
+						<button
+							style={{
+								background: 'none',
+								width: 10,
+								aspectRatio: '1',
+								marginRight: 16,
+								marginLeft: 0,
+								padding: 0,
+								color: '#ff4747',
+								outline: 'none',
+							}}
+							onClick={() => {
+								void dispatch(removeMethodFromPlan({
+									planId: currentSelectedPlan.id,
+									methodIndex: Number(index),
+									skill: skillId ?? '',
+									characterName: character?.username ?? ''
 
-							}))
-						}}
-					><Trash2 size={15} /></button>
+								}))
+							}}
+						><Trash2 size={15} /></button>
+					</Tooltip>
 				</td>
 				<td style={{ paddingBottom: 5 }}>
 					<input
@@ -160,7 +161,6 @@ const MethodRow = ({
 							opacity: 1, // Always fully visible
 							background: 'inherit',
 							border: '1px solid #ccc',
-							// color: 'inherit',
 							padding: '2px 5px',
 							width: '50px',
 							textAlign: 'center',
@@ -204,16 +204,20 @@ const MethodRow = ({
 									}}>
 										{option.label}
 										{hasRequirementWarning && (
-											<span
-												title={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
-												style={{
-													color: '#ff9800',
-													marginLeft: '5px',
-													cursor: 'help'
-												}}
+											<Tooltip 
+												content={`This method requires ${skillId} level ${requiredLevel}, but starts at level ${from}`}
+												position="top"
 											>
-												⚠️
-											</span>
+												<span
+													style={{
+														color: '#ff9800',
+														marginLeft: '5px',
+														cursor: 'help'
+													}}
+												>
+													⚠️
+												</span>
+											</Tooltip>
 										)}
 									</span>
 								);
@@ -251,7 +255,7 @@ const MethodRow = ({
 				<td style={{ paddingBottom: 5 }}>{plan.method.xp}</td>
 				{isActive ? (
 					<>
-						<td style={{ paddingBottom: 5 }} title={itemsToNext.toString()}>
+						<td style={{ paddingBottom: 5 }}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{origMethod.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
@@ -259,14 +263,15 @@ const MethodRow = ({
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-											<img
-												src={getItemIconUrl(item?.id ?? 0, item?.label)}
-												width="24"
-												height="24"
-												alt={itemData.item.label}
-												title={itemData.item.label}
-												style={{ marginRight: '4px' }}
-											/>
+											<Tooltip content={itemData.item.label} position="top">
+												<img
+													src={getItemIconUrl(item?.id ?? 0, item?.label)}
+													width="24"
+													height="24"
+													alt={itemData.item.label}
+													style={{ marginRight: '4px' }}
+												/>
+											</Tooltip>
 											<span>
 												{(amount * itemsToNext).toLocaleString("en-AU", {
 													maximumFractionDigits: 0,
@@ -292,15 +297,19 @@ const MethodRow = ({
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-											<img
-												src={getItemIconUrl(outputItem?.id ?? 0, outputItem?.label)}
-												width="24"
-												height="24"
-												alt={outputData.item.label}
-												title={outputData.item.label}
-												style={{ marginRight: '4px' }}
-												data-id={outputData.item.id}
-											/>
+											<Tooltip 
+												content={outputData.item.label}
+												position="top"
+											>
+												<img
+													src={getItemIconUrl(outputItem?.id ?? 0, outputItem?.label)}
+													width="24"
+													height="24"
+													alt={outputData.item.label}
+													style={{ marginRight: '4px' }}
+													data-id={outputData.item.id}
+												/>
+											</Tooltip>
 											<span>
 												{(amount * itemsToNext).toLocaleString("en-AU", {
 													maximumFractionDigits: 0,
@@ -309,10 +318,15 @@ const MethodRow = ({
 											</span>
 											{
 												outputData.link && (
-													<a style={{marginLeft: 5, color: 'var(--osrs-gold)'}} title="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
-                                                        <InfoIcon size={12} />
-                                                    </a>
-                                                )
+													<Tooltip 
+													content={"View burn rates"}
+													position="top"
+												>
+													<a style={{marginLeft: 5, color: 'var(--osrs-gold)'}} aria-label="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
+														<InfoIcon size={12} />
+													</a>
+													</Tooltip>
+												)
 											}
 										</div>
 									)
@@ -344,19 +358,30 @@ const MethodRow = ({
 								const isProfit = totalCost < 0;
 
 								return (
-									<span style={{
-										color: !isProfit ? '#4CAF50' : '#ff4747',
-										fontWeight: 'bold',
-									}}>
-										{/* {isProfit ? '+' : ''} */}
-										{totalCost.toLocaleString("en-AU", {
-											notation: 'compact',
-										})} gp
-									</span>
+									<Tooltip 
+										content={isProfit ? "Profit from this method" : "Cost of this method"}
+										position="top"
+									>
+										<span style={{
+											color: !isProfit ? '#4CAF50' : '#ff4747',
+											fontWeight: 'bold',
+										}}>
+											{totalCost.toLocaleString("en-AU", {
+												notation: 'compact',
+											})} gp
+										</span>
+									</Tooltip>
 								);
 							})()}
 						</td>
-						<td>{calculateTimeToComplete()}</td>
+						<td>
+							<Tooltip 
+								content={`Estimated time to complete: ${calculateTimeToComplete()}`}
+								position="top"
+							>
+								<span>{calculateTimeToComplete()}</span>
+							</Tooltip>
+						</td>
 					</>
 				) : (
 					<td colSpan={4} style={{ textAlign: 'center', color: '#4CAF50', fontWeight: 'bold' }}>
