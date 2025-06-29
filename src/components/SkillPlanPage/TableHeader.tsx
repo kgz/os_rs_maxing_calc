@@ -20,7 +20,7 @@ export const TableHeader = () => {
                 <th style={{whiteSpace: 'nowrap'}}>XP Left {currentSkillLevel ?  <><br/>(from {currentSkillLevel}) </> :''}</th>
                 <th>Method</th>
                 <th>XP/Action</th>
-                <th>Items</th>
+                <th>Input</th>
                 <th>Output</th>
                 <th>Profit/Loss</th>
                 <th>Time to Complete</th> {/* New column */}

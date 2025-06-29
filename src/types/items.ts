@@ -417,5 +417,13 @@ export const Items = {
 	BurntSalmon: {
 		id: 343,
         label: 'Burnt fish (salmon)',
+	},
+	BurntKarambwan: {
+		id: 3148,
+        label: 'Burnt karambwan',
+	},
+	BurntSwordfish: {
+		id: 375,
+        label: 'Burnt swordfish',
 	}
 } as const;

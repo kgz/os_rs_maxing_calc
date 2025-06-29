@@ -14,77 +14,81 @@ const getCookSuccessRate = (currentLevel: number, baseLevel: number, maxLevel: n
 
 // Helper function to calculate average rate across level range
 const getAverageCookRate = (
-  fromLevel: number, 
-  toLevel: number, 
-  baseLevel: number, 
-  maxLevel: number, 
-  minRate: number, 
-  maxRate: number, 
-  isBurnRate: boolean = false
+	fromLevel: number,
+	toLevel: number,
+	baseLevel: number,
+	maxLevel: number,
+	minRate: number,
+	maxRate: number,
+	isBurnRate: boolean = false
 ) => {
-  let totalRate = 0;
-  let levels = 0;
-  
-  for (let level = fromLevel; level <= toLevel; level++) {
-    const successRate = getCookSuccessRate(level, baseLevel, maxLevel, minRate, maxRate);
-    totalRate += isBurnRate ? (1 - successRate) : successRate;
-    levels++;
-  }
-  
-  if (levels === 0) {
-    const defaultRate = getCookSuccessRate(fromLevel, baseLevel, maxLevel, minRate, maxRate);
-    return isBurnRate ? (1 - defaultRate) : defaultRate;
-  }
-  
-  return totalRate / levels;
+	let totalRate = 0;
+	let levels = 0;
+
+	for (let level = fromLevel; level <= toLevel; level++) {
+		const successRate = getCookSuccessRate(level, baseLevel, maxLevel, minRate, maxRate);
+		totalRate += isBurnRate ? (1 - successRate) : successRate;
+		levels++;
+	}
+
+	if (levels === 0) {
+		const defaultRate = getCookSuccessRate(fromLevel, baseLevel, maxLevel, minRate, maxRate);
+		return isBurnRate ? (1 - defaultRate) : defaultRate;
+	}
+
+	return totalRate / levels;
 };
 
 export default {
 	shrimpAnchovies: {
-    id: "shrimpAnchovies",
-    label: "Shrimp & Anchovies",
-    xp: 30, // Average XP per cook
-    items: [
-        { 
-            amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
-                return 1 / avgSuccessRate;
-            }, 
-            item: Items.RawShrimps 
-        },
-    ],
-    returns: [
-        { amount: 1, item: Items.Shrimps },
-        {
-            amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
-                return (1 - avgSuccessRate) / avgSuccessRate;
-            },
-            item: Items.BurntShrimps,
-			link: "https://oldschool.runescape.wiki/w/Shrimps#Cooking_chance"
-        }
-    ],
-    actionsPerHour: 1300,
-    requirement: {
-        "levels": {},
-    },
+		id: "shrimpAnchovies",
+		label: "Shrimp & Anchovies",
+		xp: 30, // Average XP per cook
+		items: [
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawShrimps
+			},
+		],
+		returns: [
+			{ amount: 1, item: Items.Shrimps },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntShrimps,
+				link: "https://oldschool.runescape.wiki/w/Shrimps#Cooking_chance"
+			}
+		],
+		actionsPerHour: 1300,
+		requirement: {
+			"levels": {},
+		},
 	},
 	trout: {
 		id: "trout",
 		label: "Trout",
 		xp: 70,
 		items: [
-			{ amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
-                return 1 / avgSuccessRate;
-            }, item: Items.RawTrout },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
+					return 1 / avgSuccessRate;
+				}, item: Items.RawTrout
+			},
 		],
 		returns: [
 			{ amount: 1, item: Items.Trout },
-				{ amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
-                return (1 - avgSuccessRate) / avgSuccessRate;
-            }, item: Items.BurntTrout, link: "https://oldschool.runescape.wiki/w/Trout#Cooking_chance" },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				}, item: Items.BurntTrout, link: "https://oldschool.runescape.wiki/w/Trout#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {
@@ -98,18 +102,25 @@ export default {
 		label: "Salmon",
 		xp: 90,
 		items: [
-			{ amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
-                return 1 / avgSuccessRate;
-            }, item: Items.RawSalmon },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawSalmon
+			},
 		],
 		returns: [
 			{ amount: 1, item: Items.Salmon },
-			{ amount: (fromLevel: number, toLevel: number) => {
-				const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
-                return (1 - avgSuccessRate) / avgSuccessRate;
-            }, item: Items.BurntSalmon, link: "https://oldschool.runescape.wiki/w/Salmon#Cooking_chance" },
-			
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntSalmon,
+				link: "https://oldschool.runescape.wiki/w/Salmon#Cooking_chance"
+			},
+
 		],
 		actionsPerHour: 1300,
 		requirement: {
@@ -123,10 +134,25 @@ export default {
 		label: "Karambwan",
 		xp: 190,
 		items: [
-			{ amount: 1, item: Items.RawKarambwan },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 30, 99, 0.6172, 1.0);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawKarambwan
+			},
 		],
 		returns: [
-			{ amount: 0.9, item: Items.CookedKarambwan },
+			{ amount: 1, item: Items.CookedKarambwan },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 30, 99, 0.6172, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntKarambwan,
+				link: "https://oldschool.runescape.wiki/w/Cooked_karambwan#Cooking_chance"
+			},
+
 		],
 		actionsPerHour: 1500,
 		requirement: {
@@ -136,44 +162,57 @@ export default {
 		},
 	},
 	lobster: {
-    id: "lobster",
-    label: "Lobster",
-    xp: 120,
-    items: [
-        { 
-            amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
-                return 1 / avgSuccessRate;
-            }, 
-            item: Items.RawLobster 
-        },
-    ],
-    returns: [
-        { amount: 1, item: Items.Lobster },
-        {
-            amount: (fromLevel: number, toLevel: number) => {
-                const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
-                return (1 - avgSuccessRate) / avgSuccessRate;
-            },
-            item: Items.BurntLobster,
-        }
-    ],
-    actionsPerHour: 1300,
-    requirement: {
-        "levels": {
-            "Cooking": 40
-        },
-    },
+		id: "lobster",
+		label: "Lobster",
+		xp: 120,
+		items: [
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawLobster
+			},
+		],
+		returns: [
+			{ amount: 1, item: Items.Lobster },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntLobster,
+			}
+		],
+		actionsPerHour: 1300,
+		requirement: {
+			"levels": {
+				"Cooking": 40
+			},
+		},
 	},
 	swordfish: {
 		id: "swordfish",
 		label: "Swordfish",
 		xp: 140,
 		items: [
-			{ amount: 1, item: Items.RawSwordfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 45, 86, 0.5547, 1.0);
+					return 1 / avgSuccessRate;
+				}, item: Items.RawSwordfish
+			},
 		],
 		returns: [
-			{ amount: 0.85, item: Items.Swordfish },
+			{ amount: 1, item: Items.Swordfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 45, 86, 0.5547, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				}, item: Items.BurntSwordfish,
+
+				link: "https://oldschool.runescape.wiki/w/Swordfish#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {
