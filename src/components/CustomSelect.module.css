@@ -50,6 +50,7 @@
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
+  width:max-content;
 }
 
 .option {
@@ -131,4 +132,12 @@
 
 .optionsContainer::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+.dropdownTop {
+  bottom: 100%;
+  top: auto;
+  margin-bottom: 5px;
+  margin-top: 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
 }

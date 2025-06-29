@@ -1,6 +1,6 @@
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { useAppSelector } from "../../store/store";
-import { useCurrentSkillStats } from "../../hooks/usecurrentSkillStats";
+import { useCurrentSkillStats } from "../../hooks/useCurrentSkillStats";
 import { useParams } from "react-router-dom";
 
 export const TableHeader = () => {
@@ -20,7 +20,7 @@ export const TableHeader = () => {
                 <th style={{whiteSpace: 'nowrap'}}>XP Left {currentSkillLevel ?  <><br/>(from {currentSkillLevel}) </> :''}</th>
                 <th>Method</th>
                 <th>XP/Action</th>
-                <th>Items</th>
+                <th>Input</th>
                 <th>Output</th>
                 <th>Profit/Loss</th>
                 <th>Time to Complete</th> {/* New column */}

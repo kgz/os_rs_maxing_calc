@@ -9,8 +9,12 @@ import agility_fastest from './agility/agility_fastest';
 
 import { crafting_low_cost, crafting_medium_cost, crafting_high_cost } from './crafting';
 import attack_training from './attack/attack_training';
+import cooking_fast from './cooking/cooking_fast';
+import cooking_profit from './cooking/cooking_profit';
+import cooking_wine from './cooking/cooking_wine';
+import { construction_cheapest, construction_medium, construction_fastest } from './construction';
 
-type SkillPlans = {
+export type SkillPlans = {
 	[K in keyof typeof skillsEnum]?: {
 		[key:string]: Plan
 	};
@@ -35,5 +39,15 @@ export const Plans = {
 		crafting_low_cost,
 		crafting_medium_cost,
 		crafting_high_cost
-	}
+	},
+	Cooking: {
+		cooking_fast,
+		cooking_profit,
+		cooking_wine
+	},
+	"Construction": {
+		construction_cheapest,
+		construction_medium,
+		construction_fastest
+	},
 } as const satisfies SkillPlans

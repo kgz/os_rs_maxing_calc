@@ -1,4 +1,4 @@
-import { SkillMethods } from "../../methods/methods";
+import { SkillMethods } from "../../methods/index.ts";
 import type { Plan } from "../../types/plan";
 export default {
     id: "high-cost",

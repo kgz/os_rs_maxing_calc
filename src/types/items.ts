@@ -92,12 +92,10 @@ export const Items = {
         id: 21347,
         label: 'Amethyst',
     },
-    AmethystArrowtips: {
+    AmethystArrowTips: {
         id: 21350,
-        label: 'Amethyst arrowtips',
+        label: 'Amethyst arrow tips',
     },
-    
-    // Battlestaffs and orbs
     Battlestaff: {
         id: 1391,
         label: 'Battlestaff',
@@ -207,7 +205,6 @@ export const Items = {
         label: 'Soul rune',
     },
     
-    // Urium remains for zealot robes
     UriumRemains: {
         id: 24792,
         label: 'Urium remains',
@@ -238,18 +235,19 @@ export const Items = {
         id: 24952,
         label: "Zealot's boots",
     },
-	CrystalShard: {
-		id: 23962,
+    CrystalShard: {
+        id: 23962,
         label: "Crystal Shard",
-	},
-	MarkOfGrace: {
-		id: 11849,
+    },
+    MarkOfGrace: {
+        id: 11849,
         label: "Mark of Grace",
-	},
-	WildernessAgilityTicket: {
-		id: 29460,
+    },
+    WildernessAgilityTicket: {
+        id: 29460,
         label: "Wilderness Agility Ticket",
-	},
+    },
+    
     // Prayer and combat potions
     PrayerPotion4: {
         id: 2434,
@@ -311,4 +309,130 @@ export const Items = {
         id: -1, // No actual item ID for points
         label: 'Nightmare Zone points',
     },
+    
+    // Cooking items
+    RawShrimps: {
+        id: 317,
+        label: 'Raw shrimps',
+    },
+    Shrimps: {
+        id: 315,
+        label: 'Shrimps',
+    },
+    RawTrout: {
+        id: 335,
+        label: 'Raw trout',
+    },
+    Trout: {
+        id: 333,
+        label: 'Trout',
+    },
+    RawSalmon: {
+        id: 331,
+        label: 'Raw salmon',
+    },
+    Salmon: {
+        id: 329,
+        label: 'Salmon',
+    },
+    RawLobster: {
+        id: 377,
+        label: 'Raw lobster',
+    },
+    Lobster: {
+        id: 379,
+        label: 'Lobster',
+    },
+    RawSwordfish: {
+        id: 371,
+        label: 'Raw swordfish',
+    },
+    Swordfish: {
+        id: 373,
+        label: 'Swordfish',
+    },
+    RawMonkfish: {
+        id: 7944,
+        label: 'Raw monkfish',
+    },
+    Monkfish: {
+        id: 7946,
+        label: 'Monkfish',
+    },
+    RawShark: {
+        id: 383,
+        label: 'Raw shark',
+    },
+    RawKarambwan: {
+        id: 3142,
+        label: 'Raw karambwan',
+    },
+    CookedKarambwan: {
+        id: 3144,
+        label: 'Cooked karambwan',
+    },
+    RawAnglerfish: {
+        id: 13439,
+        label: 'Raw anglerfish',
+    },
+    Anglerfish: {
+        id: 13441,
+        label: 'Anglerfish',
+    },
+    RawDarkCrab: {
+        id: 11934,
+        label: 'Raw dark crab',
+    },
+    DarkCrab: {
+        id: 11936,
+        label: 'Dark crab',
+    },
+    Grapes: {
+        id: 1987,
+        label: 'Grapes',
+    },
+    JugOfWater: {
+        id: 1937,
+        label: 'Jug of water',
+    },
+	WineOfZamorak: {
+		id: 245,
+        label: 'Wine of Zamorak',
+	},
+    BurntLobster: {
+        id: 381,
+        label: 'Burnt lobster',
+    },
+    BurntShrimps: {
+        id: 7954,
+        label: 'Burnt shrimp',
+    },
+	BurntTrout: {
+		id: 343,
+        label: 'Burnt fish (trout)',
+	},
+	BurntSalmon: {
+		id: 343,
+        label: 'Burnt fish (salmon)',
+	},
+	BurntKarambwan: {
+		id: 3148,
+        label: 'Burnt karambwan',
+	},
+	BurntSwordfish: {
+		id: 375,
+        label: 'Burnt swordfish',
+	},
+	BurntMonkfish: {
+		id: 7948,
+        label: 'Burnt monkfish',
+	},
+	BurntShark: {
+		id: 387,
+        label: 'Burnt shark',
+	},
+	BurntAnglerfish:{
+		id: 13443,
+        label: 'Burnt anglerfish',
+	}
 } as const;

@@ -33,16 +33,15 @@ function CustomSelect<T>({
 }: CustomSelectProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
-    const selectRef = useRef<HTMLDivElement>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const searchInputRef = useRef<HTMLInputElement>(null);
-    const selectedOptionRef = useRef<HTMLDivElement>(null);
+    const [dropdownPosition, setDropdownPosition] = useState&lt;'bottom' | 'top'&gt;('bottom');
+    const selectRef = useRef&lt;HTMLDivElement&gt;(null);
+    const dropdownRef = useRef&lt;HTMLDivElement&gt;(null);
+    const searchInputRef = useRef&lt;HTMLInputElement&gt;(null);
 
     // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+            if (selectRef.current &amp;&amp; !selectRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         }
@@ -55,7 +54,7 @@ function CustomSelect<T>({
 
     // Focus search input when dropdown opens
     useEffect(() => {
-        if (isOpen && showSearch && searchInputRef.current) {
+        if (isOpen &amp;&amp; showSearch &amp;&amp; searchInputRef.current) {
             setTimeout(() => {
                 searchInputRef.current?.focus();
             }, 10);
@@ -71,26 +70,13 @@ function CustomSelect<T>({
 
     // Determine dropdown position when opening
     useEffect(() => {
-        if (isOpen && selectRef.current) {
+        if (isOpen &amp;&amp; selectRef.current) {
             const selectRect = selectRef.current.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
+            const spaceBelow = viewportHeight - selectRect.bottom;
+            const spaceNeeded = dropdownRef.current?.offsetHeight || 300; // Fallback to 300px if not yet rendered
             
-            // Check if the select is in the bottom half of the viewport
-            const isInBottomHalf = selectRect.top > viewportHeight / 2;
-            
-            setDropdownPosition(isInBottomHalf ? 'top' : 'bottom');
-        }
-    }, [isOpen]);
-
-    // Scroll to the selected option when dropdown opens
-    useEffect(() => {
-        if (isOpen && selectedOptionRef.current) {
-            setTimeout(() => {
-                selectedOptionRef.current?.scrollIntoView({ 
-                    block: 'nearest',
-                    inline: 'nearest'
-                });
-            }, 0);
+            setDropdownPosition(spaceBelow &lt; spaceNeeded &amp;&amp; selectRect.top &gt; spaceNeeded ? 'top' : 'bottom');
         }
     }, [isOpen]);
 
@@ -109,11 +95,11 @@ function CustomSelect<T>({
         return getOptionValue(option) === getOptionValue(value);
     };
 
-    const filteredOptions = showSearch && searchText
+    const filteredOptions = showSearch &amp;&amp; searchText
         ? options.filter(option => searchFn(option, searchText))
         : options;
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
         setSearchText(e.target.value);
     };
 
@@ -143,12 +129,12 @@ function CustomSelect<T>({
                 <div className={styles.arrow}>▼</div>
             </div>
 
-            {isOpen && (
+            {isOpen &amp;&amp; (
                 <div 
                     ref={dropdownRef}
                     className={`${styles.dropdown} ${dropdownPosition === 'top' ? styles.dropdownTop : ''}`}
                 >
-                    {showSearch && (
+                    {showSearch &amp;&amp; (
                         <div className={styles.searchContainer} onClick={(e) => e.stopPropagation()}>
                             <input
                                 ref={searchInputRef}
@@ -163,24 +149,20 @@ function CustomSelect<T>({
                         </div>
                     )}
 
-                    {filteredOptions.length > 0 ? (
-                        filteredOptions.map((option, index) => {
-                            const selected = isOptionSelected(option);
-                            return (
-                                <div
-                                    key={`${getOptionValue(option)}-${index}`}
-                                    ref={selected ? selectedOptionRef : null}
-                                    className={`${styles.option} ${selected ? styles.selected : ''}`}
-                                    onClick={() => handleSelect(option, index)}
-                                >
-                                    {renderOption ? (
-                                        renderOption(option, selected)
-                                    ) : (
-                                        getOptionLabel(option)
-                                    )}
-                                </div>
-                            );
-                        })
+                    {filteredOptions.length &gt; 0 ? (
+                        filteredOptions.map((option, index) => (
+                            <div
+                                key={`${getOptionValue(option)}-${index}`}
+                                className={`${styles.option} ${isOptionSelected(option) ? styles.selected : ''}`}
+                                onClick={() => handleSelect(option, index)}
+                            >
+                                {renderOption ? (
+                                    renderOption(option, isOptionSelected(option))
+                                ) : (
+                                    getOptionLabel(option)
+                                )}
+                            </div>
+                        ))
                     ) : (
                         <div className={styles.noOptions}>No options found</div>
                     )}

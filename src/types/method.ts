@@ -10,11 +10,11 @@ export type Method = {
 	id: string;
 	label: string;
 	xp: number;
-	items: { amount: number, item: Item }[];
-	returns: { amount: number, item: Item }[];
+	items: { amount: number | ((fromLevel: number, toLevel:number) => number), item: Item, link?: string }[];
+	returns: { amount: number | ((fromLevel: number, toLevel:number) => number), item: Item, link?: string }[];
 	// pehaps we add a lower and upper bound on the number of actions
 	actionsPerHour: number;
-	requirments: {
+	requirement: {
 		levels: SkillLevels;
 		other?: unknown;
 	}

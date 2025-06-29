@@ -1,12 +1,10 @@
-import { Plans } from '../plans/plans';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { useEffect, useState } from 'react';
-import type { Method } from '../types/method';
-import { SkillMethods } from '../methods/methods';
+import { SkillMethods } from '../methods/index';
 import { updatePlanMethod } from '../store/thunks/skills/updatePlanMethod';
 
 // Helper function for deep equality comparison
-const isEqual = (obj1: any, obj2: any): boolean => {
+const isEqual = (obj1: unknown, obj2: unknown): boolean => {
   // Handle primitive types and null/undefined
   if (obj1 === obj2) return true;
   if (obj1 == null || obj2 == null) return false;
@@ -19,15 +17,18 @@ const isEqual = (obj1: any, obj2: any): boolean => {
   }
   
   // Handle objects
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
+  const keys1 = Object.keys(obj1 as object);
+  const keys2 = Object.keys(obj2 as object);
   
   if (keys1.length !== keys2.length) return false;
   
   return keys1.every(key => {
     // Skip comparing functions
-    if (typeof obj1[key] === 'function' && typeof obj2[key] === 'function') return true;
-    return isEqual(obj1[key], obj2[key]);
+    const val1 = (obj1 as Record<string, unknown>)[key];
+    const val2 = (obj2 as Record<string, unknown>)[key];
+    
+    if (typeof val1 === 'function' && typeof val2 === 'function') return true;
+    return isEqual(val1, val2);
   });
 };
 
@@ -44,9 +45,13 @@ export const useValidateUserPlans = () => {
             const type = plan.type;
             plan.methods.forEach(({method}, methodIndex) => {
                 
+                const skillMethods = SkillMethods[type as keyof typeof SkillMethods];
+                if (!skillMethods) {
+                    console.warn(`Skill methods not found for skill: ${type}`);
+                    return;
+                }
                 
-                let originalMethod = SkillMethods[type as keyof typeof SkillMethods]
-                originalMethod = Object.values(originalMethod).find(m => m.id === method.id)
+                const originalMethod = Object.values(skillMethods).find(m => m.id === method.id);
 				
                 
                 // const methodIndex = plan.methods.findIndex(m => m.method.id === method.id);
@@ -73,7 +78,6 @@ export const useValidateUserPlans = () => {
                 }
             });
         }
-        console.log('asdasdasd', {methodsToProcess});
         // Update processed methods
         if (methodsToProcess.size > 0) {
             setProcessedMethods(prev => new Set([...prev, ...methodsToProcess]));

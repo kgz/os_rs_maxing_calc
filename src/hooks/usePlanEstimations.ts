@@ -60,7 +60,7 @@ export const usePlanEstimations = () => {
 		const methodsArray = [..._methodsArray];
 
 		let sortedMethods = methodsArray.sort((a, b) => Number(a.from) - Number(b.from));
-		sortedMethods = sortedMethods.filter((method, i) => {
+		sortedMethods = sortedMethods.filter((_, i) => {
 			if (sortedMethods[i + 1] && sortedMethods[i + 1].from <= currentLevel) return false;
 			return true;
 		});
@@ -71,8 +71,10 @@ export const usePlanEstimations = () => {
 
 		for (const method of sortedMethods) {
 			if (remainingXpToCalculate <= 0) break;
-
 			const methodObj = method.method;
+			if (!methodObj) {
+				console.warn('Invalid method', method);
+			}
 			const xpPerAction = methodObj.xp;
 			const input = methodObj.items;
 			const output = methodObj.returns;
@@ -88,13 +90,15 @@ export const usePlanEstimations = () => {
 
 			let costPerAction = 0;
 			input.forEach(item => {
+				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
 				const cost = getItemPrice(item.item?.id) ?? 0;
-				costPerAction += cost * item.amount;
+				costPerAction += cost * amount;
 			});
 
 			output.forEach(item => {
 				const cost = getItemPrice(item.item?.id) ?? 0;
-				costPerAction -= cost * item.amount;
+				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
+				costPerAction -= cost * amount;
 			});
 
 			if (xpPerAction <= 0) continue;

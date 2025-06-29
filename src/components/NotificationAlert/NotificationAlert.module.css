@@ -1,0 +1,57 @@
+.notificationAlert {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  border-left: 4px solid;
+}
+
+.title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.message {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Success type */
+.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  border-left-color: #2ecc71;
+}
+
+.success .title {
+  color: #2ecc71;
+}
+
+/* Error type */
+.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-left-color: #e74c3c;
+}
+
+.error .title {
+  color: #e74c3c;
+}
+
+/* Warning type */
+.warning {
+  background-color: rgba(241, 196, 15, 0.1);
+  border-left-color: #f1c40f;
+}
+
+.warning .title {
+  color: #f1c40f;
+}
+
+/* Info type */
+.info {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left-color: #3498db;
+}
+
+.info .title {
+  color: #3498db;
+}

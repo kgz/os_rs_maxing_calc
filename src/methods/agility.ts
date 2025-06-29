@@ -1,5 +1,5 @@
-import { Items } from "../../types/items";
-import type { Methods } from "../../types/method";
+import { Items } from "../types/items";
+import type { Methods } from "../types/method";
 
 export default {
 	brimhavenArena: {
@@ -11,7 +11,7 @@ export default {
 		],
 		returns: [],
 		actionsPerHour: 1200, // Approximate, varies based on efficiency
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 20
 			},
@@ -26,7 +26,7 @@ export default {
 			{ item: Items.Coins, amount: 16_022 }, // Approximate drop rate
 		],
 		actionsPerHour: 100, // Approximate laps per hour
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 52
 			},
@@ -39,7 +39,7 @@ export default {
 		items: [],
 		returns: [],
 		actionsPerHour: 10, // Approximate runs per hour
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 62
 			},
@@ -54,7 +54,7 @@ export default {
 			{ item: Items.MarkOfGrace, amount: 0.1 }, // Approximate drop rate
 		],
 		actionsPerHour: 200, // Varies by course
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 10 // Varies by course, this is for the lowest level course
 			},
@@ -69,7 +69,7 @@ export default {
 			{ item: Items.Coins, amount: 10000 }, // Pyramid top reward
 		],
 		actionsPerHour: 25, // Approximate laps per hour
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 30
 			},
@@ -82,7 +82,7 @@ export default {
 		items: [],
 		returns: [],
 		actionsPerHour: 150, // Approximate laps per hour
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 60
 			},
@@ -97,7 +97,7 @@ export default {
 			{ item: Items.CrystalShard, amount: 0.002 }, // Approximate drop rate
 		],
 		actionsPerHour: 75, // Approximate laps per hour
-		requirments: {
+		requirement: {
 			"levels": {
 				"Agility": 75
 			}
