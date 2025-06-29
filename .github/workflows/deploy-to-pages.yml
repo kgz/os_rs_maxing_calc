@@ -34,6 +34,8 @@ jobs:
         run: |
           # Create a .nojekyll file to bypass Jekyll processing
           touch dist/.nojekyll
+          # Add CNAME file for custom domain
+          echo "07tools.net" > dist/CNAME
           
       - name: Setup Git Identity
         run: |
@@ -67,3 +69,12 @@ jobs:
           # Clean up
           git checkout -f master
           git branch -D gh-pages-temp
+          
+      - name: Configure GitHub Pages Settings
+        run: |
+          # Configure GitHub Pages to use gh-pages branch and custom domain
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages \
+            -d '{"source":{"branch":"gh-pages","path":"/"},"cname":"07tools.net"}'

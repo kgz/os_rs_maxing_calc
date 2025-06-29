@@ -1,0 +1,64 @@
+name: Deploy to Beta
+
+on:
+  push:
+    branches: [ staging ]  # Your staging branch
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        run: npm install -g pnpm
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build
+        run: |
+          export DEPLOY_ENV=beta
+          pnpm run build
+        
+      - name: Configure GitHub Pages
+        run: |
+          touch dist/.nojekyll
+          echo "beta.07tools.net" > dist/CNAME
+          
+      - name: Setup Git Identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+      - name: Deploy to Beta Branch
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}
+          git checkout --orphan gh-pages-beta
+          find . -maxdepth 1 ! -name 'dist' ! -name '.git' -exec rm -rf {} \;
+          mv dist/* .
+          rm -rf dist
+          git add .
+          git commit -m "Deploy to Beta"
+          git push -f origin gh-pages-beta
+          git checkout -f staging
+          git branch -D gh-pages-beta
+
+      - name: Configure GitHub Pages Settings
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages \
+            -d '{"source":{"branch":"gh-pages-beta","path":"/"},"cname":"beta.07tools.net"}'
