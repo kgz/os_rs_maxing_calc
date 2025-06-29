@@ -7,11 +7,13 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Use your self-hosted runner
+    runs-on: self-hosted  # Keep using your self-hosted runner
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for proper git operations
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -22,13 +24,7 @@ jobs:
         run: npm install -g pnpm
           
       - name: Install dependencies
-        run: |
-          # Check if pnpm-lock.yaml exists
-          if [ -f "pnpm-lock.yaml" ]; then
-            pnpm install --frozen-lockfile
-          else
-            pnpm install
-          fi
+        run: pnpm install
         
       - name: Build
         run: pnpm run build  # Your build command
@@ -38,12 +34,32 @@ jobs:
           # Create a .nojekyll file to bypass Jekyll processing
           touch dist/.nojekyll
           
-          # If you're using a custom domain, create a CNAME file
-          # echo "07tools.net" > dist/CNAME
+      - name: Setup Git Identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist  # The folder the action should deploy (your build output)
-          branch: gh-pages  # The branch the action should deploy to
-          clean: true  # Automatically remove deleted files from the deploy branch
+        run: |
+          # Create a temporary branch
+          git checkout --orphan gh-pages-temp
+          
+          # Remove all files except the dist directory
+          find . -maxdepth 1 ! -name 'dist' ! -name '.git' -exec rm -rf {} \;
+          
+          # Move dist contents to root
+          mv dist/* .
+          rm -rf dist
+          
+          # Add all files
+          git add .
+          
+          # Commit changes
+          git commit -m "Deploy to GitHub Pages"
+          
+          # Force push to gh-pages branch
+          git push -f origin gh-pages-temp:gh-pages
+          
+          # Clean up
+          git checkout -f master
+          git branch -D gh-pages-temp
