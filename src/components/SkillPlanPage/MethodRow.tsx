@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
-import { FileWarningIcon, InfoIcon, MessageCircleWarningIcon, Trash2, TriangleAlert } from "lucide-react";
+import { InfoIcon, Trash2, TriangleAlert } from "lucide-react";
 import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";

@@ -3,6 +3,7 @@ import { Plans } from '../plans/plans';
 import { setSelectedPlan } from '../store/thunks/skills/setSelectedPlan';
 import { useLastCharacter } from './useLastCharacter';
 import { useMemo } from 'react';
+import type { PlanOption } from '../components/MaxingGuide/types';
 
 export const useSkillPlans = () => {
 	const dispatch = useAppDispatch();
@@ -38,7 +39,7 @@ export const useSkillPlans = () => {
 		return [...templatePlanOptions, ...filteredUserPlans];
 	};
 
-	const handlePlanChange = (skillId: string, option: unknown) => {
+	const handlePlanChange = (skillId: string, option: PlanOption | null) => {
 		const valInSkills = (key: string): key is keyof typeof Plans => key in Plans;
 		if (!valInSkills(skillId)) {
 			console.warn('Invalid skill', skillId);

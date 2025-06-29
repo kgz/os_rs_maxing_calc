@@ -377,15 +377,17 @@ const skillsSlice = createSlice({
           state.plans = state.plans.filter(plan => !(plan.id === planId && plan.character === characterName));
           
           // Remove the plan from selectedPlans if it's selected
-          if (state.selectedPlans[characterName] && 
-              Object.entries(state.selectedPlans[characterName]).some(([, value]) => value === planId)) {
+          if (state.selectedPlans[characterName]) {
             // Find which skill had this plan selected
-            for (const skill in state.selectedPlans[characterName]) {
+            Object.keys(state.selectedPlans[characterName]).forEach(skillKey => {
+              // Use type assertion to tell TypeScript this is a valid key
+              const skill = skillKey as keyof typeof state.selectedPlans[typeof characterName];
+              
               if (state.selectedPlans[characterName][skill] === planId) {
                 // Remove this skill's selected plan
                 delete state.selectedPlans[characterName][skill];
               }
-            }
+            });
           }
         });
 

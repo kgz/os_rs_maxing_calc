@@ -1,5 +1,4 @@
 import { createContext, useContext } from "react";
-import type { TrainingMethod } from "../store/slices/skillsSlice";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types";
 import invariant from 'tiny-invariant';
 
@@ -28,12 +27,6 @@ export type Item = {
 };
 
 export const itemKey = Symbol('item');
-export type ItemData = {
-	[itemKey]: true;
-	item: TrainingMethod;
-	index: number;
-	instanceId: symbol;
-};
 
 
 
@@ -44,7 +37,3 @@ export const  useListContext = () => {
 }
 
 
-
-export function isItemData(data: Record<string | symbol, unknown>): data is ItemData {
-	return data[itemKey] === true;
-}

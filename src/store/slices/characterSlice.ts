@@ -1,4 +1,4 @@
-import { createSlice, current } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { fetchCharacterStats } from '../thunks/character/fetchCharacterStats';
 import type { skillsEnum } from '../../types/skillsResponse';
 
@@ -65,7 +65,7 @@ const slice = createSlice({
 
 			state[characterName]['lastUpdated'] = (new Date()).valueOf();
 	})
-	builder.addCase(fetchCharacterStats.rejected, (state, action) => {
+	builder.addCase(fetchCharacterStats.rejected, (_, action) => {
 		console.warn('Failed to fetch character stats:', action.error.message);
 		throw new Error('Failed to fetch character stats');
 	

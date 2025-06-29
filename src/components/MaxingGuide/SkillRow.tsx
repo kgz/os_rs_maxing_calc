@@ -22,7 +22,7 @@ interface SkillRowProps {
   remainingXP: number;
   planOptions: PlanOption[];
   selectedPlanOption: PlanOption | null;
-  handlePlanChange: (skillId: string, option: unknown) => void;
+  handlePlanChange: (skillId: string, option: PlanOption | null ) => void;
   estimatedCost: number | null;
   estimatedTime: number | null;
 }

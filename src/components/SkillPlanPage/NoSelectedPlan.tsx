@@ -9,7 +9,7 @@ interface NoSelectedPlanProps {
     plan: Plan;
     isTemplate: boolean;
   }>;
-  handlePlanChange: (option: unknown) => void;
+  handlePlanChange: (option: { id: string; label: unknown; plan: unknown; isTemplate: boolean; } | null) => void;
 }
 
 export const NoSelectedPlan: React.FC<NoSelectedPlanProps> = ({ planOptions, handlePlanChange }) => {

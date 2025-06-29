@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { addNewMethodToPlan } from '../../store/thunks/skills/addNewMethodToPlan';
 import { Plans } from '../../plans/plans';
