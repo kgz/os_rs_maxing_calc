@@ -18,11 +18,20 @@ jobs:
         with:
           node-version: '18'  # Use the Node.js version your project requires
           
+      - name: Install pnpm
+        run: npm install -g pnpm
+          
       - name: Install dependencies
-        run: npm ci
+        run: |
+          # Check if pnpm-lock.yaml exists
+          if [ -f "pnpm-lock.yaml" ]; then
+            pnpm install --frozen-lockfile
+          else
+            pnpm install
+          fi
         
       - name: Build
-        run: npm run build  # Your build command
+        run: pnpm run build  # Your build command
         
       - name: Configure GitHub Pages
         run: |
