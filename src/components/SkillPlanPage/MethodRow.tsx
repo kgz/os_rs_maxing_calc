@@ -6,7 +6,7 @@ import { Plans } from "../../plans/plans";
 import { removeMethodFromPlan } from "../../store/thunks/skills/removeMethodFromPlan";
 import { setPlanFromLevel } from "../../store/thunks/skills/setPlanFromLevel";
 import CustomSelect from "../CustomSelect";
-import { SkillMethods } from "../../methods/methods";
+import { SkillMethods } from "../../methods/index.ts";
 import type { Method } from "../../types/method";
 import { updatePlanMethod } from "../../store/thunks/skills/updatePlanMethod";
 import { useItems } from "../../hooks/useItems";

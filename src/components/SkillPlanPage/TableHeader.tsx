@@ -1,6 +1,6 @@
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { useAppSelector } from "../../store/store";
-import { useCurrentSkillStats } from "../../hooks/usecurrentSkillStats";
+import { useCurrentSkillStats } from "../../hooks/useCurrentSkillStats";
 import { useParams } from "react-router-dom";
 
 export const TableHeader = () => {

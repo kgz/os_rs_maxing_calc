@@ -92,12 +92,10 @@ export const Items = {
         id: 21347,
         label: 'Amethyst',
     },
-    AmethystArrowtips: {
+    AmethystArrowTips: {
         id: 21350,
-        label: 'Amethyst arrowtips',
+        label: 'Amethyst arrow tips',
     },
-    
-    // Battlestaffs and orbs
     Battlestaff: {
         id: 1391,
         label: 'Battlestaff',
@@ -207,7 +205,6 @@ export const Items = {
         label: 'Soul rune',
     },
     
-    // Urium remains for zealot robes
     UriumRemains: {
         id: 24792,
         label: 'Urium remains',
@@ -433,5 +430,9 @@ export const Items = {
 	BurntShark: {
 		id: 387,
         label: 'Burnt shark',
+	},
+	BurntAnglerfish:{
+		id: 13443,
+        label: 'Burnt anglerfish',
 	}
 } as const;

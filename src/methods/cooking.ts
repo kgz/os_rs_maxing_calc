@@ -1,5 +1,5 @@
-import { Items } from "../../types/items";
-import type { Methods } from "../../types/method";
+import { Items } from "../types/items";
+import type { Methods } from "../types/method";
 
 // Helper function to calculate success rate based on level, is a linear interpolation function
 const getCookSuccessRate = (currentLevel: number, baseLevel: number, maxLevel: number, minRate: number = 0.6, maxRate: number = 1.0) => {
@@ -288,10 +288,26 @@ export default {
 		label: "Anglerfish",
 		xp: 230,
 		items: [
-			{ amount: 1, item: Items.RawAnglerfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					// Using fire rates: ~66.8% at level 84, stops burning completely at level 99
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, .7852);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawAnglerfish
+			},
 		],
 		returns: [
-			{ amount: 0.85, item: Items.Anglerfish },
+			{ amount: 1, item: Items.Anglerfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					// Using fire rates: ~66.8% at level 84, stops burning completely at level 99
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, .7852);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntAnglerfish,
+				link: "https://oldschool.runescape.wiki/w/Anglerfish#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {

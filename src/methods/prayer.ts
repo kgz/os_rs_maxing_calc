@@ -1,5 +1,7 @@
-import { Items } from "../../types/items";
-import type { Methods } from "../../types/method";
+import { Items } from "../types/items";
+import type { Methods } from "../types/method";
+
+// cspell:words bbsb bbssw dbct dbecto ectofuntus sdct unnoting
 
 export default {
     bdbga: {

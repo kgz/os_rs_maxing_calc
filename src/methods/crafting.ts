@@ -1,5 +1,5 @@
-import { Items } from "../../types/items";
-import type { Methods } from "../../types/method";
+import { Items } from "../types/items";
+import type { Methods } from "../types/method";
 
 export default {
   leatherGloves: {
@@ -290,7 +290,7 @@ export default {
       { amount: 1, item: Items.Chisel },
     ],
     returns: [
-      { amount: 15, item: Items.AmethystArrowtips }
+      { amount: 15, item: Items.AmethystArrowTips }
     ],
     actionsPerHour: 2780,
     requirement: {

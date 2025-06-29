@@ -1,5 +1,5 @@
-import { Items } from "../../types/items";
-import type { Methods } from "../../types/method";
+import { Items } from "../types/items";
+import type { Methods } from "../types/method";
 
 export default {
 	brimhavenArena: {

@@ -78,24 +78,14 @@ export const SkillHeader = ({
 				</div>
 
 			</div>
-
-			{/* <div className={style.headerNotificatons}>
-				<div className={style.notificationBox}>
-					<h4>About Training</h4>
-					<p>
-						Success rates improve as your level increases. Higher levels often lead to better outcomes.
-						Special equipment and locations can provide bonuses to your training efficiency.
-					</p>
-				</div>
-			</div> */}
-			<NotificationAlert
+			{skillId === "Cooking" && <NotificationAlert
 				message={<>
 
 					Burn Rates are calculated linearly based on the Runescape wiki and assumes cooking at a fire/range. <br /> Using cooking gloves, Lumbridge Range, and/or Hosidius range will reflect lower burn rates.
 				</>}
 				type='info'
 
-			/>
+			/>}
 		</>
 	)
 };

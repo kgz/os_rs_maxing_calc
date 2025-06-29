@@ -37,6 +37,7 @@ function CustomSelect<T>({
     const selectRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const selectedOptionRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -78,6 +79,18 @@ function CustomSelect<T>({
             const isInBottomHalf = selectRect.top > viewportHeight / 2;
             
             setDropdownPosition(isInBottomHalf ? 'top' : 'bottom');
+        }
+    }, [isOpen]);
+
+    // Scroll to the selected option when dropdown opens
+    useEffect(() => {
+        if (isOpen && selectedOptionRef.current) {
+            setTimeout(() => {
+                selectedOptionRef.current?.scrollIntoView({ 
+                    block: 'nearest',
+                    inline: 'nearest'
+                });
+            }, 0);
         }
     }, [isOpen]);
 
@@ -151,19 +164,23 @@ function CustomSelect<T>({
                     )}
 
                     {filteredOptions.length > 0 ? (
-                        filteredOptions.map((option, index) => (
-                            <div
-                                key={`${getOptionValue(option)}-${index}`}
-                                className={`${styles.option} ${isOptionSelected(option) ? styles.selected : ''}`}
-                                onClick={() => handleSelect(option, index)}
-                            >
-                                {renderOption ? (
-                                    renderOption(option, isOptionSelected(option))
-                                ) : (
-                                    getOptionLabel(option)
-                                )}
-                            </div>
-                        ))
+                        filteredOptions.map((option, index) => {
+                            const selected = isOptionSelected(option);
+                            return (
+                                <div
+                                    key={`${getOptionValue(option)}-${index}`}
+                                    ref={selected ? selectedOptionRef : null}
+                                    className={`${styles.option} ${selected ? styles.selected : ''}`}
+                                    onClick={() => handleSelect(option, index)}
+                                >
+                                    {renderOption ? (
+                                        renderOption(option, selected)
+                                    ) : (
+                                        getOptionLabel(option)
+                                    )}
+                                </div>
+                            );
+                        })
                     ) : (
                         <div className={styles.noOptions}>No options found</div>
                     )}

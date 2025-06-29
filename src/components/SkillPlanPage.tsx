@@ -6,7 +6,7 @@ import { Plans } from '../plans/plans';
 import { levelToXp, remainingXPToTarget } from '../utils/xpCalculations';
 import { setSelectedPlan } from '../store/thunks/skills/setSelectedPlan';
 import { usePlans } from '../hooks/usePlans';
-import { useCurrentSkillStats } from '../hooks/usecurrentSkillStats';
+import { useCurrentSkillStats } from '../hooks/useCurrentSkillStats';
 import { useLastCharacter } from '../hooks/useLastCharacter';
 import { MethodRow } from './SkillPlanPage/MethodRow';
 import { TableHeader } from './SkillPlanPage/TableHeader';
