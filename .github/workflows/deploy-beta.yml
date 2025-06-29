@@ -36,11 +36,7 @@ jobs:
         run: |
           touch dist/.nojekyll
           echo "beta.07tools.net" > dist/CNAME
-          
-      - name: Setup Git Identity
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+
           
       - name: Deploy to Beta Branch
         run: |

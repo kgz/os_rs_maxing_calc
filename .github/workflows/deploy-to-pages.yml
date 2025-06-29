@@ -37,11 +37,6 @@ jobs:
           # Add CNAME file for custom domain
           echo "07tools.net" > dist/CNAME
           
-      - name: Setup Git Identity
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          
       - name: Deploy to GitHub Pages
         run: |
           # Set the remote URL with the token for authentication
