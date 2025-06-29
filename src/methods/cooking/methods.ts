@@ -226,10 +226,24 @@ export default {
 		label: "Monkfish",
 		xp: 150,
 		items: [
-			{ amount: 1, item: Items.RawMonkfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 62, 92, 0.6875, 1.0);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawMonkfish
+			},
 		],
 		returns: [
-			{ amount: 0.9, item: Items.Monkfish },
+			{ amount: 1, item: Items.Monkfish },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 62, 92, 0.6875, 1.0);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntMonkfish,
+				link: "https://oldschool.runescape.wiki/w/Monkfish#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {
@@ -243,10 +257,24 @@ export default {
 		label: "Shark",
 		xp: 210,
 		items: [
-			{ amount: 1, item: Items.RawShark },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
+					return 1 / avgSuccessRate;
+				},
+				item: Items.RawShark
+			},
 		],
 		returns: [
-			{ amount: 0.85, item: Items.SharkCooked },
+			{ amount: 1, item: Items.SharkCooked },
+			{
+				amount: (fromLevel: number, toLevel: number) => {
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
+					return (1 - avgSuccessRate) / avgSuccessRate;
+				},
+				item: Items.BurntShark,
+				link: "https://oldschool.runescape.wiki/w/Shark#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {
