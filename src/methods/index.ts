@@ -4,6 +4,7 @@ import Crafting from "./crafting"
 import Agility from "./agility"
 import Attack from "./attack"
 import Cooking from "./cooking"
+import Construction from "./construction"
 
 
 export const SkillMethods = {
@@ -11,6 +12,7 @@ export const SkillMethods = {
 	Prayer,
 	Crafting,
 	Cooking,
+	Construction,
 	Agility
 } as const satisfies {
 	[key: string]: Methods

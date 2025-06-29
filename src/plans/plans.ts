@@ -12,6 +12,7 @@ import attack_training from './attack/attack_training';
 import cooking_fast from './cooking/cooking_fast';
 import cooking_profit from './cooking/cooking_profit';
 import cooking_wine from './cooking/cooking_wine';
+import { construction_cheapest, construction_medium, construction_fastest } from './construction';
 
 export type SkillPlans = {
 	[K in keyof typeof skillsEnum]?: {
@@ -43,5 +44,10 @@ export const Plans = {
 		cooking_fast,
 		cooking_profit,
 		cooking_wine
+	},
+	"Construction": {
+		construction_cheapest,
+		construction_medium,
+		construction_fastest
 	},
 } as const satisfies SkillPlans
