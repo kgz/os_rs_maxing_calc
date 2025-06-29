@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]  # Change to your main branch name if different
+  workflow_dispatch:    # Allow manual triggers
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # Use your self-hosted runner
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Use the Node.js version your project requires
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build  # Your build command
+        
+      - name: Configure GitHub Pages
+        run: |
+          # Create a .nojekyll file to bypass Jekyll processing
+          touch dist/.nojekyll
+          
+          # If you're using a custom domain, create a CNAME file
+          # echo "07tools.net" > dist/CNAME
+          
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist  # The folder the action should deploy (your build output)
+          branch: gh-pages  # The branch the action should deploy to
+          clean: true  # Automatically remove deleted files from the deploy branch
