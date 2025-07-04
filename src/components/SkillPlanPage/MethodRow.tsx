@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
 import { InfoIcon, Trash2, TriangleAlert } from "lucide-react";
@@ -15,6 +15,7 @@ import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { forwardRef } from 'react';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Modifiers } from "../../modifiers/index.ts";
+import styles from './MethodRow.module.css';
 
 type Props = {
 	index: string;
@@ -49,6 +50,7 @@ const MethodRow = ({
 
 	const characters = useAppSelector(state => state.characterReducer)
 	const character = useLastCharacter(characters);
+	const [selectedModifier, setSelectedItemModifier] = useState<string[]>([]);
 
 	// Calculate time to complete based on actions per hour
 	const calculateTimeToComplete = () => {
@@ -80,11 +82,12 @@ const MethodRow = ({
 	const skill_modifiers = useMemo(() => {
 		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
 			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
-			return [];
-        }
-		return Object.values(Modifiers[skillId as keyof typeof Modifiers]);
+			return { keys: [] as string[], methods: {} as Record<string, never> };
+		}
 
-	}, [skillId])
+		const skill_m = Modifiers[skillId as keyof typeof Modifiers];
+		return { keys: Object.keys(skill_m), methods: skill_m };
+	}, [skillId]);
 
 	const rowStyle = {
 		// opacity: isActive ? 1 : 0.5,
@@ -109,15 +112,7 @@ const MethodRow = ({
 		<Fragment key={index} >
 			<tr>
 				<td style={{ position: 'relative', paddingTop: 4, paddingBottom: 4, paddingRight: 10 }}>
-					<div style={{
-						position: 'absolute',
-						width: '100%',
-						height: '1px',
-						opacity: 0.5,
-						top: '50%',
-						left: 0
-					}}></div>
-
+					<div className={styles.dividerLine}></div>
 				</td>
 				<td colSpan={100} style={{ borderTop: 'solid 1px white' }}></td>
 			</tr>
@@ -126,16 +121,7 @@ const MethodRow = ({
 					{/* Remove button */}
 					<Tooltip content="Remove method" position="top">
 						<button
-							style={{
-								background: 'none',
-								width: 10,
-								aspectRatio: '1',
-								marginRight: 16,
-								marginLeft: 0,
-								padding: 0,
-								color: '#ff4747',
-								outline: 'none',
-							}}
+							className={styles.removeButton}
 							onClick={() => {
 								void dispatch(removeMethodFromPlan({
 									planId: currentSelectedPlan.id,
@@ -168,14 +154,7 @@ const MethodRow = ({
 						}}
 						// onclick select whole value
 						onFocus={(e) => { e.target.select(); }}
-						style={{
-							opacity: 1, // Always fully visible
-							background: 'inherit',
-							border: '1px solid #ccc',
-							padding: '2px 5px',
-							width: '50px',
-							textAlign: 'center',
-						}}
+						className={styles.inputField}
 					/>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
@@ -188,11 +167,7 @@ const MethodRow = ({
 								position="top"
 							>
 								<span
-									style={{
-										color: '#ff9800',
-										marginLeft: '5px',
-										cursor: 'help'
-									}}
+									className={styles.warningIcon}
 								>
 									<TriangleAlert style={{ marginTop: 5 }} size={16} />
 								</span>
@@ -265,24 +240,91 @@ const MethodRow = ({
 				{/* <td style={{ paddingBottom: 5 }}>{origMethod.xp}</td> */}
 				<td style={{ paddingBottom: 5 }}>
 					{/* modifiers */}
-					<CustomSelect 
-						options={skill_modifiers} 
-						value={undefined} 
-						onChange={function (value, index: number): void {
-							throw new Error("Function not implemented.");
-						}} 
-						getOptionLabel={function (option): string {
-							return option?.label ?? '';
+					<CustomSelect
+						options={skill_modifiers.keys}
+						value={selectedModifier}
+						onChange={function (value: string[]): void {
+							console.log(value);
+							setSelectedItemModifier(value)
 						}}
-						renderOption={(option) => {
+						getOptionLabel={function (option: string): string {
+							if (option in skill_modifiers.methods) {
+								const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
+								return optionData?.label || option;
+							}
+							return option;
+						}}
+						renderOption={(option: string) => {
+							// Use type assertion to tell TypeScript that this is a valid key
+							const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
 							return (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {option?.image && <img src ={option.image} width="24" height="24" /> }
-                                    <span>{option?.label}</span>
-									{option?.stats && <span style={{ color: '#666666' }}>{option?.stats}</span>}
-                                </div>
-                            );
+								<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+									{optionData?.image &&
+										<img
+											src={optionData.image}
+											width="20"
+											height="20"
+											alt={optionData?.label || option}
+										/>
+
+									}
+									<span>{optionData?.label}</span>
+									{optionData?.stats && <span style={{ color: '#666666' }}>{optionData?.stats}</span>}
+								</div>
+							);
 						}}
+
+						renderTags={(selectedOptions: string[]) => (
+							<div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+								{selectedOptions.map((option) => {
+									const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
+									return (
+										<div
+											key={option}
+											onClick={(e) => {
+												e.stopPropagation();
+												const newValue = selectedModifier.filter(item => item !== option);
+												setSelectedItemModifier(newValue);
+											}}
+											style={{
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												backgroundColor: 'rgba(255,255,255,0.1)',
+												borderRadius: '4px',
+											}}
+											title={`Remove ${optionData?.label || option}`}
+										>
+											{optionData?.image &&
+												<div className={styles.TagContainer}>
+													<div
+														className={styles.trashOverlay}
+														onClick={(e) => {
+															e.stopPropagation();
+															const newValue = selectedModifier.filter(item => item !== option);
+															setSelectedItemModifier(newValue);
+														}}
+													>
+														<Trash2 size={12} color="white" />
+													</div>
+													<img
+														src={optionData.image}
+														width="20"
+														height="20"
+														style={{
+												padding: '2px 4px'
+
+														}}
+														alt={optionData?.label || option}
+													/>
+												</div>
+											}
+										</div>
+									);
+								})}
+							</div>
+						)}
+						multiple={true}
 
 					></CustomSelect>
 

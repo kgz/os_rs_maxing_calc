@@ -2,18 +2,30 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './CustomSelect.module.css';
 
 export interface CustomSelectProps<T> {
-    options: T[];
-    value: T;
-    onChange: (value: T, index: number) => void;
+    options: T[];  // Change this from T to T[]
     getOptionLabel: (option: T) => string;
     getOptionValue?: (option: T) => string | number;
     renderOption?: (option: T, isSelected: boolean) => React.ReactNode;
-    renderSelectedValue?: (option: T) => React.ReactNode;
+    renderSelectedValue?: (option: T | T[]) => React.ReactNode;
     placeholder?: string;
     disabled?: boolean;
     showSearch?: boolean;
     searchFn?: (option: T, searchText: string) => boolean;
     searchPlaceholder?: string;
+}
+
+interface CustomSingleSelectProps<T> extends CustomSelectProps<T> {
+    value: T | undefined;
+    multiple?: false;
+    onChange: (value: T, index: number) => void;
+	renderTags: (selectedOptions: T[]) => React.ReactNode;
+}
+
+interface CustomMultipleSelectProps<T> extends CustomSelectProps<T> {
+    multiple: true;
+    onChange: (value: T[], index: number) => void;
+    value: T[] | undefined;
+    renderTags?: (selectedOptions: T[]) => React.ReactNode;
 }
 
 function CustomSelect<T>({
@@ -29,8 +41,10 @@ function CustomSelect<T>({
     showSearch = false,
     searchFn = (option: T, searchText: string) =>
         getOptionLabel(option).toLowerCase().includes(searchText.toLowerCase()),
-    searchPlaceholder = 'Search...'
-}: CustomSelectProps<T>) {
+    searchPlaceholder = 'Search...',
+    multiple = false,
+	renderTags = undefined,
+}: CustomSingleSelectProps<T> | CustomMultipleSelectProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>('bottom');
@@ -94,9 +108,30 @@ function CustomSelect<T>({
         }
     }, [isOpen]);
 
-    const handleSelect = (option: T, index:number) => {
-        onChange(option, index);
-        setIsOpen(false);
+    const handleSelect = (option: T, index: number) => {
+        if (multiple) {
+            // We know we're in multiple mode, so cast to the appropriate type
+            const multipleProps = { multiple, value, onChange } as CustomMultipleSelectProps<T>;
+            const currentValue = multipleProps.value || [];
+            const isSelected = currentValue.some(item => getOptionValue(item) === getOptionValue(option));
+            
+            let newValue: T[];
+            if (isSelected) {
+                // Remove the option if already selected
+                newValue = currentValue.filter(item => getOptionValue(item) !== getOptionValue(option));
+            } else {
+                // Add the option if not already selected
+                newValue = [...currentValue, option];
+            }
+            
+            multipleProps.onChange(newValue, index);
+            // Don't close dropdown for multiple select
+        } else {
+            // We know we're in single mode, so cast to the appropriate type
+            const singleProps = { value, onChange } as CustomSingleSelectProps<T>;
+            singleProps.onChange(option, index);
+            setIsOpen(false);
+        }
     };
 
     const toggleDropdown = () => {
@@ -106,7 +141,10 @@ function CustomSelect<T>({
     };
 
     const isOptionSelected = (option: T) => {
-        return getOptionValue(option) === getOptionValue(value);
+        if (multiple && Array.isArray(value)) {
+            return value.some(item => getOptionValue(item) === getOptionValue(option));
+        }
+        return value && getOptionValue(option) === getOptionValue(value as T);
     };
 
     const filteredOptions = showSearch && searchText
@@ -135,7 +173,17 @@ function CustomSelect<T>({
                     renderSelectedValue ? (
                         renderSelectedValue(value)
                     ) : (
-                        <div className={styles.selectedValue}>{getOptionLabel(value)}</div>
+                        <div className={styles.selectedValue}>
+                            {multiple && Array.isArray(value) ? (
+                                multiple && renderTags ? 
+                                    renderTags(value) :
+                                    value.length > 0 ? 
+                                        `${value.length} selected` : 
+                                        placeholder
+                            ) : (
+                                getOptionLabel(value as T)
+                            )}
+                        </div>
                     )
                 ) : (
                     <div className={styles.placeholder}>{placeholder}</div>
@@ -169,12 +217,17 @@ function CustomSelect<T>({
                             return (
                                 <div
                                     key={`${getOptionValue(option)}-${index}`}
-                                    ref={selected ? selectedOptionRef : null}
+                                    ref={selected && !multiple ? selectedOptionRef : null}
                                     className={`${styles.option} ${selected ? styles.selected : ''}`}
                                     onClick={() => handleSelect(option, index)}
                                 >
+                                    {multiple && (
+                                        <span className={styles.checkbox}>
+                                            {selected ? '✓' : ''}
+                                        </span>
+                                    )}
                                     {renderOption ? (
-                                        renderOption(option, selected)
+                                        renderOption(option, selected === true)
                                     ) : (
                                         getOptionLabel(option)
                                     )}

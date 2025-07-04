@@ -1,0 +1,133 @@
+.dividerLine {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  opacity: 0.5;
+  top: 50%;
+  left: 0;
+}
+
+.removeButton {
+  background: none;
+  width: 10px;
+  aspect-ratio: 1;
+  margin-right: 16px;
+  margin-left: 0;
+  padding: 0;
+  color: #ff4747;
+  outline: none;
+}
+
+.levelInput {
+  opacity: 1;
+  background: inherit;
+  border: 1px solid #ccc;
+  padding: 2px 5px;
+  width: 50px;
+  text-align: center;
+}
+
+.warningIcon {
+  color: #ff9800;
+  margin-left: 5px;
+  cursor: help;
+}
+
+.methodOptionContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.modifierContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.modifierTag {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.modifierOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.modifierStats {
+  color: #666666;
+}
+
+.imageContainer {
+  position: relative;
+}
+
+
+.TagContainer:hover > .trashOverlay:hover {
+  opacity: 1;
+}
+
+.TagContainer{
+	position:relative;
+}
+
+.trashOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+}
+
+.itemImage {
+  margin-right: 4px;
+}
+
+.profitText {
+  font-weight: bold;
+}
+
+.profitPositive {
+  color: #4CAF50;
+}
+
+.profitNegative {
+  color: #ff4747;
+}
+
+.completedCell {
+  text-align: center;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.infoLink {
+  margin-left: 5px;
+  color: var(--osrs-gold);
+}

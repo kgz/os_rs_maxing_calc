@@ -5,7 +5,8 @@ export type TModifiers = {
 	[key:string]: {
 		image?: string;
 		label?: string;
-		stats?: string
+		stats?: string;
+		uniqueWith: string[]
 	};
 }
 
