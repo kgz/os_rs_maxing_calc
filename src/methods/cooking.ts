@@ -358,7 +358,7 @@ export default {
 				"Cooking": 80
 			},
 		},
-		allowed_modifiers: ['gauntlets']
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	anglerfish: {
 		id: "anglerfish",

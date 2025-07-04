@@ -448,7 +448,7 @@ const MethodRow = ({
 												outputData.link && (
 													<Tooltip
 														content={
-															<div>
+															<div style={{width:600}}>
 																{skillId === 'Cooking' && (
 																	<CookingBurnRateGraph
 																		baseLevel={origMethod.requirement.levels.Cooking || 1}

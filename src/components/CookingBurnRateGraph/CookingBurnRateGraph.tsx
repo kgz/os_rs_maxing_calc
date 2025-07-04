@@ -58,33 +58,33 @@ const applyCookingModifiers = (baseSuccessRate: number, modifiers?: string[]) =>
 
 // Add this helper function to create a highlight dataset
 const createHighlightDataset = (labels: number[], fromLevel?: number, toLevel?: number) => {
-	// If either fromLevel or toLevel is undefined, don't create a highlight
-	if (fromLevel === undefined || toLevel === undefined) {
-		return null;
-	}
+    // If either fromLevel or toLevel is undefined, don't create a highlight
+    if (fromLevel === undefined || toLevel === undefined) {
+        return null;
+    }
 
-	// Create data points that will form a filled area for the range
-	const data = labels.map(level => {
-		// Only include data points within the range
-		if (level >= fromLevel && level <= toLevel) {
-			return 100; // Full height of the chart
-		}
-		return 0; // Use 0 instead of null (Chart.js expects numbers)
-	});
+    // Create data points that will form a filled area for the range
+    const data = labels.map(level => {
+        // Only include data points within the range
+        if (level >= fromLevel && level <= toLevel) {
+            return 100; // Full height of the chart
+        }
+        return null; // Use null instead of 0 to create sharp edges
+    });
 
-	return {
-		label: 'Selected Range',
-		data: data,
-		backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold with transparency
-		borderColor: 'rgba(255, 215, 0, 0.3)',
-		borderWidth: 1,
-		pointRadius: 0,
-		fill: true,
-		tension: 0,
-		order: 10, // Draw behind other datasets
-		// Don't show in legend
-		hidden: false
-	};
+    return {
+        label: 'Selected Range',
+        data: data,
+        backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold with transparency
+        borderColor: 'rgba(255, 215, 0, 0.3)',
+        borderWidth: 1,
+        pointRadius: 0,
+        fill: true,
+        tension: 0, // Set tension to 0 for straight lines
+        stepped: 'before', // Use stepped line for sharp vertical edges
+        order: 10, // Draw behind other datasets
+        hidden: false
+    };
 };
 
 const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
@@ -220,8 +220,11 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 					d => d.data.join(',') === dataKey
 				);
 
-				// Combine their names
-				const combinedName = matchingDatasets.map(d => d.name).join(' / ');
+				// Get unique names to avoid duplication
+				const uniqueNames = [...new Set(matchingDatasets.map(d => d.name))];
+
+				// Combine the unique names
+				const combinedName = uniqueNames.join(' / ');
 
 				// Check if any of the matching datasets is selected
 				const isAnySelected = matchingDatasets.some(d => d.isSelected);
@@ -289,6 +292,21 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 							filter: function (item) {
 								// Don't show the highlight dataset in the legend
 								return item.text !== 'Selected Range';
+							},
+							generateLabels: function(chart) {
+							    const originalLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+							    
+							    // Modify each label to include line breaks
+							    return originalLabels.map(label => {
+							        // Add line breaks after each slash while keeping the slash
+							        if (label.text) {
+							            label.text = label.text.replace(/ \/ /g, ' / \n');
+							        }
+							        return label;
+							    });
+							},
+							font: {
+								lineHeight: 1.2
 							}
 						}
 					},
