@@ -204,6 +204,7 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 			fill: boolean;
 			borderDash?: number[];
 			order: number;
+			avgSuccessRate: number; // Add this to store the average success rate
 		}[] = [];
 		const processedDataKeys = new Set();
 
@@ -229,6 +230,9 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 				// Check if any of the matching datasets is selected
 				const isAnySelected = matchingDatasets.some(d => d.isSelected);
 
+				// Calculate average success rate for sorting
+				const avgSuccessRate = dataset.data.reduce((sum, val) => sum + val, 0) / dataset.data.length;
+
 				uniqueDataSets.push({
 					label: combinedName,
 					data: dataset.data,
@@ -239,13 +243,18 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 					tension: 0.1,
 					fill: false,
 					borderDash: isAnySelected ? [] : [5, 5],
-					order: isAnySelected ? 1 : 2
+					order: isAnySelected ? 1 : 2,
+					avgSuccessRate: avgSuccessRate
 				});
 			}
 		});
 
+		// Sort datasets by average success rate (highest to lowest)
+		uniqueDataSets.sort((a, b) => b.avgSuccessRate - a.avgSuccessRate);
+
 		// Create datasets array starting with uniqueDataSets
-		const datasets = [...uniqueDataSets];
+		// Remove avgSuccessRate property before adding to chart
+		const datasets = uniqueDataSets.map(({ avgSuccessRate, ...rest }) => rest);
 
 		// Add highlight dataset if fromLevel and toLevel are defined
 		const highlightDataset = createHighlightDataset(labels, fromLevel, toLevel);
@@ -366,6 +375,19 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
 				ref={chartRef}
 				className={styles.graph}
 			/>
+			{fromLevel !== undefined && toLevel !== undefined && (
+				<div className={styles.customLegend}>
+					<div className={styles.legendItem}>
+						<span 
+							className={styles.legendColor} 
+							style={{ backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: 'rgba(255, 215, 0, 0.3)' }}
+						></span>
+						<span className={styles.legendText}>
+							Selected Range (Levels {fromLevel} - {toLevel})
+						</span>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
