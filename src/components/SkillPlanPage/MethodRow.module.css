@@ -9,13 +9,20 @@
 
 .removeButton {
   background: none;
-  width: 10px;
+  width: 20px;
   aspect-ratio: 1;
-  margin-right: 16px;
+  margin-right: 10px;
   margin-left: 0;
   padding: 0;
   color: #ff4747;
   outline: none;
+  opacity: 0.5;
+
+  &:hover {
+	  background: none;
+	  color: #ff4747;
+      opacity: 1;
+  }
 }
 
 .levelInput {

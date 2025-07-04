@@ -368,6 +368,7 @@ const MethodRow = ({
 						)}
 						multiple={true}
 
+
 					></CustomSelect> || <>N/A</>}
 
 				</td>
@@ -474,6 +475,8 @@ const MethodRow = ({
 																		selectedModifiers={selectedModifier}
 																		foodName={origMethod.label}
 																		allowedModifiers={origMethod.allowed_modifiers ?? []}
+																		fromLevel={from}
+																		toLevel={nextLevel}
 																	/>
 																)}
 															</div>
