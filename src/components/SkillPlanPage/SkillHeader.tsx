@@ -71,7 +71,7 @@ export const SkillHeader = ({
 								renderOption={(option) => (
 									<span>{option?.label}</span>
 								)}
-								
+
 							/>
 						</div>
 					</div>
@@ -80,12 +80,12 @@ export const SkillHeader = ({
 				</div>
 
 			</div>
-			{ <NotificationAlert
-				message={<div style={{textAlign:'left', display:'flex', alignItems: 'center', gap:15}}>
-						<InfoIcon />
+			{<NotificationAlert
+				message={<div style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: 15 }}>
+					<InfoIcon />
 					<div>
-						Prices use the average of the high and low of the osrs wiki realtime prices. <br/>
-						Please check the prices yourself before purchasing.
+						Although we use real-time prices from the OSRS Wiki, market values fluctuate frequently. <br />
+						We advise confirming current prices yourself before buying/selling.
 					</div>
 				</div>}
 				type='info'
