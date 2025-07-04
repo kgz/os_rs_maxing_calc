@@ -476,7 +476,55 @@ const MethodRow = ({
 
 								return (
 									<Tooltip
-										content={isProfit ? "Profit from this method" : "Cost of this method"}
+										content={
+											<div style={{ textAlign: 'left' }}>
+												<div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+													{isProfit ? "Profit Breakdown:" : "Cost Breakdown:"}
+												</div>
+												<div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+													{/* Input items */}
+													{origMethod.items.map((item, idx) => {
+														const amount = typeof item.amount === 'function' ? 
+															item.amount(from, nextLevel, selectedModifier) : item.amount;
+														const cost = getItemPrice(item.item?.id) ?? 0;
+														const totalItemCost = cost * amount * itemsToNext;
+														
+														return (
+															<div key={`input-${idx}`} style={{ display: 'flex', justifyContent: 'space-between' }}>
+																<span>{item.item.label}:</span>
+																<span style={{ color: '#ff4747' }}>
+																	-{totalItemCost.toLocaleString("en-AU")} gp
+																</span>
+															</div>
+														);
+													})}
+													
+													{/* Output items */}
+													{origMethod.returns.map((item, idx) => {
+														const amount = typeof item.amount === 'function' ? 
+															item.amount(from, nextLevel, selectedModifier) : item.amount;
+														const cost = getItemPrice(item.item?.id) ?? 0;
+														const totalItemReturn = cost * amount * itemsToNext;
+														
+														return (
+															<div key={`output-${idx}`} style={{ display: 'flex', justifyContent: 'space-between' }}>
+																<span>{item.item.label}:</span>
+																<span style={{ color: '#4CAF50' }}>
+																	+{totalItemReturn.toLocaleString("en-AU")} gp
+																</span>
+															</div>
+														);
+													})}
+													
+													<div style={{ borderTop: '1px solid #444', marginTop: '4px', paddingTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
+														<span><strong>Total:</strong></span>
+														<span style={{ color: isProfit ? '#4CAF50' : '#ff4747', fontWeight: 'bold' }}>
+															{isProfit ? '+' : ''}{totalCost.toLocaleString("en-AU")} gp
+														</span>
+													</div>
+												</div>
+											</div>
+										}
 										position="top"
 									>
 										<span style={{
