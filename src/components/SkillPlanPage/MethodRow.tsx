@@ -79,15 +79,7 @@ const MethodRow = ({
 		}
 	};
 
-	const skill_modifiers = useMemo(() => {
-		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
-			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
-			return { keys: [] as string[], methods: {} as Record<string, never> };
-		}
-
-		const skill_m = Modifiers[skillId as keyof typeof Modifiers];
-		return { keys: Object.keys(skill_m), methods: skill_m };
-	}, [skillId]);
+	
 
 	const rowStyle = {
 		// opacity: isActive ? 1 : 0.5,
@@ -107,6 +99,24 @@ const MethodRow = ({
 		console.log({ orig })
 		return orig;
 	}, [plan.method, skillId])
+
+
+	const skill_modifiers = useMemo(() => {
+		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
+			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
+			return { keys: [] as string[], methods: {} as Record<string, never> };
+		}
+
+		const skill_m = Modifiers[skillId as keyof typeof Modifiers];
+		return { keys: Object.keys(skill_m), methods: skill_m };
+	}, [skillId]);
+
+
+	const filtered_skill_modifiers = useMemo(() => {
+		console.log(skill_modifiers.keys, )
+		return skill_modifiers.keys.filter(m => origMethod.allowed_modifiers?.includes(m));
+    }, [skill_modifiers.keys, origMethod.allowed_modifiers]);
+	
 
 	return (
 		<Fragment key={index} >
@@ -240,12 +250,28 @@ const MethodRow = ({
 				{/* <td style={{ paddingBottom: 5 }}>{origMethod.xp}</td> */}
 				<td style={{ paddingBottom: 5 }}>
 					{/* modifiers */}
-					<CustomSelect
-						options={skill_modifiers.keys}
+					{filtered_skill_modifiers.length > 0 && <CustomSelect
+						options={filtered_skill_modifiers}
 						value={selectedModifier}
 						onChange={function (value: string[]): void {
-							console.log(value);
-							setSelectedItemModifier(value)
+							// Handle uniqueWith constraints
+							if (value.length > selectedModifier.length) {
+								// A new modifier was added
+								const newModifier = value.find(mod => !selectedModifier.includes(mod));
+								if (newModifier) {
+									// Check if the new modifier conflicts with any existing ones
+									const optionData = skill_modifiers.methods[newModifier as keyof typeof skill_modifiers.methods];
+									if (optionData?.uniqueWith && optionData.uniqueWith.length > 0) {
+										// Remove any conflicting modifiers
+										const filteredValue = value.filter(mod => 
+											mod === newModifier || !optionData.uniqueWith.includes(mod)
+										);
+										setSelectedItemModifier(filteredValue);
+										return;
+									}
+								}
+							}
+							setSelectedItemModifier(value);
 						}}
 						getOptionLabel={function (option: string): string {
 							if (option in skill_modifiers.methods) {
@@ -257,19 +283,34 @@ const MethodRow = ({
 						renderOption={(option: string) => {
 							// Use type assertion to tell TypeScript that this is a valid key
 							const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
+							
+							// // Check if this option conflicts with any selected modifiers
+							// const isDisabled = selectedModifier.some(selectedMod => {
+							// 	const selectedModData = skill_modifiers.methods[selectedMod as keyof typeof skill_modifiers.methods];
+							// 	return selectedModData?.uniqueWith?.includes(option);
+							// });
+							
 							return (
-								<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+								<div 
+									style={{ 
+									  display: 'flex', 
+									  alignItems: 'center', 
+									  gap: '4px',
+									//   opacity: isDisabled ? 0.5 : 1,
+									//   cursor: isDisabled ? 'not-allowed' : 'pointer'
+									}}
+								>
 									{optionData?.image &&
-										<img
-											src={optionData.image}
-											width="20"
-											height="20"
-											alt={optionData?.label || option}
-										/>
-
+									  <img
+										src={optionData.image}
+										width="20"
+										height="20"
+										alt={optionData?.label || option}
+									  />
 									}
 									<span>{optionData?.label}</span>
 									{optionData?.stats && <span style={{ color: '#666666' }}>{optionData?.stats}</span>}
+									{/* {isDisabled && <span style={{ color: '#ff4747', marginLeft: '4px' }}>(Conflicts with selected)</span>} */}
 								</div>
 							);
 						}}
@@ -326,7 +367,7 @@ const MethodRow = ({
 						)}
 						multiple={true}
 
-					></CustomSelect>
+					></CustomSelect> || <>N/A</>}
 
 				</td>
 				{isActive ? (
@@ -335,7 +376,7 @@ const MethodRow = ({
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{origMethod.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel) : itemData.amount;
+									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel, selectedModifier) : itemData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -369,7 +410,7 @@ const MethodRow = ({
 									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
 									console.log({ outputData, outputItem });
-									const amount = typeof outputData.amount === 'function' ? outputData.amount(from, nextLevel) : outputData.amount;
+									const amount = typeof outputData.amount === 'function' ? outputData.amount(from, nextLevel, selectedModifier) : outputData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -418,14 +459,14 @@ const MethodRow = ({
 								let costPerAction = 0;
 
 								inputItems.forEach(item => {
-									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, selectedModifier) : item.amount;
 									const cost = getItemPrice(item.item?.id) ?? 0;
 									costPerAction += cost * amount;
 								});
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, selectedModifier) : item.amount;
 									costPerAction -= cost * amount;
 								});
 

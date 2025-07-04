@@ -9,13 +9,13 @@ export const cookingModifiers = {
 	},
 	hosidius_easy: {
 		image: "https://oldschool.runescape.wiki/images/thumb/Rada%27s_blessing_1_detail.png/130px-Rada%27s_blessing_1_detail.png?4c58f",
-		label: "Hosidius - Easy Diary",
+		label: "Hosidius Range - Easy Diary",
         stats: "+5%",
 		uniqueWith: ["hosidius_elite"]
 	},
 	hosidius_elite: {
 		image: "https://oldschool.runescape.wiki/images/thumb/Rada%27s_blessing_4_detail.png/130px-Rada%27s_blessing_4_detail.png?4c58f",
-		label: "Hosidius - Elite Diary",
+		label: "Hosidius Range - Elite Diary",
         stats: "+10%",
 		uniqueWith: ["hosidius_easy"]
 	}

@@ -443,4 +443,8 @@ export const Items = {
 		id: 1942,
         label: 'Potatoes',
     },
+	BurntDarkCrab: {
+		id: 11938,
+        label: 'Burnt dark crab',
+	}
 } as const;

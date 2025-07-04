@@ -39,6 +39,33 @@ const getAverageCookRate = (
 	return totalRate / levels;
 };
 
+// Helper function to apply cooking modifiers to success rates
+const applyCookingModifiers = (baseSuccessRate: number, modifiers?: string[]) => {
+  let modifiedRate = baseSuccessRate;
+  
+  if (modifiers && Array.isArray(modifiers)) {
+    // Check for cooking gauntlets
+    if (modifiers.includes('gauntlets')) {
+      // Increase success rate by approximately 10%
+      modifiedRate = Math.min(1.0, modifiedRate + 0.1);
+    }
+    
+    // Check for Hosidius range - Easy diary
+    if (modifiers.includes('hosidius_easy')) {
+      // Increase success rate by 5%
+      modifiedRate = Math.min(1.0, modifiedRate + 0.05);
+    }
+    
+    // Check for Hosidius range - Elite diary
+    if (modifiers.includes('hosidius_elite')) {
+      // Increase success rate by 10%
+      modifiedRate = Math.min(1.0, modifiedRate + 0.1);
+    }
+  }
+  
+  return modifiedRate;
+};
+
 export default {
 	shrimpAnchovies: {
 		id: "shrimpAnchovies",
@@ -46,9 +73,10 @@ export default {
 		xp: 30, // Average XP per cook
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
-					return 1 / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawShrimps
 			},
@@ -56,9 +84,10 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.Shrimps },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 1, 34, 0.5, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntShrimps,
 				link: "https://oldschool.runescape.wiki/w/Shrimps#Cooking_chance"
@@ -68,6 +97,7 @@ export default {
 		requirement: {
 			"levels": {},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	trout: {
 		id: "trout",
@@ -75,19 +105,24 @@ export default {
 		xp: 70,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
-					return 1 / avgSuccessRate;
-				}, item: Items.RawTrout
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
+				}, 
+				item: Items.RawTrout
 			},
 		],
 		returns: [
 			{ amount: 1, item: Items.Trout },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 15, 49, 0.53, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
-				}, item: Items.BurntTrout, link: "https://oldschool.runescape.wiki/w/Trout#Cooking_chance"
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
+				}, 
+				item: Items.BurntTrout, 
+				link: "https://oldschool.runescape.wiki/w/Trout#Cooking_chance"
 			},
 		],
 		actionsPerHour: 1300,
@@ -96,6 +131,7 @@ export default {
 				"Cooking": 15
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	salmon: {
 		id: "salmon",
@@ -103,9 +139,10 @@ export default {
 		xp: 90,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
-					return 1 / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawSalmon
 			},
@@ -113,14 +150,14 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.Salmon },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 25, 58, 0.6172, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntSalmon,
 				link: "https://oldschool.runescape.wiki/w/Salmon#Cooking_chance"
 			},
-
 		],
 		actionsPerHour: 1300,
 		requirement: {
@@ -128,6 +165,7 @@ export default {
 				"Cooking": 25
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	karambwan: {
 		id: "karambwan",
@@ -135,9 +173,10 @@ export default {
 		xp: 190,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 30, 99, 0.6172, 1.0);
-					return 1 / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawKarambwan
 			},
@@ -145,14 +184,14 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.CookedKarambwan },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 30, 99, 0.6172, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntKarambwan,
 				link: "https://oldschool.runescape.wiki/w/Cooked_karambwan#Cooking_chance"
 			},
-
 		],
 		actionsPerHour: 1500,
 		requirement: {
@@ -160,6 +199,7 @@ export default {
 				"Cooking": 30
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	lobster: {
 		id: "lobster",
@@ -167,9 +207,10 @@ export default {
 		xp: 120,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
-					return 1 / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawLobster
 			},
@@ -177,9 +218,15 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.Lobster },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 40, 74, 0.6, 1.0);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					// Calculate burn rate based on success rate
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntLobster,
 			}
@@ -190,6 +237,7 @@ export default {
 				"Cooking": 40
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	swordfish: {
 		id: "swordfish",
@@ -197,20 +245,28 @@ export default {
 		xp: 140,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 45, 86, 0.5547, 1.0);
-					return 1 / avgSuccessRate;
-				}, item: Items.RawSwordfish
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
+				}, 
+				item: Items.RawSwordfish
 			},
 		],
 		returns: [
 			{ amount: 1, item: Items.Swordfish },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 45, 86, 0.5547, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
-				}, item: Items.BurntSwordfish,
-
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 45, 86, 0.5547, 1.0);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					// Calculate burn rate based on success rate
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
+				},
+				item: Items.BurntSwordfish,
 				link: "https://oldschool.runescape.wiki/w/Swordfish#Cooking_chance"
 			},
 		],
@@ -220,6 +276,7 @@ export default {
 				"Cooking": 45
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	monkfish: {
 		id: "monkfish",
@@ -227,9 +284,10 @@ export default {
 		xp: 150,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 62, 92, 0.6875, 1.0);
-					return 1 / avgSuccessRate;
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawMonkfish
 			},
@@ -237,9 +295,15 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.Monkfish },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 62, 92, 0.6875, 1.0);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 62, 92, 0.6875, 1.0);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					// Calculate burn rate based on success rate
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntMonkfish,
 				link: "https://oldschool.runescape.wiki/w/Monkfish#Cooking_chance"
@@ -251,6 +315,7 @@ export default {
 				"Cooking": 62
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	shark: {
 		id: "shark",
@@ -258,9 +323,14 @@ export default {
 		xp: 210,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
-					return 1 / avgSuccessRate;
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawShark
 			},
@@ -268,9 +338,15 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.SharkCooked },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 80, 99, 0.6404, 0.793);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					// Calculate burn rate based on success rate
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntShark,
 				link: "https://oldschool.runescape.wiki/w/Shark#Cooking_chance"
@@ -282,6 +358,7 @@ export default {
 				"Cooking": 80
 			},
 		},
+		allowed_modifiers: ['gauntlets']
 	},
 	anglerfish: {
 		id: "anglerfish",
@@ -289,10 +366,11 @@ export default {
 		xp: 230,
 		items: [
 			{
-				amount: (fromLevel: number, toLevel: number) => {
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					// Using fire rates: ~66.8% at level 84, stops burning completely at level 99
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, .7852);
-					return 1 / avgSuccessRate;
+					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, 0.7852);
+					const modifiedSuccessRate = applyCookingModifiers(avgSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
 				},
 				item: Items.RawAnglerfish
 			},
@@ -300,10 +378,15 @@ export default {
 		returns: [
 			{ amount: 1, item: Items.Anglerfish },
 			{
-				amount: (fromLevel: number, toLevel: number) => {
-					// Using fire rates: ~66.8% at level 84, stops burning completely at level 99
-					const avgSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, .7852);
-					return (1 - avgSuccessRate) / avgSuccessRate;
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 84, 99, 0.668, 0.7852);
+					
+					// Apply modifiers if present
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					
+					// Calculate burn rate based on success rate
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
 				item: Items.BurntAnglerfish,
 				link: "https://oldschool.runescape.wiki/w/Anglerfish#Cooking_chance"
@@ -315,16 +398,35 @@ export default {
 				"Cooking": 84
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	darkCrab: {
 		id: "darkCrab",
 		label: "Dark Crab",
 		xp: 215,
 		items: [
-			{ amount: 1, item: Items.RawDarkCrab },
+			{
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate for dark crabs
+					const baseSuccessRate = 0.9; // 90% success rate
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					return 1 / modifiedSuccessRate;
+				},
+				item: Items.RawDarkCrab 
+			},
 		],
 		returns: [
-			{ amount: 0.9, item: Items.DarkCrab },
+			{ amount: 1, item: Items.DarkCrab },
+			{
+				amount: (fromLevel: number, toLevel: number, modifiers) => {
+					// Base success rate for dark crabs
+					const baseSuccessRate = 0.9; // 90% success rate
+					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
+					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
+				},
+				item: Items.BurntDarkCrab,
+				link: "https://oldschool.runescape.wiki/w/Dark_crab#Cooking_chance"
+			},
 		],
 		actionsPerHour: 1300,
 		requirement: {
@@ -332,6 +434,7 @@ export default {
 				"Cooking": 90
 			},
 		},
+		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
 	},
 	wine: {
 		id: "wine",
