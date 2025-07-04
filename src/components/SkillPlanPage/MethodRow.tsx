@@ -16,6 +16,7 @@ import { forwardRef } from 'react';
 import { Tooltip } from '../Tooltip/Tooltip';
 import { Modifiers } from "../../modifiers/index.ts";
 import styles from './MethodRow.module.css';
+import CookingBurnRateGraph from '../CookingBurnRateGraph/CookingBurnRateGraph';
 
 type Props = {
 	index: string;
@@ -436,8 +437,37 @@ const MethodRow = ({
 											{
 												outputData.link && (
 													<Tooltip
-														content={"View burn rates"}
+														content={
+															<div>
+																<div>View burn rates</div>
+																{skillId === 'Cooking' && (
+																	<CookingBurnRateGraph
+																		baseLevel={origMethod.requirement.levels.Cooking || 1}
+																		maxLevel={origMethod.id === 'shark' ? 99 : (origMethod.id === 'anglerfish' ? 99 : 92)}
+																		minRate={
+																			origMethod.id === 'shrimpAnchovies' ? 0.5 :
+																			origMethod.id === 'trout' ? 0.53 :
+																			origMethod.id === 'salmon' ? 0.6172 :
+																			origMethod.id === 'karambwan' ? 0.6172 :
+																			origMethod.id === 'lobster' ? 0.6 :
+																			origMethod.id === 'swordfish' ? 0.5547 :
+																			origMethod.id === 'monkfish' ? 0.6875 :
+																			origMethod.id === 'shark' ? 0.6404 :
+																			origMethod.id === 'anglerfish' ? 0.668 :
+																			origMethod.id === 'darkCrab' ? 0.9 : 0.6
+																		}
+																		maxRate={
+																			origMethod.id === 'shark' ? 0.793 :
+																			origMethod.id === 'anglerfish' ? 0.7852 : 1.0
+																		}
+																		selectedModifiers={selectedModifier}
+																		foodName={origMethod.label}
+																	/>
+																)}
+															</div>
+														}
 														position="top"
+														wide={true}
 													>
 														<a style={{ marginLeft: 5, color: 'var(--osrs-gold)' }} aria-label="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
 															<InfoIcon size={12} />
