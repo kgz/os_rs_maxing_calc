@@ -91,14 +91,24 @@ export const usePlanEstimations = () => {
 			let costPerAction = 0;
 			input.forEach(item => {
 				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
-				const cost = getItemPrice(item.item?.id) ?? 0;
-				costPerAction += cost * amount;
+				try {
+
+					const cost = getItemPrice(item.item?.id) ?? 0;
+					costPerAction += cost * amount;
+				} catch (error) {
+					console.error('Error calculating cost for item', item, error);
+                }
 			});
 
 			output.forEach(item => {
-				const cost = getItemPrice(item.item?.id) ?? 0;
-				const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
-				costPerAction -= cost * amount;
+				try {
+
+					const cost = getItemPrice(item.item?.id) ?? 0;
+					const amount = typeof item.amount === 'function'? item.amount(method.from, nextLevel) : item.amount;
+					costPerAction -= cost * amount;
+				} catch (error) {
+					console.error('Error calculating cost for item', item, error);
+                }
 			});
 
 			if (xpPerAction <= 0) continue;

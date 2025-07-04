@@ -439,7 +439,6 @@ const MethodRow = ({
 													<Tooltip
 														content={
 															<div>
-																<div>View burn rates</div>
 																{skillId === 'Cooking' && (
 																	<CookingBurnRateGraph
 																		baseLevel={origMethod.requirement.levels.Cooking || 1}
@@ -480,9 +479,8 @@ const MethodRow = ({
 															</div>
 														}
 														position="top"
-														wide={true}
 													>
-														<a style={{ marginLeft: 5, color: 'var(--osrs-gold)' }} aria-label="view burn rates" href={outputData.link} target="_blank" rel="noopener noreferrer">
+														<a style={{ marginLeft: 5, color: 'var(--osrs-gold)' }} aria-label="view burn rates">
 															<InfoIcon size={12} />
 														</a>
 													</Tooltip>
