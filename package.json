@@ -30,6 +30,7 @@
     "@vitejs/plugin-react": "^4.5.0",
     "axios": "^1.9.0",
     "box": "link:@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box",
+    "chart.js": "^4.5.0",
     "dnd-core": "^16.0.1",
     "drag-handle-button": "link:@atlaskit/pragmatic-drag-and-drop-react-accessibility/drag-handle-button",
     "lodash": "^4.17.21",

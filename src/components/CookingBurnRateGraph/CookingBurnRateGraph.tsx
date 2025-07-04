@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Chart from 'chart.js/auto';
 import styles from './CookingBurnRateGraph.module.css';
 
 interface CookingBurnRateGraphProps {
@@ -54,124 +55,183 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
   selectedModifiers,
   foodName
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstance = useRef<Chart | null>(null);
+
+  // Define all possible modifier combinations
+  const modifierCombinations = [
+    { name: 'No modifiers', modifiers: [] },
+    { name: 'Cooking gauntlets', modifiers: ['gauntlets'] },
+    { name: 'Hosidius (Easy)', modifiers: ['hosidius_easy'] },
+    { name: 'Hosidius (Elite)', modifiers: ['hosidius_elite'] },
+    { name: 'Gauntlets + Hosidius (Easy)', modifiers: ['gauntlets', 'hosidius_easy'] },
+    { name: 'Gauntlets + Hosidius (Elite)', modifiers: ['gauntlets', 'hosidius_elite'] }
+  ];
+
+  // Colors for different modifier combinations
+  const colors = [
+    '#ff4747', // Red - No modifiers
+    '#4CAF50', // Green - Cooking gauntlets
+    '#2196F3', // Blue - Hosidius Easy
+    '#9C27B0', // Purple - Hosidius Elite
+    '#FF9800', // Orange - Gauntlets + Hosidius Easy
+    '#FFEB3B'  // Yellow - Gauntlets + Hosidius Elite
+  ];
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!chartRef.current) return;
 
-    const ctx = canvas.getContext('2d');
+    // Destroy previous chart if it exists
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+
+    // Generate data points for each level
+    const labels = [];
+    for (let level = baseLevel; level <= maxLevel; level++) {
+      labels.push(level);
+    }
+
+    // Generate datasets for each modifier combination
+    const datasets = modifierCombinations
+      .filter(combo => {
+        // Filter out combinations that aren't applicable for this food
+        if ((combo.modifiers.includes('hosidius_easy') || combo.modifiers.includes('hosidius_elite')) && 
+            foodName === 'Shark') {
+          return false;
+        }
+        return true;
+      })
+      .map((combo, index) => {
+        // Check if this combination matches the selected modifiers
+        const isSelected = selectedModifiers.length === combo.modifiers.length && 
+                          combo.modifiers.every(mod => selectedModifiers.includes(mod));
+        
+        // Generate data points for this modifier combination
+        const data = labels.map(level => {
+          const successRate = getCookSuccessRate(level, baseLevel, maxLevel, minRate, maxRate);
+          return applyCookingModifiers(successRate, combo.modifiers) * 100; // Convert to percentage
+        });
+
+        return {
+          label: combo.name,
+          data: data,
+          borderColor: colors[index],
+          backgroundColor: colors[index],
+          borderWidth: isSelected ? 3 : 1.5,
+          pointRadius: 0,
+          tension: 0.1,
+          fill: false,
+          borderDash: isSelected ? [] : [5, 5]
+        };
+      });
+
+    // Create the chart
+    const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Set dimensions
-    const width = canvas.width;
-    const height = canvas.height;
-    const padding = 40;
-    const graphWidth = width - padding * 2;
-    const graphHeight = height - padding * 2;
-
-    // Draw axes
-    ctx.beginPath();
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 1;
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
-
-    // Draw labels
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    
-    // X-axis labels (levels)
-    for (let i = 0; i <= 10; i++) {
-      const level = Math.floor(i * 10);
-      const x = padding + (i * graphWidth) / 10;
-      ctx.fillText(level.toString(), x, height - padding + 15);
-    }
-
-    // Y-axis labels (success rate)
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= 10; i++) {
-      const rate = i / 10;
-      const y = height - padding - (rate * graphHeight);
-      ctx.fillText((rate * 100).toFixed(0) + '%', padding - 5, y + 4);
-    }
-
-    // Title
-    ctx.textAlign = 'center';
-    ctx.font = '14px Arial';
-    ctx.fillText(`${foodName} Cooking Success Rate`, width / 2, padding - 15);
-
-    // Draw grid lines
-    ctx.beginPath();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 0.5;
-    
-    // Horizontal grid lines
-    for (let i = 1; i <= 10; i++) {
-      const y = height - padding - (i / 10 * graphHeight);
-      ctx.moveTo(padding, y);
-      ctx.lineTo(width - padding, y);
-    }
-    
-    // Vertical grid lines
-    for (let i = 1; i <= 10; i++) {
-      const x = padding + (i / 10 * graphWidth);
-      ctx.moveTo(x, padding);
-      ctx.lineTo(x, height - padding);
-    }
-    ctx.stroke();
-
-    // Draw success rate line
-    ctx.beginPath();
-    ctx.strokeStyle = '#4CAF50';
-    ctx.lineWidth = 2;
-
-    for (let level = 1; level <= 99; level++) {
-      const successRate = getCookSuccessRate(level, baseLevel, maxLevel, minRate, maxRate);
-      const modifiedRate = applyCookingModifiers(successRate, selectedModifiers);
-      
-      const x = padding + ((level - 1) / 98) * graphWidth;
-      const y = height - padding - (modifiedRate * graphHeight);
-      
-      // Make line more transparent for levels below the base level
-      if (level < baseLevel) {
-        ctx.globalAlpha = 0.3;
-      } else {
-        ctx.globalAlpha = 1.0;
+    chartInstance.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `${foodName} Cooking Success Rate`,
+            color: '#fff',
+            font: {
+              size: 14
+            }
+          },
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#ddd',
+              usePointStyle: true,
+              padding: 15
+            }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+              }
+            }
+          },
+          annotation: {
+            annotations: {
+              stopBurningLine: {
+                type: 'line',
+                yMin: maxRate * 100,
+                yMax: maxRate * 100,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderWidth: 1,
+                borderDash: [5, 5],
+                label: {
+                  content: `Stop burning at level ${maxLevel}`,
+                  enabled: true,
+                  position: 'end',
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  color: '#fff',
+                  font: {
+                    size: 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Level',
+              color: '#ddd'
+            },
+            ticks: {
+              color: '#ddd',
+              maxTicksLimit: 10
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Success Rate (%)',
+              color: '#ddd'
+            },
+            min: 0,
+            max: 100,
+            ticks: {
+              color: '#ddd'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          }
+        }
       }
-      
-      if (level === 1) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
+    });
+
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
       }
-    }
-    ctx.stroke();
-    ctx.globalAlpha = 1.0;
-
-    // Add legend
-    ctx.fillStyle = '#4CAF50';
-    ctx.fillRect(width - padding - 100, padding, 10, 10);
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'left';
-    ctx.fillText('Success Rate', width - padding - 85, padding + 9);
-
+    };
   }, [baseLevel, maxLevel, minRate, maxRate, selectedModifiers, foodName]);
 
   return (
     <div className={styles.graphContainer}>
-      <canvas 
-        ref={canvasRef} 
-        width={400} 
-        height={300} 
-        className={styles.graph}
-      />
+      <canvas ref={chartRef} className={styles.graph} />
     </div>
   );
 };
