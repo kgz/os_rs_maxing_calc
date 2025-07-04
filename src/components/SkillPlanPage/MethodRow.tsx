@@ -523,7 +523,7 @@ const MethodRow = ({
 										content={
 											<div style={{ textAlign: 'left' }}>
 												<div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-													{isProfit ? "Profit Breakdown:" : "Cost Breakdown:"}
+													{!isProfit ? "Profit Breakdown:" : "Cost Breakdown:"}
 												</div>
 												<div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
 													{/* Input items */}
@@ -531,10 +531,10 @@ const MethodRow = ({
 														const amount = typeof item.amount === 'function' ? 
 															item.amount(from, nextLevel, selectedModifier) : item.amount;
 														const cost = getItemPrice(item.item?.id) ?? 0;
-														const totalItemCost = cost * amount * itemsToNext;
+														const totalItemCost = Math.round(cost * amount * itemsToNext);
 														
 														return (
-															<div key={`input-${idx}`} style={{ display: 'flex', justifyContent: 'space-between' }}>
+															<div key={`input-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 5 }}>
 																<span>{item.item.label}:</span>
 																<span style={{ color: '#ff4747' }}>
 																	-{totalItemCost.toLocaleString("en-AU")} gp
@@ -548,10 +548,10 @@ const MethodRow = ({
 														const amount = typeof item.amount === 'function' ? 
 															item.amount(from, nextLevel, selectedModifier) : item.amount;
 														const cost = getItemPrice(item.item?.id) ?? 0;
-														const totalItemReturn = cost * amount * itemsToNext;
+														const totalItemReturn = Math.round(cost * amount * itemsToNext);
 														
 														return (
-															<div key={`output-${idx}`} style={{ display: 'flex', justifyContent: 'space-between' }}>
+															<div key={`output-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 5 }}>
 																<span>{item.item.label}:</span>
 																<span style={{ color: '#4CAF50' }}>
 																	+{totalItemReturn.toLocaleString("en-AU")} gp
@@ -563,7 +563,7 @@ const MethodRow = ({
 													<div style={{ borderTop: '1px solid #444', marginTop: '4px', paddingTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
 														<span><strong>Total:</strong></span>
 														<span style={{ color: isProfit ? '#4CAF50' : '#ff4747', fontWeight: 'bold' }}>
-															{isProfit ? '+' : ''}{totalCost.toLocaleString("en-AU")} gp
+															{(Math.round(-totalCost)).toLocaleString('en-AU')} gp
 														</span>
 													</div>
 												</div>

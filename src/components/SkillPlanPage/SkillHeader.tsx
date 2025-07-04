@@ -4,6 +4,7 @@ import { getSkillIconUrl } from "../../utils/getSkillIconUrl";
 import CustomSelect from "../CustomSelect";
 import style from '../SkillPlanPage.module.css';
 import { NotificationAlert } from '../NotificationAlert/NotificationAlert';
+import { InfoIcon } from "lucide-react";
 
 export const SkillHeader = ({
 	skillId,
@@ -70,6 +71,7 @@ export const SkillHeader = ({
 								renderOption={(option) => (
 									<span>{option?.label}</span>
 								)}
+								
 							/>
 						</div>
 					</div>
@@ -78,11 +80,14 @@ export const SkillHeader = ({
 				</div>
 
 			</div>
-			{skillId === "Cooking" && <NotificationAlert
-				message={<>
-
-					Burn Rates are calculated linearly based on the Runescape wiki and assumes cooking at a fire/range. <br /> Using cooking gloves, Lumbridge Range, and/or Hosidius range will reflect lower burn rates.
-				</>}
+			{ <NotificationAlert
+				message={<div style={{textAlign:'left', display:'flex', alignItems: 'center', gap:15}}>
+						<InfoIcon />
+					<div>
+						Prices use the average of the high and low of the osrs wiki realtime prices. <br/>
+						Please check the prices yourself before purchasing.
+					</div>
+				</div>}
 				type='info'
 
 			/>}

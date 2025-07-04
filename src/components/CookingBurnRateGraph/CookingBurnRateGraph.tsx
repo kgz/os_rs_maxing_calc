@@ -75,8 +75,8 @@ const createHighlightDataset = (labels: number[], fromLevel?: number, toLevel?: 
     return {
         label: 'Selected Range',
         data: data,
-        backgroundColor: 'rgba(255, 215, 0, 0.2)', // Gold with transparency
-        borderColor: 'rgba(255, 215, 0, 0.6)',
+        backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold with transparency
+        borderColor: 'rgba(255, 215, 0, 0.3)',
         borderWidth: 1,
         pointRadius: 0,
         fill: true,
@@ -202,7 +202,7 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
             pointRadius: number;
             tension: number;
             fill: boolean;
-            borderDash: number[];
+            borderDash?: number[];
             order: number;
         }[] = [];
         const processedDataKeys = new Set();
@@ -242,7 +242,7 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
         });
 
         // Create datasets array starting with uniqueDataSets
-        let datasets = [...uniqueDataSets];
+        const datasets = [...uniqueDataSets];
         
         // Add highlight dataset if fromLevel and toLevel are defined
         const highlightDataset = createHighlightDataset(labels, fromLevel, toLevel);
@@ -260,6 +260,14 @@ const CookingBurnRateGraph: React.FC<CookingBurnRateGraphProps> = ({
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false, // Disable all animations
+                transitions: {
+                    active: {
+                        animation: {
+                            duration: 0 // Disable transition animations
+                        }
+                    }
+                },
                 plugins: {
                     title: {
                         display: true,
