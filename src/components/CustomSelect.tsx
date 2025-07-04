@@ -22,7 +22,7 @@ interface CustomSingleSelectProps<T> extends CustomSelectProps<T> {
 }
 
 interface CustomMultipleSelectProps<T> extends CustomSelectProps<T> {
-    multiple: true;
+    multiple?: true;
     onChange: (value: T[], index: number) => void;
     value: T[] | undefined;
     renderTags?: (selectedOptions: T[]) => React.ReactNode;

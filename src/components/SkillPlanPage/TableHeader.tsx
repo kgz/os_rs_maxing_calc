@@ -2,6 +2,8 @@ import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { useAppSelector } from "../../store/store";
 import { useCurrentSkillStats } from "../../hooks/useCurrentSkillStats";
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
+import { Modifiers } from "../../modifiers";
 
 export const TableHeader = () => {
 
@@ -12,6 +14,16 @@ export const TableHeader = () => {
 	const { currentSkillLevel } = useCurrentSkillStats(character, skillId);
 	
 
+	const has_modifiers = useMemo(() => {
+		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
+			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
+			return false;
+		}
+
+		const skill_m = Modifiers[skillId as keyof typeof Modifiers];
+		return Object.keys(skill_m).length > 0;
+	}, [skillId]);
+
     return (
         <thead>
             <tr>
@@ -19,7 +31,7 @@ export const TableHeader = () => {
                 <th>From</th>
                 <th style={{whiteSpace: 'nowrap'}}>XP Left {currentSkillLevel ?  <><br/>(from {currentSkillLevel}) </> :''}</th>
                 <th>Method</th>
-                {/* <th>XP/Action</th> */}
+                {has_modifiers && <th>Modifiers</th>}
                 <th>Input</th>
                 <th>Output</th>
                 <th>Profit/Loss</th>
