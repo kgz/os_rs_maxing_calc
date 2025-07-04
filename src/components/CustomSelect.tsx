@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './CustomSelect.module.css';
 
 export interface CustomSelectProps<T> {
-    options: T[];  // Change this from T to T[]
+    options: T[];
     getOptionLabel: (option: T) => string;
     getOptionValue?: (option: T) => string | number;
     renderOption?: (option: T, isSelected: boolean) => React.ReactNode;
-    renderSelectedValue?: (option: T | T[]) => React.ReactNode;
     placeholder?: string;
     disabled?: boolean;
     showSearch?: boolean;
@@ -18,13 +17,16 @@ interface CustomSingleSelectProps<T> extends CustomSelectProps<T> {
     value: T | undefined;
     multiple?: false;
     onChange: (value: T, index: number) => void;
+    renderSelectedValue?: (option: T) => React.ReactNode;
+    renderTags?: undefined;
 }
 
 interface CustomMultipleSelectProps<T> extends CustomSelectProps<T> {
-    multiple?: true;
+    multiple: true;
     onChange: (value: T[], index: number) => void;
     value: T[] | undefined;
     renderTags?: (selectedOptions: T[]) => React.ReactNode;
+    renderSelectedValue?: (option: T[]) => React.ReactNode;
 }
 
 function CustomSelect<T>({
@@ -42,7 +44,7 @@ function CustomSelect<T>({
         getOptionLabel(option).toLowerCase().includes(searchText.toLowerCase()),
     searchPlaceholder = 'Search...',
     multiple = false,
-	renderTags = undefined,
+    renderTags,
 }: CustomSingleSelectProps<T> | CustomMultipleSelectProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -170,7 +172,11 @@ function CustomSelect<T>({
             >
                 {value ? (
                     renderSelectedValue ? (
-                        renderSelectedValue(value)
+                        multiple ? 
+                            // For multiple select
+                            (renderSelectedValue as (option: T[]) => React.ReactNode)(value as T[]) :
+                            // For single select
+                            (renderSelectedValue as (option: T) => React.ReactNode)(value as T)
                     ) : (
                         <div className={styles.selectedValue}>
                             {multiple && Array.isArray(value) ? (

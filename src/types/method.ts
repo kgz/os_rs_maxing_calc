@@ -9,16 +9,16 @@ type SkillLevels = {
 
 type Mods = keyof typeof Modifiers
 
-export type AllowedModifiers = keyof typeof Modifiers[Mods];
+export type AllowedModifiers = keyof typeof Modifiers[Mods]; 
 
 
 export type Method = {
 	id: string;
 	label: string;
 	xp: number;
-	items: { amount: number | ((fromLevel: number, toLevel:number, modifiers?: AllowedModifiers[]) => number), item: Item, link?: string }[];
-	returns: { amount: number | ((fromLevel: number, toLevel:number, modifiers?: AllowedModifiers[]) => number), item: Item, link?: string }[];
-	// pehaps we add a lower and upper bound on the number of actions
+	items: { amount: number | ((fromLevel: number, toLevel:number, modifiers?: string[]) => number), item: Item, link?: string }[];
+	returns: { amount: number | ((fromLevel: number, toLevel:number, modifiers?: string[]) => number), item: Item, link?: string }[];
+	// perhaps we add a lower and upper bound on the number of actions
 	actionsPerHour: number;
 	requirement: {
 		levels: SkillLevels;

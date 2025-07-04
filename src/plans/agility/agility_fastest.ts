@@ -16,7 +16,7 @@ export default {
         },
         {
             from: 62,
-            method: SkillMethods.Agility.hallowedsepulchre,
+            method: SkillMethods.Agility.hallowedSepulchre,
         },
        
     ]

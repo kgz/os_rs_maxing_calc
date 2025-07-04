@@ -30,7 +30,7 @@ const slice = createSlice({
 	extraReducers: (builder) => {
 		builder.addCase(fetchCharacterStats.fulfilled, (state, action) => {
 			const characterName = action.meta.arg;
-			// for each stat, check if its already in [chcracter_name][skill_id][epoch]
+			// for each stat, check if its already in [character_name][skill_id][epoch]
 			// only if its different from the previous epoch add it to the state
 			const stats = action.payload.skills;
 			for (const skill of stats) {

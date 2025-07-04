@@ -27,6 +27,7 @@ import getStoredState from "redux-persist/es/getStoredState";
 
 const persistConfig: PersistConfig<DefaultRootState> = {
     key: "root",
+	// cspell: words BAWP
     storage: storage("BAWP"),
 };
 

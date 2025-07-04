@@ -32,8 +32,8 @@ export default {
 			},
 		},
 	},
-	hallowedsepulchre: {
-		id: "hallowedsepulchre",
+	hallowedSepulchre: {
+		id: "hallowedSepulchre",
 		label: "Hallowed Sepulchre",
 		xp: 6000, // Approximate XP per run, varies by floor
 		items: [],
@@ -88,8 +88,8 @@ export default {
 			},
 		},
 	},
-	priffdinasAgilityCourse: {
-		id: "priffdinasAgilityCourse",
+	prifddinasAgilityCourse: {
+		id: "prifddinasAgilityCourse",
 		label: "Prifddinas Agility Course",
 		xp: 1160, // XP per lap
 		items: [],

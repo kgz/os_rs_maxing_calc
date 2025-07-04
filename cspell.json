@@ -1,0 +1,73 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "australia",
+    "runescape",
+    "osrs",
+    "maxing",
+    "hosidius",
+    "ectofuntus",
+    "unnoting",
+    "bbsb",
+    "bbssw",
+    "dbct",
+    "dbecto",
+    "sdct",
+    "gauntlets",
+	"Attack",
+    "Defence",
+    "Strength",
+    "Hitpoints",
+    "Ranged",
+    "Prayer",
+    "Magic",
+    "Cooking",
+    "Woodcutting",
+    "Fletching",
+    "Fishing",
+    "Firemaking",
+    "Crafting",
+    "Smithing",
+    "Mining",
+    "Herblore",
+    "Agility",
+    "Thieving",
+    "Slayer",
+    "Farming",
+    "Runecraft",
+    "Hunter",
+    "Construction",
+	"anglerfish"
+  ],
+  "dictionaries": [
+    "en_US",
+    "companies",
+    "softwareTerms",
+    "typescript",
+    "node",
+    "osrs-items",
+    "package"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "osrs-items",
+      "path": "./.cspell/cspell-osrs-items.txt",
+      "description": "OSRS Item Names Dictionary"
+    },
+    {
+      "name": "package",
+      "path": "./.cspell/cspell-package.txt",
+      "description": "Package Specific Dictionary"
+    }
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "*.min.*",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "itemIds.txt"
+  ]
+}

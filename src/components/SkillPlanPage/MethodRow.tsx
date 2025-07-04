@@ -33,6 +33,14 @@ type Props = {
 	isLastMethod: boolean;
 	isActive: boolean;
 }
+
+type ModifierMethod = {
+  label: string;
+  uniqueWith?: string[];
+  image?: string;
+  stats?: string;
+};
+
 // Component for the method row
 const MethodRow = ({
 	index,
@@ -105,18 +113,19 @@ const MethodRow = ({
 	const skill_modifiers = useMemo(() => {
 		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
 			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
-			return { keys: [] as string[], methods: {} as Record<string, never> };
+			return { keys: [] as string[], methods: {} as Record<string, ModifierMethod> };
 		}
 
 		const skill_m = Modifiers[skillId as keyof typeof Modifiers];
-		return { keys: Object.keys(skill_m), methods: skill_m };
+		return { keys: Object.keys(skill_m), methods: skill_m as Record<string, ModifierMethod> };
 	}, [skillId]);
 
 
 	const filtered_skill_modifiers = useMemo(() => {
-		console.log(skill_modifiers.keys, )
-		return skill_modifiers.keys.filter(m => origMethod.allowed_modifiers?.includes(m));
-    }, [skill_modifiers.keys, origMethod.allowed_modifiers]);
+    return skill_modifiers.keys.filter(m => 
+        (origMethod.allowed_modifiers as string[] | undefined)?.includes(m)
+    );
+}, [skill_modifiers.keys, origMethod.allowed_modifiers]);
 	
 
 	return (
@@ -254,7 +263,7 @@ const MethodRow = ({
 					{filtered_skill_modifiers.length > 0 && <CustomSelect
 						options={filtered_skill_modifiers}
 						value={selectedModifier}
-						onChange={function (value: string[]): void {
+						onChange={function (value): void {
 							// Handle uniqueWith constraints
 							if (value.length > selectedModifier.length) {
 								// A new modifier was added
@@ -265,7 +274,7 @@ const MethodRow = ({
 									if (optionData?.uniqueWith && optionData.uniqueWith.length > 0) {
 										// Remove any conflicting modifiers
 										const filteredValue = value.filter(mod => 
-											mod === newModifier || !optionData.uniqueWith.includes(mod)
+											mod === newModifier || !optionData.uniqueWith?.includes(mod)
 										);
 										setSelectedItemModifier(filteredValue);
 										return;
@@ -274,7 +283,7 @@ const MethodRow = ({
 							}
 							setSelectedItemModifier(value);
 						}}
-						getOptionLabel={function (option: string): string {
+						getOptionLabel={function (option): string {
 							if (option in skill_modifiers.methods) {
 								const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
 								return optionData?.label || option;
@@ -366,7 +375,7 @@ const MethodRow = ({
 								})}
 							</div>
 						)}
-						multiple={true}
+						multiple
 
 
 					></CustomSelect> || <>N/A</>}
