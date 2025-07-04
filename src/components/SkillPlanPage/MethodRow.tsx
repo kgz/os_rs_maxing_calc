@@ -443,7 +443,18 @@ const MethodRow = ({
 																{skillId === 'Cooking' && (
 																	<CookingBurnRateGraph
 																		baseLevel={origMethod.requirement.levels.Cooking || 1}
-																		maxLevel={origMethod.id === 'shark' ? 99 : (origMethod.id === 'anglerfish' ? 99 : 92)}
+																		maxLevel={
+																			origMethod.id === 'shark' ? 99 : 
+																			origMethod.id === 'anglerfish' ? 99 : 
+																			origMethod.id === 'darkCrab' ? 99 : 
+																			origMethod.id === 'shrimpAnchovies' ? 34 :
+																			origMethod.id === 'trout' ? 49 :
+																			origMethod.id === 'salmon' ? 58 :
+																			origMethod.id === 'karambwan' ? 99 :
+																			origMethod.id === 'lobster' ? 74 :
+																			origMethod.id === 'swordfish' ? 86 :
+																			origMethod.id === 'monkfish' ? 92 : 99
+																		}
 																		minRate={
 																			origMethod.id === 'shrimpAnchovies' ? 0.5 :
 																			origMethod.id === 'trout' ? 0.53 :
@@ -454,14 +465,16 @@ const MethodRow = ({
 																			origMethod.id === 'monkfish' ? 0.6875 :
 																			origMethod.id === 'shark' ? 0.6404 :
 																			origMethod.id === 'anglerfish' ? 0.668 :
-																			origMethod.id === 'darkCrab' ? 0.9 : 0.6
+																			origMethod.id === 'darkCrab' ? 0.8 : 0.6
 																		}
 																		maxRate={
 																			origMethod.id === 'shark' ? 0.793 :
-																			origMethod.id === 'anglerfish' ? 0.7852 : 1.0
+																			origMethod.id === 'anglerfish' ? 0.7852 :
+																			origMethod.id === 'darkCrab' ? 0.8711 : 1.0
 																		}
 																		selectedModifiers={selectedModifier}
 																		foodName={origMethod.label}
+																		allowedModifiers={origMethod.allowed_modifiers ?? []}
 																	/>
 																)}
 															</div>

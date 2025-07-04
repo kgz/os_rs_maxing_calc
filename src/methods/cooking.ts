@@ -408,7 +408,7 @@ export default {
 			{
 				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					// Base success rate for dark crabs
-					const baseSuccessRate = 0.9; // 90% success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 90, 99, 0.8, 0.8711);
 					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
 					return 1 / modifiedSuccessRate;
 				},
@@ -420,7 +420,7 @@ export default {
 			{
 				amount: (fromLevel: number, toLevel: number, modifiers) => {
 					// Base success rate for dark crabs
-					const baseSuccessRate = 0.9; // 90% success rate
+					const baseSuccessRate = getAverageCookRate(fromLevel, toLevel, 90, 99, 0.8, 0.8711);
 					const modifiedSuccessRate = applyCookingModifiers(baseSuccessRate, modifiers);
 					return (1 - modifiedSuccessRate) / modifiedSuccessRate;
 				},
@@ -434,7 +434,7 @@ export default {
 				"Cooking": 90
 			},
 		},
-		allowed_modifiers: ['gauntlets', 'hosidius_easy', 'hosidius_elite']
+		allowed_modifiers: ['hosidius_easy', 'hosidius_elite']
 	},
 	wine: {
 		id: "wine",
