@@ -5,7 +5,7 @@ import Agility from "./agility"
 import Attack from "./attack"
 import Cooking from "./cooking"
 import Construction from "./construction"
-
+import Farming from "./farming"
 
 export const SkillMethods = {
 	Attack,
@@ -13,7 +13,8 @@ export const SkillMethods = {
 	Crafting,
 	Cooking,
 	Construction,
-	Agility
+	Agility,
+	Farming
 } as const satisfies {
 	[key: string]: Methods
 }

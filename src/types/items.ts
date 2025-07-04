@@ -434,5 +434,13 @@ export const Items = {
 	BurntAnglerfish:{
 		id: 13443,
         label: 'Burnt anglerfish',
-	}
+	},
+	PotatoSeed: {
+		id: 3581,
+        label: 'Potato seeds',
+	},
+	Potato: {
+		id: 1942,
+        label: 'Potatoes',
+    },
 } as const;

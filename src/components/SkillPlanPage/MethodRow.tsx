@@ -14,6 +14,7 @@ import { Items } from "../../types/items";
 import { useLastCharacter } from "../../hooks/useLastCharacter";
 import { forwardRef } from 'react';
 import { Tooltip } from '../Tooltip/Tooltip';
+import { Modifiers } from "../../modifiers/index.ts";
 
 type Props = {
 	index: string;
@@ -76,6 +77,15 @@ const MethodRow = ({
 		}
 	};
 
+	const skill_modifiers = useMemo(() => {
+		if (Object.keys(Modifiers).indexOf(skillId ?? '') === -1) {
+			console.log('No skill modifiers found for', skillId, "in ", Object.keys(Modifiers));
+			return [];
+        }
+		return Object.values(Modifiers[skillId as keyof typeof Modifiers]);
+
+	}, [skillId])
+
 	const rowStyle = {
 		// opacity: isActive ? 1 : 0.5,
 		color: isActive ? 'inherit' : '#888',
@@ -91,7 +101,7 @@ const MethodRow = ({
 		if (!orig) {
 			throw new Error(`Method not found for skill ${skillId} and method id ${plan.method.id}`);
 		}
-		console.log({orig})
+		console.log({ orig })
 		return orig;
 	}, [plan.method, skillId])
 
@@ -252,7 +262,31 @@ const MethodRow = ({
 					</div>
 
 				</td>
-				<td style={{ paddingBottom: 5 }}>{origMethod.xp}</td>
+				{/* <td style={{ paddingBottom: 5 }}>{origMethod.xp}</td> */}
+				<td style={{ paddingBottom: 5 }}>
+					{/* modifiers */}
+					<CustomSelect 
+						options={skill_modifiers} 
+						value={undefined} 
+						onChange={function (value, index: number): void {
+							throw new Error("Function not implemented.");
+						}} 
+						getOptionLabel={function (option): string {
+							return option?.label ?? '';
+						}}
+						renderOption={(option) => {
+							return (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {option?.image && <img src ={option.image} width="24" height="24" /> }
+                                    <span>{option?.label}</span>
+									{option?.stats && <span style={{ color: '#666666' }}>{option?.stats}</span>}
+                                </div>
+                            );
+						}}
+
+					></CustomSelect>
+
+				</td>
 				{isActive ? (
 					<>
 						<td style={{ paddingBottom: 5 }}>
@@ -376,7 +410,14 @@ const MethodRow = ({
 						</td>
 						<td>
 							<Tooltip
-								content={`Estimated time to complete: ${calculateTimeToComplete()}`}
+								content={
+									<>
+										{origMethod.xp}xp per action at {origMethod.actionsPerHour.toLocaleString("en-AU", {
+											notation: 'compact',
+										})} actions/hour.
+									</>
+
+								}
 								position="top"
 							>
 								<span>{calculateTimeToComplete()}</span>
