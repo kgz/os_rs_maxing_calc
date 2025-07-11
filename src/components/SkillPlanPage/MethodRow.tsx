@@ -178,7 +178,7 @@ const MethodRow = ({
 					/>
 				</td>
 				<td style={{ paddingBottom: 5 }}>{xpToNext.toLocaleString('en-au', { notation: 'compact' })}</td>
-				{skill_modifiers.keys.length > 0 && <td style={{ paddingBottom: 5 }}>
+				<td style={{ paddingBottom: 5 }}>
 
 					<div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} data-key={index}>
 						{(origMethod.requirement.levels[skillId as keyof typeof origMethod.requirement.levels] ?? 0) > from && (
@@ -256,9 +256,9 @@ const MethodRow = ({
 						/>
 					</div>
 
-				</td>}
+				</td>
 				{/* <td style={{ paddingBottom: 5 }}>{origMethod.xp}</td> */}
-				<td style={{ paddingBottom: 5 }}>
+				{skill_modifiers.keys.length > 0 && <td style={{ paddingBottom: 5 }}>
 					{/* modifiers */}
 					{filtered_skill_modifiers.length > 0 && <CustomSelect
 						options={filtered_skill_modifiers}
@@ -380,7 +380,7 @@ const MethodRow = ({
 
 					></CustomSelect> || <>N/A</>}
 
-				</td>
+				</td>}
 				{isActive ? (
 					<>
 						<td style={{ paddingBottom: 5 }}>

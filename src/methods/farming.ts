@@ -1,4 +1,5 @@
 import { Items } from "../types/items";
+import type { Methods } from "../types/method";
 
 export default {
   // Allotments
@@ -25,7 +26,6 @@ export default {
     xp: 9.5,
     items: [
       { amount: 1, item: Items.OnionSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
       { amount: 3, item: Items.Onion }
@@ -43,7 +43,6 @@ export default {
     xp: 10,
     items: [
       { amount: 1, item: Items.CabbageSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
       { amount: 3, item: Items.Cabbage }
@@ -61,7 +60,6 @@ export default {
     xp: 12.5,
     items: [
       { amount: 1, item: Items.TomatoSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
       { amount: 3, item: Items.Tomato }
@@ -81,7 +79,6 @@ export default {
     xp: 12.5,
     items: [
       { amount: 1, item: Items.GuamSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
       { amount: 6, item: Items.GuamLeaf }
@@ -99,10 +96,9 @@ export default {
     xp: 15,
     items: [
       { amount: 1, item: Items.MarrentillSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
-      { amount: 6, item: Items.MarrentillHerb }
+      { amount: 6, item: Items.GrimyMarrentill }
     ],
     actionsPerHour: 8,
     requirement: {
@@ -117,10 +113,9 @@ export default {
     xp: 30.5,
     items: [
       { amount: 1, item: Items.RanarrSeed },
-      { amount: 1, item: Items.Dibber },
     ],
     returns: [
-      { amount: 6, item: Items.RanarrWeed }
+      { amount: 6, item: Items.GrimyRanarrWeed }
     ],
     actionsPerHour: 8,
     requirement: {
@@ -137,7 +132,6 @@ export default {
     xp: 481.3,
     items: [
       { amount: 1, item: Items.OakSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.5, // Trees take longer to grow
@@ -153,7 +147,6 @@ export default {
     xp: 1481.5,
     items: [
       { amount: 1, item: Items.WillowSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.5,
@@ -169,7 +162,6 @@ export default {
     xp: 3448.4,
     items: [
       { amount: 1, item: Items.MapleSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.5,
@@ -185,7 +177,6 @@ export default {
     xp: 7069.9,
     items: [
       { amount: 1, item: Items.YewSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.5,
@@ -201,7 +192,6 @@ export default {
     xp: 13768.3,
     items: [
       { amount: 1, item: Items.MagicSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.5,
@@ -219,10 +209,9 @@ export default {
     xp: 1199.5,
     items: [
       { amount: 1, item: Items.AppleSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [
-      { amount: 6, item: Items.Apple }
+      { amount: 6, item: Items.CookingApple }
     ],
     actionsPerHour: 0.3,
     requirement: {
@@ -237,7 +226,6 @@ export default {
     xp: 1750.5,
     items: [
       { amount: 1, item: Items.BananaSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [
       { amount: 6, item: Items.Banana }
@@ -255,7 +243,6 @@ export default {
     xp: 10150.1,
     items: [
       { amount: 1, item: Items.PalmSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [
       { amount: 6, item: Items.Coconut }
@@ -289,7 +276,6 @@ export default {
     items: [
       { amount: 1, item: Items.TeakSapling },
       { amount: 1, item: Items.MahoganySapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.1, // Very slow growth rate
@@ -305,7 +291,6 @@ export default {
     xp: 12096,
     items: [
       { amount: 1, item: Items.CalquatSapling },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [
       { amount: 6, item: Items.CalquatFruit }
@@ -323,7 +308,6 @@ export default {
     xp: 19301.8,
     items: [
       { amount: 1, item: Items.SpiritSeed },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.1,
@@ -339,14 +323,12 @@ export default {
     xp: 12600,
     items: [
       { amount: 1, item: Items.HesporiSeed },
-      { amount: 1, item: Items.Spade },
     ],
     returns: [],
     actionsPerHour: 0.05, // Very rare seed
     requirement: {
       "levels": {
         "Farming": 65,
-        "Combat": 80
       },
     },
   },
