@@ -32,13 +32,12 @@ type TPlan = {
 
 type InitialState = {
     selectedPlans: TPlan,
-    plans: (Plan & { type: keyof typeof skillsEnum, id: string, character: string })[]
+    plans: (Plan & { type: keyof typeof skillsEnum, id: string, character: string, methods?: string[], modifiers?: string[] })[],
 }
-
 
 const initialState: InitialState = {
     selectedPlans: {},
-    plans: []
+    plans: [],
 }
 
 // Create the skills slice
@@ -47,8 +46,87 @@ const skillsSlice = createSlice({
     initialState,
     reducers: {
         // Add a new reducer to handle adding custom plans
-        addCustomPlan(state, action: PayloadAction<Plan & { type: keyof typeof skillsEnum, id: string, character: string }>) {
+        addCustomPlan(state, action: PayloadAction<InitialState['plans'][0]>) {
             state.plans.push(action.payload);
+        },
+        
+        // Add new reducer for modifiers
+        setMethodModifiers(state, action: PayloadAction<{
+        	characterName: string,
+			planId: string,
+			skill: string,
+			methodIndex: string,
+			modifiers: string[]
+        }>) {
+            const { characterName, modifiers, skill, methodIndex, planId } = action.payload;
+
+			let planIndex = state.plans.findIndex(p => p.id === planId);
+
+			if (planIndex === -1) {
+				if (!isValidSkill(skill)) {
+					console.error(`No plans found for skill: ${skill}`);
+					return;
+				}
+
+				const skillPlans = Plans[skill];
+
+				const templatePlan = Object.values(skillPlans).find(p => p.id === planId) as Plan | null;
+				if (!templatePlan) {
+					console.error(`Template plan not found: ${planId} for skill: ${skill}`);
+					return;
+				}
+
+				const newPlan = {
+					...templatePlan,
+					id: v4(),
+					label: `${templatePlan.label} (Custom)`,
+					type: skill,
+					character: characterName
+				};
+
+				state.plans.push(newPlan);
+
+				if (!state.selectedPlans[characterName]) {
+					state.selectedPlans[characterName] = {};
+				}
+				state.selectedPlans[characterName][skill] = newPlan.id;
+
+				planIndex = state.plans.length - 1;
+			}
+
+
+			const plan = state.plans[planIndex];
+
+			const method = plan.methods?.[Number(methodIndex)];
+
+			if (!method) {
+				throw new Error(`Method not found at index: ${methodIndex} in plan: ${planId}`);
+            }
+
+			// state.plans[planIndex].methods[Number(methodIndex)].modifiers = modifiers;
+			const newMethods = [...plan.methods];
+			newMethods[Number(methodIndex)] = {
+				...newMethods[Number(methodIndex)],
+				modifiers,
+			};
+
+			state.plans[planIndex] = {
+				...plan,
+				methods: newMethods,
+			};
+        },
+        
+        // Add a reducer to clear modifiers
+        clearMethodModifiers(state, action: PayloadAction<{
+            characterName: string,
+            skill: string,
+            methodId: string
+        }>) {
+            // const { characterName, skill, methodId } = action.payload;
+            
+            // if (state.modifiers[characterName]?.[skill]?.[methodId]) {
+            //     delete state.modifiers[characterName][skill][methodId];
+            // }
         }
     },
     extraReducers: (builder) => {
@@ -398,5 +476,5 @@ const skillsSlice = createSlice({
 
 
 // Export the reducer
-export const { addCustomPlan } = skillsSlice.actions;
+export const { addCustomPlan, setMethodModifiers, clearMethodModifiers } = skillsSlice.actions;
 export const skillsReducer = skillsSlice.reducer;

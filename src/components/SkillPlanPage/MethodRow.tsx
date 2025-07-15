@@ -17,6 +17,7 @@ import { Tooltip } from '../Tooltip/Tooltip';
 import { Modifiers } from "../../modifiers/index.ts";
 import styles from './MethodRow.module.css';
 import CookingBurnRateGraph from '../CookingBurnRateGraph/CookingBurnRateGraph';
+import { setMethodModifiers } from "../../store/slices/skillsSlice";
 
 type Props = {
 	index: string;
@@ -35,10 +36,10 @@ type Props = {
 }
 
 type ModifierMethod = {
-  label: string;
-  uniqueWith?: string[];
-  image?: string;
-  stats?: string;
+	label: string;
+	uniqueWith?: string[];
+	image?: string;
+	stats?: string;
 };
 
 // Component for the method row
@@ -59,7 +60,14 @@ const MethodRow = ({
 
 	const characters = useAppSelector(state => state.characterReducer)
 	const character = useLastCharacter(characters);
-	const [selectedModifier, setSelectedItemModifier] = useState<string[]>([]);
+	const modifiers = useAppSelector(state => {
+		const planFromState = state.skillsReducer.plans.find(p => p.id === currentSelectedPlan.id);
+		if (planFromState) {
+			return planFromState.methods?.[Number(index)]?.modifiers ?? [];
+		}
+		return currentSelectedPlan.methods?.[Number(index)]?.modifiers ?? [];
+	});
+
 
 	// Calculate time to complete based on actions per hour
 	const calculateTimeToComplete = () => {
@@ -88,7 +96,7 @@ const MethodRow = ({
 		}
 	};
 
-	
+
 
 	const rowStyle = {
 		// opacity: isActive ? 1 : 0.5,
@@ -105,7 +113,7 @@ const MethodRow = ({
 		if (!orig) {
 			throw new Error(`Method not found for skill ${skillId} and method id ${plan.method.id}`);
 		}
-		console.log({ orig })
+		// console.log({ orig })
 		return orig;
 	}, [plan.method, skillId])
 
@@ -122,11 +130,21 @@ const MethodRow = ({
 
 
 	const filtered_skill_modifiers = useMemo(() => {
-    return skill_modifiers.keys.filter(m => 
-        (origMethod.allowed_modifiers as string[] | undefined)?.includes(m)
-    );
-}, [skill_modifiers.keys, origMethod.allowed_modifiers]);
-	
+		return skill_modifiers.keys.filter(m =>
+			(origMethod.allowed_modifiers as string[] | undefined)?.includes(m)
+		);
+	}, [skill_modifiers.keys, origMethod.allowed_modifiers]);
+
+	const updateModifiers = (newModifiers: string[]) => {
+		console.log(newModifiers, {index, currentSelectedPlan});
+		dispatch(setMethodModifiers({
+			characterName: character?.username ?? '',
+			planId: currentSelectedPlan.id,
+			skill: skillId ?? '',
+			methodIndex: index,
+			modifiers: newModifiers
+		}));
+	};
 
 	return (
 		<Fragment key={index} >
@@ -262,26 +280,26 @@ const MethodRow = ({
 					{/* modifiers */}
 					{filtered_skill_modifiers.length > 0 && <CustomSelect
 						options={filtered_skill_modifiers}
-						value={selectedModifier}
+						value={modifiers}
 						onChange={function (value): void {
 							// Handle uniqueWith constraints
-							if (value.length > selectedModifier.length) {
+							if (value.length > modifiers.length) {
 								// A new modifier was added
-								const newModifier = value.find(mod => !selectedModifier.includes(mod));
+								const newModifier = value.find(mod => !modifiers.includes(mod));
 								if (newModifier) {
 									// Check if the new modifier conflicts with any existing ones
 									const optionData = skill_modifiers.methods[newModifier as keyof typeof skill_modifiers.methods];
 									if (optionData?.uniqueWith && optionData.uniqueWith.length > 0) {
 										// Remove any conflicting modifiers
-										const filteredValue = value.filter(mod => 
+										const filteredValue = value.filter(mod =>
 											mod === newModifier || !optionData.uniqueWith?.includes(mod)
 										);
-										setSelectedItemModifier(filteredValue);
+										updateModifiers(filteredValue);
 										return;
 									}
 								}
 							}
-							setSelectedItemModifier(value);
+							updateModifiers(value);
 						}}
 						getOptionLabel={function (option): string {
 							if (option in skill_modifiers.methods) {
@@ -293,30 +311,30 @@ const MethodRow = ({
 						renderOption={(option: string) => {
 							// Use type assertion to tell TypeScript that this is a valid key
 							const optionData = skill_modifiers.methods[option as keyof typeof skill_modifiers.methods];
-							
+
 							// // Check if this option conflicts with any selected modifiers
-							// const isDisabled = selectedModifier.some(selectedMod => {
+							// const isDisabled = modifiers.some(selectedMod => {
 							// 	const selectedModData = skill_modifiers.methods[selectedMod as keyof typeof skill_modifiers.methods];
 							// 	return selectedModData?.uniqueWith?.includes(option);
 							// });
-							
+
 							return (
-								<div 
-									style={{ 
-									  display: 'flex', 
-									  alignItems: 'center', 
-									  gap: '4px',
-									//   opacity: isDisabled ? 0.5 : 1,
-									//   cursor: isDisabled ? 'not-allowed' : 'pointer'
+								<div
+									style={{
+										display: 'flex',
+										alignItems: 'center',
+										gap: '4px',
+										//   opacity: isDisabled ? 0.5 : 1,
+										//   cursor: isDisabled ? 'not-allowed' : 'pointer'
 									}}
 								>
 									{optionData?.image &&
-									  <img
-										src={optionData.image}
-										width="20"
-										height="20"
-										alt={optionData?.label || option}
-									  />
+										<img
+											src={optionData.image}
+											width="20"
+											height="20"
+											alt={optionData?.label || option}
+										/>
 									}
 									<span>{optionData?.label}</span>
 									{optionData?.stats && <span style={{ color: '#666666' }}>{optionData?.stats}</span>}
@@ -334,8 +352,8 @@ const MethodRow = ({
 											key={option}
 											onClick={(e) => {
 												e.stopPropagation();
-												const newValue = selectedModifier.filter(item => item !== option);
-												setSelectedItemModifier(newValue);
+												const newValue = modifiers.filter(item => item !== option);
+												updateModifiers(newValue);
 											}}
 											style={{
 												cursor: 'pointer',
@@ -352,8 +370,8 @@ const MethodRow = ({
 														className={styles.trashOverlay}
 														onClick={(e) => {
 															e.stopPropagation();
-															const newValue = selectedModifier.filter(item => item !== option);
-															setSelectedItemModifier(newValue);
+															const newValue = modifiers.filter(item => item !== option);
+															updateModifiers(newValue);
 														}}
 													>
 														<Trash2 size={12} color="white" />
@@ -363,7 +381,7 @@ const MethodRow = ({
 														width="20"
 														height="20"
 														style={{
-												padding: '2px 4px'
+															padding: '2px 4px'
 
 														}}
 														alt={optionData?.label || option}
@@ -387,7 +405,7 @@ const MethodRow = ({
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 								{origMethod.items.map((itemData, idx) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
-									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel, selectedModifier) : itemData.amount;
+									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel, modifiers) : itemData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -420,8 +438,7 @@ const MethodRow = ({
 										return <span>-</span>;
 									}
 									const outputItem = Object.values(Items).find((i) => i.id === outputData.item.id);
-									console.log({ outputData, outputItem });
-									const amount = typeof outputData.amount === 'function' ? outputData.amount(from, nextLevel, selectedModifier) : outputData.amount;
+									const amount = typeof outputData.amount === 'function' ? outputData.amount(from, nextLevel, modifiers) : outputData.amount;
 
 									return (
 										<div key={idx} style={{ display: 'flex', alignItems: 'center' }}>
@@ -448,40 +465,40 @@ const MethodRow = ({
 												outputData.link && (
 													<Tooltip
 														content={
-															<div style={{width:400}}>
+															<div style={{ width: 400 }}>
 																{skillId === 'Cooking' && (
 																	<CookingBurnRateGraph
 																		baseLevel={origMethod.requirement.levels.Cooking || 1}
 																		maxLevel={
-																			origMethod.id === 'shark' ? 99 : 
-																			origMethod.id === 'anglerfish' ? 99 : 
-																			origMethod.id === 'darkCrab' ? 99 : 
-																			origMethod.id === 'shrimpAnchovies' ? 34 :
-																			origMethod.id === 'trout' ? 49 :
-																			origMethod.id === 'salmon' ? 58 :
-																			origMethod.id === 'karambwan' ? 99 :
-																			origMethod.id === 'lobster' ? 74 :
-																			origMethod.id === 'swordfish' ? 86 :
-																			origMethod.id === 'monkfish' ? 92 : 99
+																			origMethod.id === 'shark' ? 99 :
+																				origMethod.id === 'anglerfish' ? 99 :
+																					origMethod.id === 'darkCrab' ? 99 :
+																						origMethod.id === 'shrimpAnchovies' ? 34 :
+																							origMethod.id === 'trout' ? 49 :
+																								origMethod.id === 'salmon' ? 58 :
+																									origMethod.id === 'karambwan' ? 99 :
+																										origMethod.id === 'lobster' ? 74 :
+																											origMethod.id === 'swordfish' ? 86 :
+																												origMethod.id === 'monkfish' ? 92 : 99
 																		}
 																		minRate={
 																			origMethod.id === 'shrimpAnchovies' ? 0.5 :
-																			origMethod.id === 'trout' ? 0.53 :
-																			origMethod.id === 'salmon' ? 0.6172 :
-																			origMethod.id === 'karambwan' ? 0.6172 :
-																			origMethod.id === 'lobster' ? 0.6 :
-																			origMethod.id === 'swordfish' ? 0.5547 :
-																			origMethod.id === 'monkfish' ? 0.6875 :
-																			origMethod.id === 'shark' ? 0.6404 :
-																			origMethod.id === 'anglerfish' ? 0.668 :
-																			origMethod.id === 'darkCrab' ? 0.8 : 0.6
+																				origMethod.id === 'trout' ? 0.53 :
+																					origMethod.id === 'salmon' ? 0.6172 :
+																						origMethod.id === 'karambwan' ? 0.6172 :
+																							origMethod.id === 'lobster' ? 0.6 :
+																								origMethod.id === 'swordfish' ? 0.5547 :
+																									origMethod.id === 'monkfish' ? 0.6875 :
+																										origMethod.id === 'shark' ? 0.6404 :
+																											origMethod.id === 'anglerfish' ? 0.668 :
+																												origMethod.id === 'darkCrab' ? 0.8 : 0.6
 																		}
 																		maxRate={
 																			origMethod.id === 'shark' ? 0.793 :
-																			origMethod.id === 'anglerfish' ? 0.7852 :
-																			origMethod.id === 'darkCrab' ? 0.8711 : 1.0
+																				origMethod.id === 'anglerfish' ? 0.7852 :
+																					origMethod.id === 'darkCrab' ? 0.8711 : 1.0
 																		}
-																		selectedModifiers={selectedModifier}
+																		selectedModifiers={modifiers}
 																		foodName={origMethod.label}
 																		allowedModifiers={origMethod.allowed_modifiers ?? []}
 																		fromLevel={from}
@@ -512,14 +529,14 @@ const MethodRow = ({
 								let costPerAction = 0;
 
 								inputItems.forEach(item => {
-									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, selectedModifier) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, modifiers) : item.amount;
 									const cost = getItemPrice(item.item?.id) ?? 0;
 									costPerAction += cost * amount;
 								});
 
 								outputItems.forEach(item => {
 									const cost = getItemPrice(item.item?.id) ?? 0;
-									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, selectedModifier) : item.amount;
+									const amount = typeof item.amount === 'function' ? item.amount(from, nextLevel, modifiers) : item.amount;
 									costPerAction -= cost * amount;
 								});
 
@@ -537,11 +554,11 @@ const MethodRow = ({
 												<div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
 													{/* Input items */}
 													{origMethod.items.map((item, idx) => {
-														const amount = typeof item.amount === 'function' ? 
-															item.amount(from, nextLevel, selectedModifier) : item.amount;
+														const amount = typeof item.amount === 'function' ?
+															item.amount(from, nextLevel, modifiers) : item.amount;
 														const cost = getItemPrice(item.item?.id) ?? 0;
 														const totalItemCost = Math.round(cost * amount * itemsToNext);
-														
+
 														return (
 															<div key={`input-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 5 }}>
 																<span>{item.item.label}:</span>
@@ -551,14 +568,14 @@ const MethodRow = ({
 															</div>
 														);
 													})}
-													
+
 													{/* Output items */}
 													{origMethod.returns.map((item, idx) => {
-														const amount = typeof item.amount === 'function' ? 
-															item.amount(from, nextLevel, selectedModifier) : item.amount;
+														const amount = typeof item.amount === 'function' ?
+															item.amount(from, nextLevel, modifiers) : item.amount;
 														const cost = getItemPrice(item.item?.id) ?? 0;
 														const totalItemReturn = Math.round(cost * amount * itemsToNext);
-														
+
 														return (
 															<div key={`output-${idx}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 5 }}>
 																<span>{item.item.label}:</span>
@@ -568,7 +585,7 @@ const MethodRow = ({
 															</div>
 														);
 													})}
-													
+
 													<div style={{ borderTop: '1px solid #444', marginTop: '4px', paddingTop: '4px', display: 'flex', justifyContent: 'space-between' }}>
 														<span><strong>Total:</strong></span>
 														<span style={{ color: isProfit ? '#4CAF50' : '#ff4747', fontWeight: 'bold' }}>
