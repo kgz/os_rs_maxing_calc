@@ -14,7 +14,8 @@ battlestaff
 runecrafting
 Hespori
 Brimhaven
-Calquat
+calquat
+calquats
 Ranarr
 Marrentill
 Miniquest

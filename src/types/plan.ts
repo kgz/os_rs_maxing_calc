@@ -6,6 +6,7 @@ type M = Methods[keyof Methods];
 export type PlanMethod = {
   from: number;
   method: M;
+  modifiers?: string[];
 };
 
 export type Plan = {

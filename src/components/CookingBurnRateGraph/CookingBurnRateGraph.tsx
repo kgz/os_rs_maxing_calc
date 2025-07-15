@@ -69,7 +69,7 @@ const createHighlightDataset = (labels: number[], fromLevel?: number, toLevel?: 
         if (level >= fromLevel && level <= toLevel) {
             return 100; // Full height of the chart
         }
-        return null; // Use null instead of 0 to create sharp edges
+        return 0; // Return 0 instead of null to satisfy number[] type
     });
 
     return {

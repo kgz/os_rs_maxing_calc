@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import type { Plan, PlanMethod } from "../../types/plan";
 import { InfoIcon, Trash2, TriangleAlert } from "lucide-react";
@@ -65,7 +65,7 @@ const MethodRow = ({
 		if (planFromState) {
 			return planFromState.methods?.[Number(index)]?.modifiers ?? [];
 		}
-		return currentSelectedPlan.methods?.[Number(index)]?.modifiers ?? [];
+		return currentSelectedPlan.methods[Number(index)]?.modifiers ?? [];
 	});
 
 
@@ -136,7 +136,7 @@ const MethodRow = ({
 	}, [skill_modifiers.keys, origMethod.allowed_modifiers]);
 
 	const updateModifiers = (newModifiers: string[]) => {
-		console.log(newModifiers, {index, currentSelectedPlan});
+		console.log(newModifiers, { index, currentSelectedPlan });
 		dispatch(setMethodModifiers({
 			characterName: character?.username ?? '',
 			planId: currentSelectedPlan.id,
@@ -403,7 +403,7 @@ const MethodRow = ({
 					<>
 						<td style={{ paddingBottom: 5 }}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-								{origMethod.items.map((itemData, idx) => {
+								{origMethod.items.map((itemData, idx: number) => {
 									const item = Object.values(Items).find((i) => i.id === itemData.item.id);
 									const amount = typeof itemData.amount === 'function' ? itemData.amount(from, nextLevel, modifiers) : itemData.amount;
 
@@ -432,7 +432,7 @@ const MethodRow = ({
 						{/* New output column */}
 						<td style={{ paddingBottom: 5 }}>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-								{origMethod.returns?.map((outputData, idx) => {
+								{origMethod.returns?.map((outputData, idx: number) => {
 									if (!outputData.item) {
 										console.warn(`No item found for output: ${JSON.stringify(outputData)}`);
 										return <span>-</span>;

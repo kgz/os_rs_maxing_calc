@@ -1,7 +1,7 @@
 import { createSlice, current, type PayloadAction } from '@reduxjs/toolkit';
 import { Plans } from '../../plans/plans';
 import { setSelectedPlan } from '../thunks/skills/setSelectedPlan';
-import type { Plan } from '../../types/plan';
+import type { Plan, PlanMethod } from '../../types/plan';
 import { skillsEnum } from '../../types/skillsResponse';
 import { setPlanFromLevel } from '../thunks/skills/setPlanFromLevel';
 import { addNewMethodToPlan } from '../thunks/skills/addNewMethodToPlan';
@@ -32,7 +32,7 @@ type TPlan = {
 
 type InitialState = {
     selectedPlans: TPlan,
-    plans: (Plan & { type: keyof typeof skillsEnum, id: string, character: string, methods?: string[], modifiers?: string[] })[],
+    plans: (Plan & { type: keyof typeof skillsEnum, id: string, character: string })[],
 }
 
 const initialState: InitialState = {
@@ -117,11 +117,7 @@ const skillsSlice = createSlice({
         },
         
         // Add a reducer to clear modifiers
-        clearMethodModifiers(state, action: PayloadAction<{
-            characterName: string,
-            skill: string,
-            methodId: string
-        }>) {
+        clearMethodModifiers() {
             // const { characterName, skill, methodId } = action.payload;
             
             // if (state.modifiers[characterName]?.[skill]?.[methodId]) {
@@ -284,7 +280,7 @@ const skillsSlice = createSlice({
             const userPlans = state.plans[planIndex];
 
 			const _lastMethod = JSON.parse(JSON.stringify(userPlans.methods)) as typeof userPlans.methods;
-			const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0);
+			            const lastMethod = Object.values(_lastMethod).sort((a, b) => b.from - a.from).at(0) as PlanMethod;
 
 			// if (!defaultMethod) {
 			// 	throw new Error('No default method found for ' + skill);
@@ -292,7 +288,7 @@ const skillsSlice = createSlice({
 			// }
 
             // Add the new method to the user's plan at the specified index
-            const newMethods = [...Object.values(userPlans.methods), lastMethod] as typeof userPlans.methods;
+            const newMethods = [...(Object.values(userPlans.methods)), lastMethod];
 
 			
             state.plans[planIndex] = {
